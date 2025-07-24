@@ -8,13 +8,25 @@ rekomendacji masaży w oparciu o zgłaszane symptomy. Aplikacja będzie służy�
 właścicielom firm, jak i klientom, ułatwiając proces organizacji i rezerwacji wizyt.
 
 ## Instalacja
-```bash
-git clone git@github.com:emilia-nodz/praca-inzynierska.git
-```
+1. W terminalu:
+    ```bash
+    git clone git@github.com:emilia-nodz/praca-inzynierska.git
+    ```
+2. W folderze *docker* stwórz plik *.env* i uzupełnij go zawartością z pliku *.env.dist*, wpisując swoje dane konfiguracyjne do bazy
+    ```bash
+    cp .env.dist .env
+    ```
+    Przykładowe uzupełnienie:    
+    > POSTGRES_USER=my_user_name
 
-```bash
-docker-compose up --build
-```
+3. Zbuduj obraz
+    ```bash
+    docker-compose up --build
+    ```
+4. W celu zatrzymania projektu
+    ```bash
+    docker-compose down
+    ```
 
 # Engineering thesis
 
@@ -22,3 +34,25 @@ docker-compose up --build
 
 ## Description
 The goal of this project is to implement a web application that will enable massage businesses to manage massage therapist schedules, client bookings, and provide personalized massage recommendations based on reported symptoms. The application will serve both business owners and clients, simplifying the process of arranging and booking appointments.
+
+## Installation
+1. In terminal:
+    ```bash
+    git clone git@github.com:emilia-nodz/praca-inzynierska.git
+    ```
+
+2. In folder *docker* create file *.env* and into the file write the contents of *.env.dist* file, writing your own credentials to connect to the database
+    ```bash
+    cp .env.dist .env
+    ```
+    Przykładowe uzupełnienie:  
+    > POSTGRES_USER=my_user_name
+
+3. Build the docker container
+    ```bash
+    docker-compose up --build
+    ```
+4. In order to stop the container use:
+    ```bash
+    docker-compose down
+    ```
