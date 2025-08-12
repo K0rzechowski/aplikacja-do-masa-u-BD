@@ -1,22 +1,19 @@
 FROM node:24.0.0-alpine
 
+# Install Angular CLI globally
 RUN npm install -g @angular/cli@19
 
-WORKDIR /
-RUN mkdir /app
+# Create and set working directory
 WORKDIR /app
 
-ENV APP_NAME app
-ENV STYLE 'css'
-ENV SSR 'N'
+# Copy package files first for better caching
+COPY package.json package-lock.json ./
 
-# Generate Angular app only during image build
-RUN ng new $APP_NAME --style=$STYLE --ssr=$SSR --skip-install && \
-    mv $APP_NAME/* ./ && \
-    rm -rf $APP_NAME
+# Copy the rest of the application files
+COPY . .
 
-# Install dependencies
-RUN npm install
+# Install remaining dependencies
+RUN npm ci
 
 # Expose port
 EXPOSE 4200

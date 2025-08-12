@@ -12,6 +12,7 @@ właścicielom firm, jak i klientom, ułatwiając proces organizacji i rezerwacj
     ```bash
     git clone git@github.com:emilia-nodz/praca-inzynierska.git
     ```
+    
 2. W folderze *docker* stwórz plik *.env* i uzupełnij go zawartością z pliku *.env.dist*, wpisując swoje dane konfiguracyjne do bazy
     ```bash
     cp .env.dist .env
@@ -19,11 +20,23 @@ właścicielom firm, jak i klientom, ułatwiając proces organizacji i rezerwacj
     Przykładowe uzupełnienie:    
     > POSTGRES_USER=my_user_name
 
-3. Zbuduj obraz
+3. W folderze *backend* skompiluj projekt
     ```bash
+    ./mvnw clean package -DskipTests
+    ```
+
+4. Zbuduj obraz w folderze *docker*
+    ```bash
+    cd docker
     docker-compose up --build
     ```
-4. W celu zatrzymania projektu
+
+5. Zainstaluj tailwindcss
+    ```bash
+    docker exec -it frontend npm install tailwindcss @tailwindcss/postcss postcss --force
+    ```
+
+6. W celu zatrzymania projektu
     ```bash
     docker-compose down
     ```
@@ -45,14 +58,27 @@ The goal of this project is to implement a web application that will enable mass
     ```bash
     cp .env.dist .env
     ```
-    Przykładowe uzupełnienie:  
+    Example configuration:
     > POSTGRES_USER=my_user_name
 
-3. Build the docker container
+
+3. In folder *backend* compile the Java project
     ```bash
+    ./mvnw clean package -DskipTests
+    ```
+
+4. Build the docker container in *docker* folder
+    ```bash
+    cd docker
     docker-compose up --build
     ```
-4. In order to stop the container use:
+
+5. Install tailwindcss
+    ```bash
+    docker exec -it frontend npm install tailwindcss @tailwindcss/postcss postcss --force
+    ```
+
+6. In order to stop the container use:
     ```bash
     docker-compose down
     ```
