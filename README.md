@@ -31,14 +31,9 @@ właścicielom firm, jak i klientom, ułatwiając proces organizacji i rezerwacj
     docker-compose up --build
     ```
 
-5. Zainstaluj tailwindcss
+5. W celu zatrzymania projektu
     ```bash
-    docker exec -it frontend npm install tailwindcss @tailwindcss/postcss postcss --force
-    ```
-
-6. W celu zatrzymania projektu
-    ```bash
-    docker-compose down
+    docker-compose stop
     ```
 
 # Engineering thesis
@@ -73,12 +68,7 @@ The goal of this project is to implement a web application that will enable mass
     docker-compose up --build
     ```
 
-5. Install tailwindcss
+5. In order to stop the container use:
     ```bash
-    docker exec -it frontend npm install tailwindcss @tailwindcss/postcss postcss --force
-    ```
-
-6. In order to stop the container use:
-    ```bash
-    docker-compose down
+    docker-compose stop
     ```

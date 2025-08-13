@@ -1,0 +1,52 @@
+<nav class="px-5 py-2 bg-slate-100">
+    <div class="flex justify-between items-center md:max-w-3/4 mx-auto w-full">
+        <div class="flex flex-row items-center space-x-2">
+            <div class="relative group">
+                <button id="dropdownDefaultButton" data-dropdown-toggle="dropdownHover" class="btn bg-sky-200 flex flex-row space-x-2">
+                    <p>Wybierz placówkę</p> 
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                    </svg>
+                    
+                </button>
+                <!-- Dropdown menu -->
+                <div id="dropdown" class="absolute z-10 hidden group-hover:block bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 ">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                        <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a>
+                        </li>
+                        <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
+                        </li>
+                        <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
+                        </li>
+                        <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Sign out</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <a class="hidden md:block">Rezerwacja</a>
+        </div>
+        <div>          
+            <a routerLink="/login"  class="cursor-pointer flex flex-row space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>    
+                <p class="hidden md:block">Zaloguj się</p>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<nav>
+    <div class="px-5 py-2 md:max-w-3/4 mx-auto w-full bg-slate-50">
+        <div class="flex justify-end items-center space-x-3 md:space-x-4">
+            <a routerLink="/">Usługi</a>
+            <a routerLink="/">Cennik</a>
+            <a routerLink="/">Kontakt</a>
+        </div>
+    </div>
+    <hr class="h-px bg-slate-300 border-0">
+</nav>

@@ -1,3 +1,18 @@
-<h1 class="text-3xl font-bold underline">
-  Hello world!
-</h1>
+<div class="flex flex-col min-h-svh">
+  
+  <app-navbar></app-navbar>
+    
+  <div class="grow max-w-3/4 mx-auto w-full">
+    <router-outlet></router-outlet>
+  </div>
+
+  <footer class="max-w-3/4 mx-auto w-full">
+    <hr class="h-px bg-slate-500 border-0">
+    <div class="flex justify-start space-x-4 text-slate-500 m-2">
+      <a routerLink="/home" routerLinkActive="active">RODO</a>
+      <a routerLink="/about" routerLinkActive="active">Polityka prywatności</a>
+      <a routerLink="/about" routerLinkActive="active">Pomoc</a>
+      <a routerLink="/about" routerLinkActive="active">Dla firm</a>
+    </div>
+  </footer>
+</div>
