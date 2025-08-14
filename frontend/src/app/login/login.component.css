@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.splash {
+    @apply bg-linear-135 from-sky-100 to-emerald-50 rounded-xl shadow-lg lg:max-w-1/2 mx-auto w-full;    
+}
