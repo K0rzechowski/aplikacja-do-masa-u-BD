@@ -13,7 +13,7 @@ COPY package.json package-lock.json ./
 COPY . .
 
 # Install remaining dependencies
-RUN npm ci
+RUN npm install
 
 # Expose port
 EXPOSE 4200
