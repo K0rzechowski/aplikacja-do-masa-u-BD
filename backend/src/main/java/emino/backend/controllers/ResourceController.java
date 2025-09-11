@@ -16,7 +16,6 @@ public class ResourceController {
     @GetMapping("/public_resource")
     public ResponseEntity<String> nosecret(){
         // assuming no existing user
-
         return new ResponseEntity<>("You are in public area", HttpStatus.OK);
     }
 }

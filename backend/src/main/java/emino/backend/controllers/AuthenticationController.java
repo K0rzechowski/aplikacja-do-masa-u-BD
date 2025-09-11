@@ -85,6 +85,7 @@ public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, Http
             user.setSurname(signupRequest.getSurname());
             user.setEmail(signupRequest.getEmail());
             user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+            user.setDateOfBirth(signupRequest.getDateOfBirth());
             
             UserRole role = signupRequest.getRole() != null ? signupRequest.getRole() : UserRole.USER;
             user.setRole(role);
@@ -109,7 +110,5 @@ public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, Http
         request.getSession().invalidate();
         SecurityContextHolder.clearContext();
         return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
-
-
     }
 }
