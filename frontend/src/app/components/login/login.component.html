@@ -3,21 +3,25 @@
         <div class="max-w-3/4 mx-auto w-full">
             <h2 class="text-4xl mb-4">Zaloguj się</h2>
             <form [formGroup]="formModel" (ngSubmit)="submitLoginForm()">
-                <div>
+                <div class="mb-4">
                     <label for="email">Adres e-mail</label>
-                    <input type="email" id="email" placeholder="E-mail" formControlName="email" class="w-full p-2 border border-gray-300 rounded mb-4 bg-slate-300 text-slate-700"/>
-                    @if(formModel.controls['email'].invalid && formModel.controls['email'].touched ) {
-                        Adres e-mail jest wymagany
-                      } @else if(formModel.controls['email'].errors?.['pattern']) {
-                        Adres e-mail musi być poprawny
-                      }
+                    <input type="email" id="email" placeholder="E-mail" formControlName="email" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                    <p class="warning">
+                        @if(formModel.controls['email'].invalid && formModel.controls['email'].touched ) {
+                            Adres e-mail jest wymagany
+                        } @else if(formModel.controls['email'].errors?.['pattern']) {
+                            Adres e-mail musi być poprawny
+                        }
+                    </p>
                 </div>
-                <div>
+                <div class="mb-4">
                     <label for="password">Hasło</label>
-                    <input type="password" id="password" placeholder="Hasło" formControlName="password" class="w-full p-2 border border-gray-300 rounded mb-4 bg-slate-300 text-slate-700"/>
-                    @if(formModel.controls['password'].invalid && formModel.controls['password'].touched ) {
-                        Hasło jest wymagane
-                      }
+                    <input type="password" id="password" placeholder="Hasło" formControlName="password" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                    <p class="warning">
+                        @if(formModel.controls['password'].invalid && formModel.controls['password'].touched ) {
+                            Hasło jest wymagane
+                        }
+                    </p>
                 </div>
                 <div class="lg:flex lg:justify-between mb-4">
                     <div>
