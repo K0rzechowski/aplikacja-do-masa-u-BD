@@ -5,4 +5,7 @@ import { RegisterComponent } from './components/register/register.component';
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
+    // TODO change to user profile component
+    { path: 'profile', component: RegisterComponent },
+
 ];
