@@ -1,12 +1,11 @@
 package emino.backend.auth;
 
-import java.net.Authenticator;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import emino.backend.dto.UserResponse;
 import emino.backend.models.User;
 import emino.backend.models.UserRole;
 import emino.backend.repositories.UserRepository;
@@ -33,9 +32,20 @@ public class AuthenticationService {
             .build();
 
         userRepository.save(user);
+
         var jwtToken = jwtService.generateToken(user);
+
+        var userResponse = UserResponse.builder()
+            .name(request.getName())
+            .surname(request.getSurname())
+            .dateOfBirth(request.getDateOfBirth())
+            .email(request.getEmail())
+            .role(user.getRole())
+            .build();
+
         return AuthenticationResponse.builder()
             .token(jwtToken)
+            .user(userResponse)
             .build();
     }
 
@@ -47,8 +57,18 @@ public class AuthenticationService {
             .orElseThrow();
 
         var jwtToken = jwtService.generateToken(user);
+
+        var userResponse = UserResponse.builder()
+            .name(user.getName())
+            .surname(user.getSurname())
+            .dateOfBirth(user.getDateOfBirth())
+            .email(user.getEmail())
+            .role(user.getRole())
+            .build();
+
         return AuthenticationResponse.builder()
             .token(jwtToken)
+            .user(userResponse)
             .build();
     }
 

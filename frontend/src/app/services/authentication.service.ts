@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../models/auth/user';
-import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { AuthenticationResponse } from '../models/auth/authenticationResponse';
 import { AuthenticationRequest } from '../models/auth/authenticationRequest';
 import { RegisterRequest } from '../models/auth/registerRequest';
-
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +14,26 @@ import { RegisterRequest } from '../models/auth/registerRequest';
 export class AuthenticationService {
   
   private baseUrl = environment.userAuthUrl;
-  private currentUserSubject = new BehaviorSubject<AuthenticationRequest | null>(null);
+
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+
   public currentUser = this.currentUserSubject.asObservable();
+  public isAuthenticated = this.isAuthenticatedSubject.asObservable();
 
   constructor(private httpClient: HttpClient) { 
-    // this.checkAuthenticationStatus();
+    this.checkAuthStatus();
+  }
+
+  private checkAuthStatus() {
+    this.verify().subscribe({
+      next: (isAuth) => {
+        this.isAuthenticatedSubject.next(isAuth);
+      },
+      error: () => {
+        this.isAuthenticatedSubject.next(false);
+      }
+    })
   }
 
   register(request: RegisterRequest): Observable<AuthenticationResponse> {
@@ -29,6 +43,10 @@ export class AuthenticationService {
     };
 
     return this.httpClient.post<AuthenticationResponse>(`${this.baseUrl}/register`, request, httpOptions).pipe(
+      tap((response: any) => {
+        this.currentUserSubject.next(response.user);
+        console.log(response.user);
+      }),
       catchError(error => {
         console.error('Register error:', error);
         return throwError(() => error.error || 'Register failed');
@@ -44,9 +62,7 @@ export class AuthenticationService {
 
     return this.httpClient.post(`${this.baseUrl}/authenticate`, request, httpOptions).pipe(
       tap((response: any) => {
-        if(response.status === 'success'){
-          this.currentUserSubject.next(response.user);
-        } 
+        this.currentUserSubject.next(response.user);
       }),
       catchError(error => {
         console.error('Authenticationentication error:', error);
@@ -55,33 +71,32 @@ export class AuthenticationService {
     );
   }
 
-  // checkAuthenticationStatus(): void {
-  //   this.httpClient.get(`${this.baseUrl}/user`).subscribe({
-  //     next: (user: any) => this.currentUserSubject.next(user),
-  //     error: () => this.currentUserSubject.next(null)
-  //   })
-  // }
+  logout(): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({'Content-Type': 'application/json'}),
+      withCredentials: true
+    };
 
-  // logout(): Observable<any> {
-  //   const httpOptions = {
-  //     withCredentials: true
-  //   };
-
-  //   return this.httpClient.post(`${this.baseUrl}/logout`, {}, httpOptions).pipe(
-  //     tap(() => {
-  //       this.currentUserSubject.next(null);
-  //     }),
-  //     catchError(error => {
-  //       console.error('Logout error:', error);
-  //       return throwError(() => error.error || 'Logout failed');
-  //     })
-  //   );
-  // }
-
-  isAuthenticationenticated(): boolean {
-    return this.currentUserSubject.value != null;
+    return this.httpClient.post(`${this.baseUrl}/logout`, {}, httpOptions).pipe(
+      tap(() => {
+        this.currentUserSubject.next(null);
+      }),
+      catchError(error => {
+        console.error('Logout error:', error);
+        return throwError(() => error.error || 'Logout failed');
+      })
+    );
   }
 
-  // getCurrentUser(): 
+  private verify(): Observable<boolean> {
+    const httpOptions = {
+      withCredentials: true
+    };
+
+    return this.httpClient.get<any>(`${this.baseUrl}/verify`,  httpOptions).pipe(
+      map((response: { status: string; }) => response.status === "success"),
+      catchError(() => of(false))
+    );
+  }
 
 }
