@@ -1,5 +1,1 @@
 @import "tailwindcss";
-
-.splash {
-    @apply bg-[url(/bg-white.png)] bg-cover rounded-xl shadow-lg lg:max-w-1/2 mx-auto w-full;    
-}

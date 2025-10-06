@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment'
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { User } from '../models/auth/user';
 import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { AuthenticationResponse } from '../models/auth/authenticationResponse';
@@ -47,9 +47,22 @@ export class AuthenticationService {
         this.currentUserSubject.next(response.user);
         console.log(response.user);
       }),
-      catchError(error => {
-        console.error('Register error:', error);
-        return throwError(() => error.error || 'Register failed');
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Rejestracja nie powiodła się';
+        
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.status === 409 ) {
+          errorMessage = 'Podany email jest już przypisany do konta';
+        } else if (error.status === 400 ) {
+          errorMessage = 'Wprowadzono niepoprawne dane';
+        } else if (error.status === 0) {
+          errorMessage = 'Nie można połączyć się z serwerem';
+        } else if (error.status >= 500) {
+          errorMessage = 'Wystąpił błąd serwera';
+        }
+        
+        return throwError(() => new Error(errorMessage));
       })
     );
   }
@@ -64,9 +77,20 @@ export class AuthenticationService {
       tap((response: any) => {
         this.currentUserSubject.next(response.user);
       }),
-      catchError(error => {
-        console.error('Authenticationentication error:', error);
-        return throwError(() => error.error || 'Authenticationentication failed');
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Nieudana autoryzacja';
+        
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.status === 401 || error.status === 403 ) {
+          errorMessage = 'Wprowadzono niepoprawny email lub hasło';
+        } else if (error.status === 0) {
+          errorMessage = 'Nie można połączyć się z serwerem';
+        } else if (error.status >= 500) {
+          errorMessage = 'Wystąpił błąd serwera';
+        }
+        
+        return throwError(() => new Error(errorMessage));
       })
     );
   }
@@ -98,5 +122,4 @@ export class AuthenticationService {
       catchError(() => of(false))
     );
   }
-
 }

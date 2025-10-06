@@ -4,16 +4,36 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatHint, MatInputModule, MatLabel} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {provideNativeDateAdapter} from '@angular/material/core'
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { Form, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthenticationService } from '../../services/authentication.service';
 import { LocalDate } from 'local-date';
 import { RegisterRequest } from '../../models/auth/registerRequest';
 import PasswordValidator from '../../validators/password.validator';
+import localePl from '@angular/common/locales/pl';
+import 'moment/locale/pl';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
+
+registerLocaleData(localePl);
 
 @Component({
   selector: 'app-register',
-  providers: [provideNativeDateAdapter()],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'pl' },
+    provideMomentDateAdapter({
+      parse: {
+        dateInput: 'DD/MM/YYYY',
+      },
+      display: {
+        dateInput:'DD/MM/YYYY',
+        monthYearLabel: 'MMM YYYY',
+        dateA11yLabel: 'LL',
+        monthYearA11yLabel: 'MMMM YYYY',
+      }
+    }, {useUtc: true}),
+    
+  ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './register.component.html',
@@ -22,6 +42,7 @@ import PasswordValidator from '../../validators/password.validator';
 
 export class RegisterComponent {
   formModel: FormGroup;
+  errorMessage: string = '';
 
   constructor (
     private formBuilder: FormBuilder,
@@ -34,20 +55,31 @@ export class RegisterComponent {
       dateOfBirth: [null, Validators.required],
       email: ['', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       password: ['', Validators.required],
-      confirmPassword: ['', [Validators.required, PasswordValidator.matchPassword]]
+      confirmPassword: ['', [Validators.required, PasswordValidator.matchPassword]],
+      remember: [false]
     });
   }
 
   register(name:string, surname:string, dateOfBirth: LocalDate, email: string, password: string): void {
     const credentials: RegisterRequest = {name, surname, dateOfBirth: dateOfBirth.toISOString().split('T')[0], email, password} as RegisterRequest;
-    this.authService.register(credentials).subscribe(() => {
-      console.log("Succesfully registered in");
-      this.router.navigate(['/']);
-    }) 
+    this.authService.register(credentials).subscribe({
+      next: (response) => {
+        console.log("Succesfully registered");
+        this.router.navigate(['/']);
+      },
+      error: (error: Error) => {
+        this.errorMessage = error.message;
+        console.log(this.errorMessage);
+      } 
+    });
   }
 
   submitRegisterForm(): void {
     if (this.formModel.valid) {
+      if (this.formModel.value.remember) {
+        localStorage.setItem("email", this.formModel.value.email);
+      }
+
       this.register(
         this.formModel.value.name,
         this.formModel.value.surname,
@@ -55,9 +87,7 @@ export class RegisterComponent {
         this.formModel.value.email,
         this.formModel.value.password      
       );
-    } else {
-      console.log("Cannot");
-    }
-    
+    } 
   }
+  
 }

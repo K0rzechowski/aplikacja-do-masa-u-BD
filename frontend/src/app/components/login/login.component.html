@@ -1,5 +1,5 @@
 <div class="h-175 flex justify-center items-center p-10">
-    <div class="splash container py-5">
+    <div class="splash container py-5 lg:max-w-1/2">
         <div class="max-w-3/4 mx-auto w-full">
             <h2 class="text-4xl mb-4">Zaloguj się</h2>
             <form [formGroup]="formModel" (ngSubmit)="submitLoginForm()">
@@ -25,12 +25,15 @@
                 </div>
                 <div class="lg:flex lg:justify-between mb-4">
                     <div>
-                        <input type="checkbox" id="remember" name="remember" class="mr-2"/>
-                        <label for="remember">Zapamiętaj mnie</label>
+                        <input type="checkbox" id="remember" formControlName="remember" class="mr-2 mb-4 lg:mb-0"  />
+                        <label for="remember">Zapamiętaj email</label>
                     </div>
                     <p>Zapomniałeś/aś hasła?</p>
                 </div>
                 <div>
+                    @if(errorMessage) {
+                        <p class="warning text-center mb-4">{{errorMessage}}</p>
+                    }
                     <button type="submit" class="btn-long btn-sky mb-4">Zaloguj się</button>
                 </div>
             </form>

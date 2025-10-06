@@ -20,18 +20,23 @@ właścicielom firm, jak i klientom, ułatwiając proces organizacji i rezerwacj
     Przykładowe uzupełnienie:    
     > POSTGRES_USER=my_user_name
 
-3. W folderze *backend* skompiluj projekt
+3. W folderze */backend/resources/* stwórz plik *.env* i uzupełnij go zawartością z pliku *.env.dist*, wpisując utworzony klucz według przykładu
+    ```bash
+    cp .env.dist .env
+    ```
+
+4. W folderze *backend* skompiluj projekt
     ```bash
     ./mvnw clean package -DskipTests
     ```
 
-4. Zbuduj obraz w folderze *docker*
+5. Zbuduj obraz w folderze *docker*
     ```bash
     cd docker
     docker-compose up --build
     ```
 
-5. W celu zatrzymania projektu
+6. W celu zatrzymania projektu
     ```bash
     docker-compose stop
     ```
@@ -56,19 +61,23 @@ The goal of this project is to implement a web application that will enable mass
     Example configuration:
     > POSTGRES_USER=my_user_name
 
+3. In folder */backend/resources/* create file *.env* and into the file write the contents of *.env.dist*, entering the created key according to the example 
+    ```bash
+    cp .env.dist .env
+    ```
 
-3. In folder *backend* compile the Java project
+4. In folder *backend* compile the Java project
     ```bash
     ./mvnw clean package -DskipTests
     ```
 
-4. Build the docker container in *docker* folder
+5. Build the docker container in *docker* folder
     ```bash
     cd docker
     docker-compose up --build
     ```
 
-5. In order to stop the container use:
+6. In order to stop the container use:
     ```bash
     docker-compose stop
     ```
