@@ -1,5 +1,5 @@
 <div class=" flex justify-center items-center p-10 md:hv-200">
-    <div class="splash container py-5">
+    <div class="splash container py-5 lg:max-w-1/2">
         <div class="max-w-3/4 mx-auto w-full">
             <h2 class="text-4xl mb-4">Załóż konto</h2>
             <form [formGroup]="formModel" (ngSubmit)="submitRegisterForm()">
@@ -33,8 +33,9 @@
                     <!-- Mobile: only icon -->
                     <div class="block md:hidden">
                         <mat-form-field appearance="outline" class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
-                            <input matInput [matDatepicker]="mobilePicker" formControlName="dateOfBirth" placeholder="MM/DD/YYYY">
-                        </mat-form-field>                        <mat-datepicker #mobilePicker touchUi></mat-datepicker>
+                            <input matInput [matDatepicker]="mobilePicker" formControlName="dateOfBirth" placeholder="DD/MM/YYYY">
+                        </mat-form-field>                        
+                        <mat-datepicker #mobilePicker touchUi></mat-datepicker>
                     </div>
                     
                     <!-- Desktop: full input -->
@@ -42,8 +43,7 @@
                         <mat-form-field appearance="outline" class="date-input w-full bg-slate-300 p-2 rounded">
                             <mat-label>Data urodzenia</mat-label>
                             <input matInput [matDatepicker]="desktopPicker" formControlName="dateOfBirth">
-                            <!-- TODO polish date -->
-                            <mat-hint>MM/DD/YYYY</mat-hint>
+                            <mat-hint>DD/MM/YYYY</mat-hint>
                             <mat-datepicker-toggle matIconSuffix [for]="desktopPicker"></mat-datepicker-toggle>
                         </mat-form-field>
                         <mat-datepicker #desktopPicker></mat-datepicker>
@@ -91,11 +91,14 @@
                 </div>
                 <div class="lg:flex lg:justify-between mb-4">
                     <div>
-                        <input type="checkbox" id="remember" name="remember" class="mr-2"/>
-                        <label for="remember">Zapamiętaj mnie</label>
+                        <input type="checkbox" id="remember" formControlName="remember" class="mr-2"/>
+                        <label for="remember">Zapamiętaj email</label>
                     </div>
                 </div>
                 <div>
+                    @if(errorMessage) {
+                        <p class="warning text-center mb-4">{{errorMessage}}</p>
+                    }
                     <button class="btn-long btn-sky mb-4">Zarejestruj się</button>
                 </div>
             </form>

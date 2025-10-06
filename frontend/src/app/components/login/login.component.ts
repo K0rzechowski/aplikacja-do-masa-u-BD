@@ -14,28 +14,42 @@ import { CommonModule } from '@angular/common';
 
 export class LoginComponent {
   formModel: FormGroup;
+  errorMessage: string = '';
   
   constructor (
     private formBuilder: FormBuilder,
     private authService: AuthenticationService, 
     private router: Router  
   ) {
+    let rememberedEmail = localStorage.getItem("email");
     this.formModel = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
-      password: ['', Validators.required]
+      email: [rememberedEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
+      password: ['', Validators.required],
+      remember: [false]
     });
   }
 
   login(email: string, password: string): void {
     const credentials: AuthenticationRequest = {email, password} as AuthenticationRequest;
-    this.authService.auth(credentials).subscribe(() => {
+    this.authService.auth(credentials).subscribe({
+      next: (response) => {
         console.log("Succesfully logged in");
         this.router.navigate(['/']);
-    }) 
+      },
+      error: (error: Error) => {
+        this.errorMessage = error.message;
+        console.log(error.message);
+      } 
+    });
   }
 
   submitLoginForm(): void {
-    this.login(this.formModel.value.email, this.formModel.value.password);
-  }
+    if(this.formModel.valid) {
+      if (this.formModel.value.remember) {
+        localStorage.setItem("email", this.formModel.value.email);
+      }
 
+      this.login(this.formModel.value.email, this.formModel.value.password);
+    }
+  }
 }

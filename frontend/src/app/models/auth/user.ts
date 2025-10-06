@@ -1,9 +1,9 @@
 import { LocalDate } from 'local-date';
 
-enum UserRole {
-    ADMIN,
-    USER,
-    MODERATOR
+export enum UserRole {
+    ADMIN = 'ADMIN',
+    USER = 'USER',
+    EMPLOYEE = 'EMPLOYEE'
 }
 
 export interface User {

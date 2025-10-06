@@ -1,0 +1,43 @@
+<div class="">
+    <h2 class="text-4xl mb-4">Edytuj dane</h2>
+    <form [formGroup]="formModel" (ngSubmit)="submitRegisterForm()">
+        <div class="md:flex justify-between space-x-2">
+            <div>
+                <label for="name">Imię</label>
+                <input type="text" id="name" placeholder="Imię" formControlName="name" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+            </div>
+            <div class="mb-4">
+                <label for="surname">Nazwisko</label>
+                <input type="text" id="surname" placeholder="Nazwisko" formControlName="surname" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+            </div>
+        </div>
+        <div class="mb-4">
+            <div class="md:block flex" >
+                <label for="dateOfBirth">Data urodzenia</label>
+                <mat-datepicker-toggle matIconSuffix [for]="mobilePicker" class="md:hidden"></mat-datepicker-toggle>
+            </div>
+        
+            <!-- Mobile: only icon -->
+            <div class="block md:hidden">
+                <mat-form-field appearance="outline" class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
+                    <input matInput [matDatepicker]="mobilePicker" formControlName="dateOfBirth" placeholder="DD/MM/YYYY">
+                </mat-form-field>
+                <mat-datepicker #mobilePicker touchUi></mat-datepicker>
+            </div>
+            
+            <!-- Desktop: full input -->
+            <div class="hidden md:block">
+                <mat-form-field appearance="outline" class="date-input w-full bg-slate-300 p-2 rounded">
+                    <mat-label>Data urodzenia</mat-label>
+                    <input matInput [matDatepicker]="desktopPicker" formControlName="dateOfBirth">
+                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="desktopPicker"></mat-datepicker-toggle>
+                </mat-form-field>
+                <mat-datepicker #desktopPicker></mat-datepicker>
+            </div>
+        </div>
+        <div>
+            <button class="btn-long btn-sky mb-4">Zatwierdź dane</button>
+        </div>
+    </form>
+</div>

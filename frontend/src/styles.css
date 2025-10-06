@@ -23,5 +23,10 @@ body {
     @apply text-rose-700;
 }
 
+.splash {
+    @apply bg-[url(/bg-white.png)] bg-cover rounded-xl shadow-lg mx-auto w-full;    
+}
+
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

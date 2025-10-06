@@ -23,19 +23,4 @@ export class NavbarComponent {
   }
 
   constructor(private authService: AuthenticationService) {}
-
-  ngOnInit() {
-    this.currentUser$.subscribe(user => console.log(user?.name));
-  }
-
-  logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        console.log('Logged out successfully');
-      },
-      error: (err) => {
-        console.error('Logout error:', err);
-      }
-    });
-  }
 }
