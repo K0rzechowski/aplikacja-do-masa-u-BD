@@ -1,6 +1,7 @@
 package emino.backend.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,4 +11,5 @@ import emino.backend.models.Employee;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     
     List<Employee> findByCompany(Company company);
+    Optional<Employee> findByEmailAndCompany(String email, Company company);
 }

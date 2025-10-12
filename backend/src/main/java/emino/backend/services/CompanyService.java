@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import emino.backend.dto.CompanyRequest;
+import emino.backend.dto.CompanyDto;
 import emino.backend.exception.DuplicateCompanyException;
 import emino.backend.models.Company;
 import emino.backend.repositories.CompanyRepository;
@@ -18,7 +18,7 @@ public class CompanyService {
     
     private final CompanyRepository companyRepository;
 
-    public Company createCompany(CompanyRequest request) {
+    public Company createCompany(CompanyDto request) {
 
         if (companyRepository.findByNameAndCity(request.getName(), request.getCity()).isPresent()) {
             throw new DuplicateCompanyException("Firma o danej nazwie i danym mieście już istnieje");

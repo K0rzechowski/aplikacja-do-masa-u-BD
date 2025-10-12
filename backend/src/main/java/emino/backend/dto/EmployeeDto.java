@@ -11,12 +11,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminRequest {
+public class EmployeeDto {
    
     private String name;
     private String surname;
     private LocalDate dateOfBirth;
     private String email;
     private String password;
+    private String phoneNumber;
     private Long companyId;
 }

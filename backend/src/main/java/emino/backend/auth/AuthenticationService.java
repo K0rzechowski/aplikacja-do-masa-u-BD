@@ -9,11 +9,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import emino.backend.config.JwtService;
 import emino.backend.exception.DuplicateEmailException;
 import emino.backend.models.User;
 import emino.backend.models.UserRole;
 import emino.backend.repositories.UserRepository;
-import emino.backend.services.JwtService;
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -1,6 +1,5 @@
-package emino.backend.services;
+package emino.backend.config;
 
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.lang.Function;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -38,8 +36,13 @@ public class JwtService {
     }
 
     public <T> T extractClaim(String token, Function<Claims,T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        try {
+            final Claims claims = extractAllClaims(token);
+            return claimsResolver.apply(claims);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("Błąd podczas ekstraktowania claimu z tokenu: " + e.getMessage());
+            throw new IllegalArgumentException("Niepoprawny token JWT", e);
+        }         
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -72,6 +75,15 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("Token JWT nie może być pusty" );
+        }
+
+        String[] parts = token.split("\\.");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Niepoprawny format tokenu JWT. Oczekiwano 3 części oddzielonych kropkami. Otrzymano: " + parts.length);
+        }
+
         return Jwts
             .parser()
             .verifyWith(getSignInKey())
