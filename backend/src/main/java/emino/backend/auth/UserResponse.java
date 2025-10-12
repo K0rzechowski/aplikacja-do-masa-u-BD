@@ -1,4 +1,4 @@
-package emino.backend.dto;
+package emino.backend.auth;
 
 import java.time.LocalDate;
 
@@ -19,5 +19,4 @@ public class UserResponse {
     private LocalDate dateOfBirth;
     private String email;
     private UserRole role;
-
 }

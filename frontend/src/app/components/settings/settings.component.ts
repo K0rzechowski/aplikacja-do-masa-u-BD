@@ -43,7 +43,7 @@ export class SettingsComponent {
         { label: 'Wizyty', route: 'appointments' }
       ];
       if (user?.role == UserRole.ADMIN) {
-        this.settingsChoices.push({ label: 'Zarządzaj użytkownikami', route: '/admin' });
+        this.settingsChoices.push({ label: 'Zarządzaj użytkownikami', route: '/employees' });
       } else if(user?.role == UserRole.EMPLOYEE) {
         this.settingsChoices.push({ label: 'Coś dla zwykłego robola', route: '/employee' });
       }

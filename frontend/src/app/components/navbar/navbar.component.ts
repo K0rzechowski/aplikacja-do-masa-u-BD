@@ -5,6 +5,8 @@ import { User } from '../../models/auth/user';
 import { Observable } from 'rxjs';
 import { AuthenticationRequest } from '../../models/auth/authenticationRequest';
 import { AsyncPipe } from '@angular/common';
+import { CompanyService } from '../../services/company.service';
+import { Company } from '../../models/company';
 
 @Component({
   selector: 'app-navbar',
@@ -22,5 +24,11 @@ export class NavbarComponent {
     return this.authService.currentUser;
   }
 
-  constructor(private authService: AuthenticationService) {}
+  companies: Company[] = [];
+
+  constructor(private authService: AuthenticationService, private companyService: CompanyService) {
+    this.companyService.getAll().subscribe((data: Company[]) => {
+      this.companies = data;
+    });
+  }
 }
