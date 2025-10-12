@@ -25,7 +25,7 @@ export class LoginComponent {
     this.formModel = this.formBuilder.group({
       email: [rememberedEmail, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       password: ['', Validators.required],
-      remember: [false]
+      remember: [true]
     });
   }
 
@@ -47,6 +47,8 @@ export class LoginComponent {
     if(this.formModel.valid) {
       if (this.formModel.value.remember) {
         localStorage.setItem("email", this.formModel.value.email);
+      } else {
+        localStorage.removeItem("email");
       }
 
       this.login(this.formModel.value.email, this.formModel.value.password);

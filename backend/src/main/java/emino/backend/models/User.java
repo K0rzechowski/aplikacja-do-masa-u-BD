@@ -15,6 +15,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -29,6 +32,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Builder
 @Table(name = "users")
 public class User implements UserDetails{
@@ -56,6 +60,9 @@ public class User implements UserDetails{
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
+    @OneToOne(mappedBy = "customer")
+    private Reservation reservation;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -86,5 +93,4 @@ public class User implements UserDetails{
     public boolean isEnabled() {
         return true;
     }
-
 }

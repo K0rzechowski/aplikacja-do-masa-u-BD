@@ -3,6 +3,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { ManageEmployeesComponent } from './components/admin/manage-employees/manage-employees.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -12,7 +13,9 @@ export const routes: Routes = [
     children: [
       { path: 'profile', component: ProfileComponent },
       { path: 'profile/:user', component: ProfileComponent },
-      { path: '', redirectTo: 'profile', pathMatch: 'full' } 
+      { path: '', redirectTo: 'profile', pathMatch: 'full' },
+      { path: 'employees', component: ManageEmployeesComponent },
+
     ]
   }
 

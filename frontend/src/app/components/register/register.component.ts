@@ -56,7 +56,7 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       password: ['', Validators.required],
       confirmPassword: ['', [Validators.required, PasswordValidator.matchPassword]],
-      remember: [false]
+      remember: [true]
     });
   }
 
