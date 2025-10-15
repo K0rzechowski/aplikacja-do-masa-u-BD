@@ -10,7 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import emino.backend.config.JwtService;
+import emino.backend.dto.EmployeeUpdateDto;
+import emino.backend.exception.AccessDeniedException;
 import emino.backend.exception.DuplicateEmailException;
+import emino.backend.models.Admin;
+import emino.backend.models.Employee;
 import emino.backend.models.User;
 import emino.backend.models.UserRole;
 import emino.backend.repositories.UserRepository;
@@ -87,6 +91,29 @@ public class AuthenticationService {
     //     var user = userRepository.findByEmail(request.getEmail());
 
     // }
+
+    public User editProfile(Long id, UpdateProfileRequest request ) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego użytkownika"));
+
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+        if (request.getSurname() != null) {
+            user.setSurname(request.getSurname());
+        }
+        if (request.getDateOfBirth() != null) {
+            user.setDateOfBirth(request.getDateOfBirth());
+        }
+        if (request.getCurrentPassword() != null && request.getNewPassword() != null) {
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new BadCredentialsException("Niepoprawne aktualne hasło");
+            }
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
+     
+        return userRepository.save(user);
+    }
 
     public void changeUserPassword(Long userId, String newPassword) {
         User user = userRepository.findById(userId)

@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import emino.backend.models.User;
 
 import emino.backend.exception.DuplicateEmailException;
 import jakarta.servlet.http.Cookie;
@@ -85,20 +89,18 @@ public class AuthenticationController {
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 
-    // @PutMapping("/update")
-    // public ResponseEntity<AuthenticationResponse> updateProfile(@RequestBody RegisterRequest request, HttpServletResponse response) {
-    //     AuthenticationResponse authResponse = authService.(request);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<User> editProfile(@PathVariable Long id, @RequestBody UpdateProfileRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-    //     Cookie jwtCookie = new Cookie("jwt", authResponse.getToken());
-    //     jwtCookie.setHttpOnly(true);
-    //     jwtCookie.setPath("/");
-    //     jwtCookie.setSecure(true);
-    //     jwtCookie.setMaxAge(24 * 60 * 60);
-        
-    //     response.addCookie(jwtCookie);
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            User updatedUser = authService.editProfile(id, request);
+            return ResponseEntity.ok(updatedUser);
+        }
 
-    //     return ResponseEntity.ok(authResponse);
-    // }
+        // If not authenticated, return 403 Forbidden
+        return ResponseEntity.status(403).build(); 
+    }
 
     // Endpoint to verify JWT token validity
     @GetMapping("/verify")

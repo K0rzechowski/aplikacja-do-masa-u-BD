@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeUpdateDto {
+    
     private String name;
     private String surname;
     private LocalDate dateOfBirth;
