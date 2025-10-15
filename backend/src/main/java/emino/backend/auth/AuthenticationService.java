@@ -88,4 +88,12 @@ public class AuthenticationService {
 
     // }
 
+    public void changeUserPassword(Long userId, String newPassword) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym ID"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
 }

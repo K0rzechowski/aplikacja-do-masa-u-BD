@@ -29,38 +29,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String jwtToken = null;
-        String userEmail = null;
+        
+        // First, try to get token from cookie
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt-token".equals(cookie.getName())) {
+                    jwtToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        
+        // Fallback: check Authorization header (for API calls that still use Bearer token)
+        if (jwtToken == null) {
+            final String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwtToken = authHeader.substring(7);
+            }
+        }
+        
+        // If no token found, continue without authentication
+        if (jwtToken == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         try {
-            // First, try to get token from cookie
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
-                    if ("jwt-token".equals(cookie.getName())) {
-                        jwtToken = cookie.getValue();
-                        break;
-                    }
-                }
-            }
-
-            // Fallback: check Authorization header (for API calls that still use Bearer token)
-            if (jwtToken == null) {
-                final String authHeader = request.getHeader("Authorization");
-                if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                    jwtToken = authHeader.substring(7);
-                }
-            }
-
-            // If no token found, continue without authentication
-            if (jwtToken == null || jwtToken.isEmpty()) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            if (jwtToken.split("\\.").length != 3) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            userEmail = jwtService.extractUserEmail(jwtToken);
+            final String userEmail = jwtService.extractUserEmail(jwtToken);
             
             // if user is not authenticated
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -73,9 +68,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println("Błąd podczas parsowania tokenu: " + e.getMessage());
-            SecurityContextHolder.clearContext();
         } catch (UsernameNotFoundException e) {
             // Token is invalid, continue without authentication
             SecurityContextHolder.clearContext();

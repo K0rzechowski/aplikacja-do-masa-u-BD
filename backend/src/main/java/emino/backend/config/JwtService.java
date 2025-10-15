@@ -36,13 +36,8 @@ public class JwtService {
     }
 
     public <T> T extractClaim(String token, Function<Claims,T> claimsResolver) {
-        try {
-            final Claims claims = extractAllClaims(token);
-            return claimsResolver.apply(claims);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println("Błąd podczas ekstraktowania claimu z tokenu: " + e.getMessage());
-            throw new IllegalArgumentException("Niepoprawny token JWT", e);
-        }         
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -75,15 +70,6 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        if (token == null || token.isEmpty()) {
-            throw new IllegalArgumentException("Token JWT nie może być pusty" );
-        }
-
-        String[] parts = token.split("\\.");
-        if (parts.length != 3) {
-            throw new IllegalArgumentException("Niepoprawny format tokenu JWT. Oczekiwano 3 części oddzielonych kropkami. Otrzymano: " + parts.length);
-        }
-
         return Jwts
             .parser()
             .verifyWith(getSignInKey())

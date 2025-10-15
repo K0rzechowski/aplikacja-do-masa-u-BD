@@ -15,7 +15,8 @@ public class SecurityService {
     private final AdminRepository adminRepository;
 
     public Admin getCurrentAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication;
+        authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new AccessDeniedException("Brak uwierzytelnienia");
         }
