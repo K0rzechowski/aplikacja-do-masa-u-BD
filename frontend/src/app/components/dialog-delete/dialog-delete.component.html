@@ -1,0 +1,10 @@
+<div>
+  <h2 mat-dialog-title>Usuwanie</h2>
+  <mat-dialog-content >
+    Czy na pewno chcesz usunąć {{thingToDelete}}? Ta operacja jest nieodwracalna.
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close cdkFocusInitial style="color: black;">Nie</button>
+    <button mat-button mat-dialog-close (click)="delete()" style="color: black;">Tak</button>
+  </mat-dialog-actions>
+  </div>

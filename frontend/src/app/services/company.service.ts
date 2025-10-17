@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Company } from '../models/company';
 import { Observable } from 'rxjs';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -11,18 +12,13 @@ export class CompanyService {
 
   private baseUrl = `${environment.baseUrl}/companies`;
 
-  private httpOptions = {
-    headers: new HttpHeaders({'Content-Type': 'application/json'}),
-    withCredentials: true
-  };
-
   constructor(private httpClient: HttpClient) { }
 
   createCompany(request: Company): Observable<void> {
-    return this.httpClient.post<void>(`${this.baseUrl}/create`, request, this.httpOptions);
+    return this.httpClient.post<void>(`${this.baseUrl}/create`, request);
   }
 
   getAll(): Observable<Company[]> {
-    return this.httpClient.get<Company[]>(`${this.baseUrl}/getAll`, this.httpOptions);
+    return this.httpClient.get<Company[]>(`${this.baseUrl}/getAll`);
   }
 }

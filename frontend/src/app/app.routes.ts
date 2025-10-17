@@ -14,7 +14,7 @@ export const routes: Routes = [
       { path: 'profile', component: ProfileComponent },
       { path: 'profile/:user', component: ProfileComponent },
       { path: '', redirectTo: 'profile', pathMatch: 'full' },
-      { path: 'employees', component: ManageEmployeesComponent },
+      { path: 'employees/:user', component: ManageEmployeesComponent },
 
     ]
   }

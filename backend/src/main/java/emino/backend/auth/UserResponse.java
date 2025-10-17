@@ -19,4 +19,5 @@ public class UserResponse {
     private LocalDate dateOfBirth;
     private String email;
     private UserRole role;
+    private Long companyId;
 }

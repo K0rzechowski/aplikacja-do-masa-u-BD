@@ -37,12 +37,8 @@ export class AuthenticationService {
   }
 
   register(request: RegisterRequest): Observable<AuthenticationResponse> {
-    const httpOptions = {
-      headers: new HttpHeaders({'Content-Type': 'application/json'}),
-      withCredentials: true
-    };
 
-    return this.httpClient.post<AuthenticationResponse>(`${this.baseUrl}/register`, request, httpOptions).pipe(
+    return this.httpClient.post<AuthenticationResponse>(`${this.baseUrl}/register`, request).pipe(
       tap((response: any) => {
         this.currentUserSubject.next(response.user);
         console.log(response.user);
@@ -68,12 +64,8 @@ export class AuthenticationService {
   }
 
   auth(request: AuthenticationRequest): Observable<any> {
-    const httpOptions = {
-      headers: new HttpHeaders({'Content-Type': 'application/json'}),
-      withCredentials: true
-    };
-
-    return this.httpClient.post(`${this.baseUrl}/authenticate`, request, httpOptions).pipe(
+    
+    return this.httpClient.post(`${this.baseUrl}/authenticate`, request).pipe(
       tap((response: any) => {
         this.currentUserSubject.next(response.user);
       }),
@@ -96,12 +88,8 @@ export class AuthenticationService {
   }
 
   logout(): Observable<any> {
-    const httpOptions = {
-      headers: new HttpHeaders({'Content-Type': 'application/json'}),
-      withCredentials: true
-    };
 
-    return this.httpClient.post(`${this.baseUrl}/logout`, {}, httpOptions).pipe(
+    return this.httpClient.post(`${this.baseUrl}/logout`, {}).pipe(
       tap(() => {
         this.currentUserSubject.next(null);
       }),
@@ -113,13 +101,15 @@ export class AuthenticationService {
   }
 
   private verify(): Observable<boolean> {
-    const httpOptions = {
-      withCredentials: true
-    };
 
-    return this.httpClient.get<any>(`${this.baseUrl}/verify`,  httpOptions).pipe(
+    return this.httpClient.get<any>(`${this.baseUrl}/verify`).pipe(
       map((response: { status: string; }) => response.status === "success"),
       catchError(() => of(false))
     );
+  }
+
+  isAdmin(): boolean {
+    const user = this.currentUserSubject.value;
+    return user? user.role === 'ADMIN' : false;
   }
 }

@@ -10,8 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import emino.backend.config.JwtService;
-import emino.backend.dto.EmployeeUpdateDto;
-import emino.backend.exception.AccessDeniedException;
 import emino.backend.exception.DuplicateEmailException;
 import emino.backend.models.Admin;
 import emino.backend.models.Employee;
@@ -69,6 +67,13 @@ public class AuthenticationService {
                 .orElseThrow(()-> new UsernameNotFoundException("Nie znaleziono użytkownika o takich danych"));
     
             var jwtToken = jwtService.generateToken(user);
+
+            Long companyId = null;
+            if (user instanceof Admin admin) {
+                companyId = admin.getCompany().getId();
+            } else if (user instanceof Employee employee) {
+                companyId = employee.getCompany().getId();
+            }
     
             var userResponse = UserResponse.builder()
                 .name(user.getName())
@@ -76,6 +81,7 @@ public class AuthenticationService {
                 .dateOfBirth(user.getDateOfBirth())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .companyId(companyId)
                 .build();
     
             return AuthenticationResponse.builder()
@@ -86,11 +92,6 @@ public class AuthenticationService {
             throw new BadCredentialsException("Niepoprawny email lub hasło");
         }
     }
-
-    // public AuthenticationResponse updateProfile(RegisterRequest request) {
-    //     var user = userRepository.findByEmail(request.getEmail());
-
-    // }
 
     public User editProfile(Long id, UpdateProfileRequest request ) {
         User user = userRepository.findById(id)
@@ -122,5 +123,4 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
-
 }

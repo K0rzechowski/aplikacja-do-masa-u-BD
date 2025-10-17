@@ -30,6 +30,10 @@ public class EmployeeService {
         return emplRepository.findByCompany(company);
     } 
 
+    public List<Employee> getAllEmployees() {
+        return emplRepository.findAll();
+    }
+
     public Employee createEmployee(EmployeeDto request, Admin admin) {
         var company = companyRepository.findById(request.getCompanyId())
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));

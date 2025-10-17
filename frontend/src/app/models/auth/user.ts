@@ -13,5 +13,6 @@ export interface User {
     name: string,
     surname: string,
     date_of_birth: LocalDate,
-    role: UserRole
+    role: UserRole,
+    companyId?: string
 }
