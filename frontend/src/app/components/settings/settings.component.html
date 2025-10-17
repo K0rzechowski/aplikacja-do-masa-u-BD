@@ -3,7 +3,7 @@
     <div class="container bg-[#fff] rounded-xl shadow-lg">
         <div class="w-full md:grid grid-cols-4 min-h-[500px]">
             <div class="my-5 mx-5 md:ml-5 col-span-1 flex flex-col">
-                <p class="text-2xl mb-2">Imię Naziwkso{{(currentUser$ | async)?.name}} {{(currentUser$ | async)?.surname}} </p>
+                <p class="text-2xl mb-2">{{(currentUser$ | async)?.name}} {{(currentUser$ | async)?.surname}} </p>
                 <ul class="bg-[#C8F2EA] rounded-md flex-1 flex flex-col">
                     @for(choice of settingsChoices; track $index) {
                         <li class="p-2 hover:bg-emerald-300 rounded-md" [routerLink]="['/settings', choice.route, getUserEmail()]">{{choice.label}}</li>

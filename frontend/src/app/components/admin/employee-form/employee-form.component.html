@@ -1,0 +1,108 @@
+<div>
+    <div class="card-header d-flex justify-content-between p-5">
+        @if(!employee) {
+            <div class="flex justify-between items-center mb-2">
+                <h2 mat-dialog-title>Dodaj pracownika</h2>
+                <button mat-dialog-close class="p-1 btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                </button>
+            </div>
+            
+        }
+        <form [formGroup]="formModel" (ngSubmit)="submitForm()">
+            <div class="md:flex md:justify-between md:space-x-2">
+                <div>
+                    <label for="name">Imię</label>
+                    <input type="text" id="name" placeholder="Imię" formControlName="name" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                    <p class="warning">
+                        @if(formModel.controls['name'].invalid && formModel.controls['name'].touched ) {
+                            Imię jest wymagane
+                        }
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <label for="surname">Nazwisko</label>
+                    <input type="text" id="surname" placeholder="Nazwisko" formControlName="surname" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                    <p class="warning">
+                        @if(formModel.controls['surname'].invalid && formModel.controls['surname'].touched ) {
+                            Nazwisko jest wymagane
+                        }
+                    </p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="email">Adres e-mail</label>
+                <input type="text" id="email" placeholder="E-mail" formControlName="email" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <p class="warning">
+                    @if(formModel.controls['email'].invalid && formModel.controls['email'].touched ) {
+                        Adres e-mail jest wymagany
+                    } @else if(formModel.controls['email'].errors?.['pattern']) {
+                        Adres e-mail musi być poprawny
+                    }
+                </p>
+            </div>
+            @if(!employee) {
+                <div class="mb-4">
+                    <label for="password">Hasło</label>
+                    <input type="password" id="password" placeholder="Hasło" formControlName="password" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                    <p class="warning">
+                        @if(formModel.controls['password'].invalid && formModel.controls['password'].touched ) {
+                            Hasło jest wymagane
+                        }
+                    </p>
+                </div>
+            }
+            <div class="mb-4">
+                <label for="phoneNumber">Numer telefonu</label>
+                <input type="text" id="phoneNumber" placeholder="Nr telefonu" formControlName="phoneNumber" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <p class="warning">
+                    @if(formModel.controls['phoneNumber'].invalid && formModel.controls['phoneNumber'].touched ) {
+                        Numer telefonu jest wymagany
+                    } @else if(formModel.controls['phoneNumber'].errors?.['checkPhoneNumberCharacters']) {
+                        Numer telefonu musi zawierać tylko liczby
+                    } @else if(formModel.controls['phoneNumber'].errors?.['checkPhoneNumberLength']) {
+                        Numer telefonu musi zawierać 9 cyfr
+                    }
+                </p>
+            </div>
+            <div class="mb-4">
+                <div class="md:block flex" >
+                    <label for="dateOfBirth">Data urodzenia</label>
+                    <mat-datepicker-toggle matIconSuffix [for]="mobilePicker" class="md:hidden"></mat-datepicker-toggle>
+                </div>
+        
+                <!-- Mobile: only icon -->
+                <div class="block md:hidden">
+                    <mat-form-field appearance="outline" class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
+                        <input matInput [matDatepicker]="mobilePicker" formControlName="dateOfBirth" placeholder="DD/MM/YYYY">
+                    </mat-form-field>                        
+                    <mat-datepicker #mobilePicker touchUi></mat-datepicker>
+                </div>
+                
+                <!-- Desktop: full input -->
+                <div class="hidden md:block">
+                    <mat-form-field appearance="outline" class="date-input w-full bg-slate-300 p-2 rounded">
+                        <mat-label>Data urodzenia</mat-label>
+                        <input matInput [matDatepicker]="desktopPicker" formControlName="dateOfBirth">
+                        <mat-hint>DD/MM/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="desktopPicker"></mat-datepicker-toggle>
+                    </mat-form-field>
+                    <mat-datepicker #desktopPicker></mat-datepicker>
+                </div>
+        
+                <p class="warning">
+                    @if(formModel.controls['dateOfBirth'].invalid && formModel.controls['dateOfBirth'].touched) {
+                        Data urodzenia jest wymagana
+                    }
+                </p>
+            </div>
+            <div class="grid-cols-2">
+                @if (employee) {
+                    <button class="btn-long btn-sky mb-4"> Zapisz</button>
+                } @else {
+                    <button mat-button mat-dialog-close class="btn-long btn-sky mb-4" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="submitForm()">Stwórz</button>
+                }
+            </div>
+        </form>
+    </div>
+</div>

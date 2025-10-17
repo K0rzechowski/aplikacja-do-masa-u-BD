@@ -12,6 +12,7 @@ export interface User {
     email: string,
     name: string,
     surname: string,
-    date_of_birth: LocalDate,
-    role: UserRole
+    dateOfBirth: string,
+    role: UserRole,
+    companyId?: string
 }

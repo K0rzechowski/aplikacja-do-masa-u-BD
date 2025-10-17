@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import emino.backend.dto.AdminRequest;
+import emino.backend.dto.AdminDto;
 import emino.backend.models.Admin;
 import emino.backend.services.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class AdminController {
     private final AdminService adminService;
 
     @PostMapping("/create")
-    public ResponseEntity<Admin> createAdmin(@RequestBody AdminRequest request) {
+    public ResponseEntity<Admin> createAdmin(@RequestBody AdminDto request) {
         Admin admin = adminService.createAdmin(request);
         return ResponseEntity.ok(admin);
     }

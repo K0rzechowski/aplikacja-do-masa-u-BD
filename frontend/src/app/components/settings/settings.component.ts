@@ -43,10 +43,11 @@ export class SettingsComponent {
         { label: 'Wizyty', route: 'appointments' }
       ];
       if (user?.role == UserRole.ADMIN) {
-        this.settingsChoices.push({ label: 'Zarządzaj użytkownikami', route: '/employees' });
+        this.settingsChoices.push({ label: 'Zarządzaj pracownikami', route: 'employees' });
       } else if(user?.role == UserRole.EMPLOYEE) {
-        this.settingsChoices.push({ label: 'Coś dla zwykłego robola', route: '/employee' });
+        this.settingsChoices.push({ label: 'Coś dla zwykłego robola', route: 'employee' });
       }
+      console.log('Current user:', user);
     });
   }
 

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import emino.backend.dto.CompanyRequest;
+import emino.backend.dto.CompanyDto;
 import emino.backend.models.Company;
 import emino.backend.services.CompanyService;
 import lombok.RequiredArgsConstructor;
@@ -24,15 +24,15 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @PostMapping("/create")
-    public ResponseEntity<Company> createCompany(@RequestBody CompanyRequest request) {
+    public ResponseEntity<Company> createCompany(@RequestBody CompanyDto request) {
         Company Company = companyService.createCompany(request);
         return ResponseEntity.ok(Company);
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<CompanyRequest>> getAllCompanies () {
+    public ResponseEntity<List<CompanyDto>> getAllCompanies () {
         List<Company> companies = companyService.getAll();
-        List<CompanyRequest> companyRequests = companies.stream().map(company -> new CompanyRequest(company.getName(), company.getCity()))
+        List<CompanyDto> companyRequests = companies.stream().map(company -> new CompanyDto(company.getName(), company.getCity()))
         .toList();
         return ResponseEntity.ok(companyRequests);
     }

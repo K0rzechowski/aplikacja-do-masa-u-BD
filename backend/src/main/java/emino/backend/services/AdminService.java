@@ -5,9 +5,8 @@ import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import emino.backend.dto.AdminRequest;
+import emino.backend.dto.AdminDto;
 import emino.backend.models.Admin;
-import emino.backend.models.Company;
 import emino.backend.models.UserRole;
 import emino.backend.repositories.AdminRepository;
 import emino.backend.repositories.CompanyRepository;
@@ -21,7 +20,7 @@ public class AdminService {
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public Admin createAdmin(AdminRequest request) {
+    public Admin createAdmin(AdminDto request) {
         var company = companyRepository.findById(request.getCompanyId())
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
 
@@ -38,7 +37,9 @@ public class AdminService {
         return adminRepository.save(admin);
     }
     
-    public List<Admin> getAdminsByCompany(Company company) {
+    public List<Admin> getAdminsByCompany(Long companyId) {
+        var company = companyRepository.findById(companyId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
         return adminRepository.findByCompany(company);
     } 
 }
