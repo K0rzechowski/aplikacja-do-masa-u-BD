@@ -74,6 +74,23 @@ export class ManageEmployeesComponent {
     }
   }
 
+  openCreateDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
+    if (this.dialog) {
+      const dialogRef = this.dialog.open(EmployeeFormComponent, {
+        width: '500px',
+        enterAnimationDuration,
+        exitAnimationDuration
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === true) { 
+          // reload employees after deletion
+          this.loadEmployeesInMyCompany();
+        }
+      });
+    }
+  }
+
   edit(empl: Employee): void {
     this.showEmployeeDetails = true;
     this.emplToEdit = { ...empl }; 

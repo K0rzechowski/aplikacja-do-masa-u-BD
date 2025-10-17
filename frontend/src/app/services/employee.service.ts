@@ -21,7 +21,6 @@ export class EmployeeService {
     return this.httpClient.get<Employee[]>(`${this.baseUrl}/getAll`);
   }
 
-  // TODO
   getEmployeesByAdminsCompany(): Observable<Employee[]> {
     return this.httpClient.get<Employee[]>(`${this.baseUrl}`);
   }
@@ -34,4 +33,16 @@ export class EmployeeService {
     return this.httpClient.put<Employee>(`${this.baseUrl}/edit/${employee.id}`, employee);
   }
 
+  createEmployee(employee: Partial<Employee>): Observable<Employee> {
+    const createRequest = {
+      name: employee.name,
+      surname: employee.surname,
+      phoneNumber: employee.phoneNumber,
+      dateOfBirth: employee.dateOfBirth,
+      email: employee.email,
+      password: employee.password
+    };
+        
+    return this.httpClient.post<Employee>(`${this.baseUrl}/create`, createRequest);
+  }
 }

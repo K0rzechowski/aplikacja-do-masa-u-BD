@@ -35,8 +35,7 @@ public class EmployeeService {
     }
 
     public Employee createEmployee(EmployeeDto request, Admin admin) {
-        var company = companyRepository.findById(request.getCompanyId())
-            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
+        var company = admin.getCompany();
 
         Employee employee = Employee.emplBuilder()
             .name(request.getName())

@@ -64,14 +64,12 @@ export class EmployeeFormComponent {
       surname:[this.employee?.surname, Validators.required],
       dateOfBirth: [this.employee?.dateOfBirth, Validators.required],
       email: [this.employee?.email, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
-      phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberCharacters] ]
+      phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberCharacters]],
+      password: ['', Validators.required]
     })
   }
 
   ngOnInit() {
-    console.log("Pracownik skiby: " + this.employee)
-    console.log("datka:" + this.employee.dateOfBirth)
-
     if (this.employee) {
       this.employeeBeforeUpdate = {...this.employee};
       this.formModel.patchValue({ 
@@ -97,6 +95,31 @@ export class EmployeeFormComponent {
     });
   }
 
+  create(name: string, surname:string, email:string, password: string, phoneNumber: string, dateOfBirth: LocalDate) {
+    console.log(this.employee);
+    const newEmployee = {
+      name,
+      surname,
+      phoneNumber,
+      dateOfBirth: dateOfBirth.toISOString().split('T')[0],
+      email,
+      password
+    };
+    console.log(newEmployee);
+    this.emplService.createEmployee(newEmployee).subscribe({
+      next: (response) => {
+        console.log("Succesfully added");
+      },
+      error: (error: Error) => {
+        console.log(error.message);
+      } 
+    });
+
+    if (this.dialogRef) {
+      this.dialogRef.close(true);
+    }
+  }
+
   submitForm(): void {
     console.log(this.employee, this.formModel.valid)
     if (this.employee && this.formModel.valid) {
@@ -104,6 +127,15 @@ export class EmployeeFormComponent {
         this.formModel.value.name,
         this.formModel.value.surname,
         this.formModel.value.email,
+        this.formModel.value.phoneNumber,
+        this.formModel.value.dateOfBirth,
+      );
+    } else if (this.formModel.valid) {
+      this.create(
+        this.formModel.value.name,
+        this.formModel.value.surname,
+        this.formModel.value.email,
+        this.formModel.value.password,
         this.formModel.value.phoneNumber,
         this.formModel.value.dateOfBirth,
       );

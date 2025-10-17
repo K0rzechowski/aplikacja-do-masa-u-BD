@@ -42,8 +42,29 @@ public class EmployeeController {
         Admin admin = securityService.getCurrentAdmin();
         Long companyId = admin.getCompany().getId();
         List<Employee> empls = emplService.getEmployeesByCompany(companyId);
-        return  ResponseEntity.ok(empls);
+        List<Employee> emplsAlphabetically = empls.stream()
+            .sorted((e1, e2) -> {
+                int surnameComparison = e1.getSurname().compareToIgnoreCase(e2.getSurname());
+                return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
+            })
+            .toList();
+        return  ResponseEntity.ok(emplsAlphabetically);
     }
+
+    // TODO
+    // @GetMapping("/{companyId}")
+    // public ResponseEntity<List<Employee>> getEmployeesByCompany() {
+    //     Admin admin = securityService.getCurrentAdmin();
+    //     Long companyId = admin.getCompany().getId();
+    //     List<Employee> empls = emplService.getEmployeesByCompany(companyId);
+    //     List<Employee> emplsAlphabetically = empls.stream()
+    //         .sorted((e1, e2) -> {
+    //             int surnameComparison = e1.getSurname().compareToIgnoreCase(e2.getSurname());
+    //             return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
+    //         })
+    //         .toList();
+    //     return  ResponseEntity.ok(emplsAlphabetically);
+    // }
 
     @GetMapping("/all")
     public ResponseEntity<List<Employee>> getAllEmployees() {

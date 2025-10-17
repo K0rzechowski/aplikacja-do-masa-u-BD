@@ -19,5 +19,4 @@ public class EmployeeDto {
     private String email;
     private String password;
     private String phoneNumber;
-    private Long companyId;
 }
