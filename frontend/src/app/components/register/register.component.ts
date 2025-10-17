@@ -41,6 +41,7 @@ registerLocaleData(localePl);
 })
 
 export class RegisterComponent {
+  
   formModel: FormGroup;
   errorMessage: string = '';
 

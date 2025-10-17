@@ -23,12 +23,28 @@
           <td class="px-4 py-2 border-t border-gray-200">{{ empl.name }} {{ empl.surname }}</td>
           <td class="px-4 py-2 border-t border-gray-200">{{ empl.email }}</td>
           <td class="px-4 py-2 border-t border-gray-200">+48{{ empl.phoneNumber }}</td>
-          <td class="px-4 py-2 border-t border-gray-200 text-right flex justify-end gap-2">
-            <img src="icons/edit.png" alt="Edytuj pracownika" title="Edytuj pracownika" class="cursor-pointer" />
-            <img src="icons/delete.png" alt="Usuń pracownika" title="Usuń pracownika" class="cursor-pointer" (click)="openDialog('0ms', '0ms', { item: empl, type: 'employee' })" />
+          <td class="px-4 py-2 border-t border-gray-200 text-right">
+            <div class="inline-flex justify-end gap-2">
+              <img src="icons/edit.png" alt="Edytuj pracownika" title="Edytuj pracownika" class="cursor-pointer" (click)="edit(empl)">
+              <img src="icons/delete.png" alt="Usuń pracownika" title="Usuń pracownika" class="cursor-pointer" (click)="openDeleteDialog('0ms', '0ms', { item: empl, type: 'employee' })" />
+            </div>
           </td>
         </tr>     
+        @if (showEmployeeDetails && emplToEdit && emplToEdit.id === empl.id) {
+          <tr>
+            <td colspan="4" class="w-full bg-gray-50 border-t border-gray-200 px-4">
+              <div class="flex justify-between items-center mb-2">
+                <p class="font-semibold">Edycja</p>
+                <button (click)="closeEdit()" class="p-1 btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                </button>
+              </div>
+              <app-employee-form [employee]="emplToEdit"></app-employee-form>
+            </td>
+          </tr>
+        }
       }
+     
     </tbody>
   </table>
 </div>
