@@ -64,7 +64,7 @@ export class EmployeeFormComponent {
       surname:[this.employee?.surname, Validators.required],
       dateOfBirth: [this.employee?.dateOfBirth, Validators.required],
       email: [this.employee?.email, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
-      phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberCharacters]],
+      phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberLength]],
       password: ['', Validators.required]
     })
   }
@@ -108,7 +108,7 @@ export class EmployeeFormComponent {
     console.log(newEmployee);
     this.emplService.createEmployee(newEmployee).subscribe({
       next: (response) => {
-        console.log("Succesfully added");
+        console.log("Succesfully added", response);
       },
       error: (error: Error) => {
         console.log(error.message);

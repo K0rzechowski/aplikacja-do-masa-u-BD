@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Optional, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Optional, Output, ViewChild } from '@angular/core';
 import { EmployeeService } from '../../../services/employee.service';
 import { Employee } from '../../../models/employee';
 import { AuthenticationService } from '../../../services/authentication.service';
@@ -17,6 +17,7 @@ import { EmployeeFormComponent } from "../employee-form/employee-form.component"
 export class ManageEmployeesComponent {
 
   readonly dialog = inject(MatDialog);
+  private cdr = inject(ChangeDetectorRef);
   
   emplsInMyCompany: Employee[] = [];
   showEmployeeDetails: boolean = false;
@@ -45,11 +46,12 @@ export class ManageEmployeesComponent {
     // console.log('Loading employees...');
     this.emplService.getEmployeesByAdminsCompany().subscribe({
       next: (data: Employee[]) => {
-        this.emplsInMyCompany = data;
-        // console.log('Employees loaded:', this.emplsInMyCompany);
+        this.emplsInMyCompany = [...data];
+        this.cdr.markForCheck();
+        console.log('Employees loaded:', this.emplsInMyCompany);
       },
       error: (error) => {
-        // console.error('Error loading employees:', error);
+        console.error('Error loading employees:', error);
         // console.error('Error status:', error.status);
         // console.error('Error message:', error.error);
       }
@@ -66,7 +68,7 @@ export class ManageEmployeesComponent {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        if (result === true) { 
+        if (result) { 
           // reload employees after deletion
           this.loadEmployeesInMyCompany();
         }
@@ -82,10 +84,13 @@ export class ManageEmployeesComponent {
         exitAnimationDuration
       });
 
-      dialogRef.afterClosed().subscribe(result => {
-        if (result === true) { 
-          // reload employees after deletion
-          this.loadEmployeesInMyCompany();
+      dialogRef.afterClosed().subscribe((newEmployee: Employee | undefined) => {
+        console.log("Dialog closed with: " + newEmployee);
+        if (newEmployee) { 
+          console.log('Employee created, reloading list...');
+          setTimeout(() => {
+            this.loadEmployeesInMyCompany();
+          }, 300);
         }
       });
     }
@@ -101,5 +106,6 @@ export class ManageEmployeesComponent {
   closeEdit(): void {
     this.showEmployeeDetails = false;
     this.emplToEdit = undefined;
+    this.loadEmployeesInMyCompany();
   }
 }

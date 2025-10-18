@@ -1,5 +1,5 @@
 <div>
-    <div class="card-header d-flex justify-content-between p-5">
+    <div class="d-flex justify-content-between p-5">
         @if(!employee) {
             <div class="flex justify-between items-center mb-2">
                 <h2 mat-dialog-title>Dodaj pracownika</h2>
@@ -11,7 +11,7 @@
         }
         <form [formGroup]="formModel" (ngSubmit)="submitForm()">
             <div class="md:flex md:justify-between md:space-x-2">
-                <div>
+                <div class="mb-4 md:mb-0">
                     <label for="name">Imię</label>
                     <input type="text" id="name" placeholder="Imię" formControlName="name" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
                     <p class="warning">
@@ -56,13 +56,13 @@
                 <label for="phoneNumber">Numer telefonu</label>
                 <input type="text" id="phoneNumber" placeholder="Nr telefonu" formControlName="phoneNumber" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
                 <p class="warning">
-                    @if(formModel.controls['phoneNumber'].invalid && formModel.controls['phoneNumber'].touched ) {
+                    @if (formModel.controls['phoneNumber'].errors?.['checkPhoneNumberCharacters'] && formModel.controls['phoneNumber'].touched) {
+                        Numer telefonu musi składać się tylko z cyfr
+                    } @else if (formModel.controls['phoneNumber'].errors?.['checkPhoneNumberLength'] && formModel.controls['phoneNumber'].touched) {
+                        Numer telefonu musi składać się z 9 cyfr
+                    } @else if (formModel.controls['phoneNumber'].invalid && formModel.controls['phoneNumber'].touched ) {
                         Numer telefonu jest wymagany
-                    } @else if(formModel.controls['phoneNumber'].errors?.['checkPhoneNumberCharacters']) {
-                        Numer telefonu musi zawierać tylko liczby
-                    } @else if(formModel.controls['phoneNumber'].errors?.['checkPhoneNumberLength']) {
-                        Numer telefonu musi zawierać 9 cyfr
-                    }
+                    } 
                 </p>
             </div>
             <div class="mb-4">
