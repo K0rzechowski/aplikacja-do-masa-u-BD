@@ -24,6 +24,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'app-employee-form',
@@ -40,7 +41,7 @@ import {
         monthYearA11yLabel: 'MMMM YYYY',
       }
     }, {useUtc: true}),],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel, MatButtonModule, MatDialogTitle, MatDialogContent,  MatDialogClose],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel, MatButtonModule, MatDialogTitle, MatDialogClose],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './employee-form.component.html',
   styleUrl: './employee-form.component.css'
@@ -53,19 +54,19 @@ export class EmployeeFormComponent {
   formModel: FormGroup;
   employeeBeforeUpdate!: Employee;
   
-  @Input() employee!: Employee;
+  @Input() employee?: Employee;
 
   constructor(
     private emplService: EmployeeService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private alertService: AlertService
   ) {
     this.formModel = this.formBuilder.group({
       name:[this.employee?.name, Validators.required],
       surname:[this.employee?.surname, Validators.required],
       dateOfBirth: [this.employee?.dateOfBirth, Validators.required],
       email: [this.employee?.email, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
-      phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberLength]],
-      password: ['', Validators.required]
+      phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberLength]]
     })
   }
 
@@ -83,14 +84,17 @@ export class EmployeeFormComponent {
 
   edit(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate) {
     console.log(this.employee);
-    const updatedEmployee: Employee = {id: this.employee.id, name, surname, phoneNumber, dateOfBirth: dateOfBirth.toISOString().split('T')[0], email, role: this.employee.role!, company: this.employee.company!} as Employee;
-    console.log(updatedEmployee);
+    const updatedEmployee: Employee = {id: this.employee?.id, name, surname, phoneNumber, dateOfBirth: new Date(dateOfBirth).toISOString().split('T')[0], email, role: this.employee?.role!, company: this.employee?.company!} as Employee;
+    console.log("Updated employee: ", updatedEmployee);
     this.emplService.editEmployee(updatedEmployee).subscribe({
       next: (response) => {
-        console.log("Succesfully edited");
+        console.log("Succesfully edited", response);
+        this.alertService.success("Operacja edycji powiodła się");
+        this.alertService.info("Możesz zamknąć okno edycji");
       },
       error: (error: Error) => {
         console.log(error.message);
+        this.alertService.error("Błąd podczas edycji: " + error.message);
       } 
     });
   }
@@ -101,7 +105,7 @@ export class EmployeeFormComponent {
       name,
       surname,
       phoneNumber,
-      dateOfBirth: dateOfBirth.toISOString().split('T')[0],
+      dateOfBirth: new Date(dateOfBirth).toISOString().split('T')[0],
       email,
       password
     };
@@ -109,9 +113,11 @@ export class EmployeeFormComponent {
     this.emplService.createEmployee(newEmployee).subscribe({
       next: (response) => {
         console.log("Succesfully added", response);
+        this.alertService.success("Operacja dodania pracownika powiodła się");
       },
       error: (error: Error) => {
         console.log(error.message);
+        this.alertService.error("Błąd podczas dodawania pracownika: " + error.message);
       } 
     });
 
@@ -121,8 +127,9 @@ export class EmployeeFormComponent {
   }
 
   submitForm(): void {
-    console.log(this.employee, this.formModel.valid)
+    console.log("Submitting...", this.employee, this.formModel.valid)
     if (this.employee && this.formModel.valid) {
+      console.log("editing")
       this.edit(
         this.formModel.value.name,
         this.formModel.value.surname,
@@ -130,7 +137,7 @@ export class EmployeeFormComponent {
         this.formModel.value.phoneNumber,
         this.formModel.value.dateOfBirth,
       );
-    } else if (this.formModel.valid) {
+    } else if (!this.employee && this.formModel.valid) {
       this.create(
         this.formModel.value.name,
         this.formModel.value.surname,

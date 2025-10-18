@@ -5,6 +5,7 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { UserRole } from '../../models/auth/user'; 
 import { AsyncPipe } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { AlertService } from '../../services/alert.service';
 
 
 @Component({
@@ -31,20 +32,19 @@ export class SettingsComponent {
     return this.authService.currentUser;
   }
 
-  getUserEmail(): string {
-    return this.currentUser?.email || '';
-  }
-
-  constructor(private authService: AuthenticationService) {
-    this.currentUser$.subscribe(user => {
+  constructor (
+    private authService: AuthenticationService,
+    private alertService: AlertService
+  ) {
+    this.authService.currentUser.subscribe(user => {
       this.currentUser = user;
       this.settingsChoices = [
         { label: 'Moje konto', route: 'profile' },
         { label: 'Wizyty', route: 'appointments' }
       ];
-      if (user?.role == UserRole.ADMIN) {
+      if (authService.isAdmin() == true) {
         this.settingsChoices.push({ label: 'Zarządzaj pracownikami', route: 'employees' });
-      } else if(user?.role == UserRole.EMPLOYEE) {
+      } else if(authService.isEmployee() == true) {
         this.settingsChoices.push({ label: 'Coś dla zwykłego robola', route: 'employee' });
       }
       console.log('Current user:', user);
@@ -55,9 +55,11 @@ export class SettingsComponent {
     this.authService.logout().subscribe({
       next: () => {
         console.log('Logged out successfully');
+        this.alertService.success("Wylogowanie powiodło się")
       },
       error: (err) => {
         console.error('Logout error:', err);
+        this.alertService.error(err);
       }
     });
   }

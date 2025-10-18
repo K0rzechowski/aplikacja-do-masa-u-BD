@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { DialogDeleteComponent } from '../../dialog-delete/dialog-delete.component';
 import { DialogData } from '../../../models/dialog-data';
 import { EmployeeFormComponent } from "../employee-form/employee-form.component";
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'app-manage-employees',
@@ -32,7 +33,7 @@ export class ManageEmployeesComponent {
     private authService: AuthenticationService
   ) {
     this.isAdmin$ = this.authService.currentUser.pipe(
-      map(user => user?.role === 'ADMIN')
+      map(user => this.authService.isAdmin() === true)
     );
 
     this.isAdmin$.subscribe(isAdmin => {
@@ -69,6 +70,9 @@ export class ManageEmployeesComponent {
 
       dialogRef.afterClosed().subscribe(result => {
         if (result) { 
+          setTimeout(() => {
+            this.loadEmployeesInMyCompany();
+          }, 300);
           // reload employees after deletion
           this.loadEmployeesInMyCompany();
         }

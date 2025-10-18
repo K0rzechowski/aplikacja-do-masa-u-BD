@@ -6,7 +6,7 @@
                 <p class="text-2xl mb-2">{{(currentUser$ | async)?.name}} {{(currentUser$ | async)?.surname}} </p>
                 <ul class="bg-[#C8F2EA] rounded-md flex-1 flex flex-col">
                     @for(choice of settingsChoices; track $index) {
-                        <li class="p-2 hover:bg-emerald-300 rounded-md" [routerLink]="['/settings', choice.route, getUserEmail()]">{{choice.label}}</li>
+                        <li class="p-2 hover:bg-emerald-300 rounded-md" [routerLink]="['/settings', choice.route]">{{choice.label}}</li>
                     }
                     <li class="p-2 top-0 hover:bg-emerald-300 rounded-md mt-auto" (click)="logout()">Wyloguj się</li>
                 </ul>

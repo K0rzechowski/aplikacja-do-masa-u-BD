@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import emino.backend.exception.DuplicateEmailException;
-import emino.backend.models.User;
 import emino.backend.repositories.AdminRepository;
 import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.UserRepository;
@@ -96,11 +95,20 @@ public class AuthenticationController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<User> editProfile(@PathVariable Long id, @RequestBody UpdateProfileRequest request) {
+    public ResponseEntity<AuthenticationResponse> updateProfile(@PathVariable Long id, @RequestBody UpdateProfileRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            User updatedUser = authService.editProfile(id, request);
+            AuthenticationResponse updatedUser = authService.updateProfile(id, request);
+            
+            Cookie jwtCookie = new Cookie("jwtToken","");
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setPath("/");
+            jwtCookie.setSecure(true);
+            jwtCookie.setMaxAge(0);
+            
+            response.addCookie(jwtCookie);
+
             return ResponseEntity.ok(updatedUser);
         }
 

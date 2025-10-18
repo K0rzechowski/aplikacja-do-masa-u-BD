@@ -1,0 +1,18 @@
+<div class="absolute  right-2 p-1 btn z-10 top-27">
+  @for (alert of alerts$ | async; track alert.id) {
+    <div [ngClass]="getAlertClass(alert.type)" class="flex items-center p-5 mb-5 text-base border shadow-lg rounded-lg" role="alert">
+      <button class="absolute top-1 right-2 p-1 btn z-10" (click)="close(alert.id)">
+        <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 inline w-4 h-4" viewBox="0 -960 960 960" fill="currentColor">
+          <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+        </svg>  
+      </button>
+      <svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+      </svg>
+      <span class="sr-only">Info</span>
+      <div>
+          {{ alert.message }}
+      </div>
+    </div>
+  }  
+</div>
