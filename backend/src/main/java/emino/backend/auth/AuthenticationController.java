@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -95,20 +94,11 @@ public class AuthenticationController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<AuthenticationResponse> updateProfile(@PathVariable Long id, @RequestBody UpdateProfileRequest request, HttpServletResponse response) {
+    public ResponseEntity<UserResponse> updateProfile(@PathVariable Long id, @RequestBody UpdateProfileRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            AuthenticationResponse updatedUser = authService.updateProfile(id, request);
-            
-            Cookie jwtCookie = new Cookie("jwtToken","");
-            jwtCookie.setHttpOnly(true);
-            jwtCookie.setPath("/");
-            jwtCookie.setSecure(true);
-            jwtCookie.setMaxAge(0);
-            
-            response.addCookie(jwtCookie);
-
+            UserResponse updatedUser = authService.updateProfile(id, request);
             return ResponseEntity.ok(updatedUser);
         }
 
@@ -134,12 +124,5 @@ public class AuthenticationController {
                 "authenticated", false,
                 "message", "Not authenticated"
             ));
-    }
-
-    //This is just for now, later the user will get a custom link to reset password
-    @PatchMapping("/{userId}/password")
-    public ResponseEntity<Map> changePassword(@PathVariable Long userId, @RequestBody Map<String, String> request) {
-        authService.changeUserPassword(userId, request.get("newPassword"));
-        return ResponseEntity.ok().build();
     }
 }

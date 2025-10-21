@@ -47,7 +47,6 @@ export class SettingsComponent {
       } else if(authService.isEmployee() == true) {
         this.settingsChoices.push({ label: 'Coś dla zwykłego robola', route: 'employee' });
       }
-      console.log('Current user:', user);
     });
   }
 

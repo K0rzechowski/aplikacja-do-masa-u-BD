@@ -40,7 +40,6 @@ export class AuthenticationService {
     return this.httpClient.post<AuthenticationResponse>(`${this.baseUrl}/register`, request).pipe(
       tap((response: any) => {
         this.currentUserSubject.next(response.user);
-        console.log(response.user);
       }),
       catchError((error: HttpErrorResponse) => {
         let errorMessage = 'Rejestracja nie powiodła się';
@@ -114,19 +113,26 @@ export class AuthenticationService {
     return user? user.role === 'EMPLOYEE' : false;
   }
 
-  updateProfile(request: UpdateProfileRequest, user: User): Observable<AuthenticationResponse> {
-    console.log('User ID:', user.id);
+  updateProfile(request: UpdateProfileRequest, user: User): Observable<any> {
     return this.httpClient.put(`${this.baseUrl}/update/${user.id}`, request).pipe(
-      tap((response: any) => {
-        this.currentUserSubject.next(response.user);
-        console.log(response.user);
+      tap((updatedUser: UpdateProfileRequest) => {
+        const currentUser = this.currentUserSubject.value;
+        const mergedUser = { ...currentUser, ...updatedUser } as User;
+        this.currentUserSubject.next(mergedUser);
       }),
       catchError((error: HttpErrorResponse) => {
-        let errorMessage = '';
+        let errorMessage = 'Nieudana edycja profilu';
         
         if (error.error && error.error.message) {
           errorMessage = error.error.message;
-        }         
+        } else if (error.status === 401 || error.status === 403 ) {
+          errorMessage = 'Wprowadzono niepoprawne aktualne hasło';
+        } else if (error.status === 0) {
+          errorMessage = 'Nie można połączyć się z serwerem';
+        } else if (error.status >= 500) {
+          errorMessage = 'Wystąpił błąd serwera';
+        }
+        
         return throwError(() => new Error(errorMessage));
       })
     );

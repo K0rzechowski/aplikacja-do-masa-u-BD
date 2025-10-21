@@ -15,6 +15,7 @@ import 'moment/locale/pl';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import { UpdateProfileRequest, User } from '../../models/auth/user';
 import { AlertService } from '../../services/alert.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 registerLocaleData(localePl);
 
@@ -70,17 +71,19 @@ export class ProfileComponent {
   }
 
   updateProfile(updateRequest: UpdateProfileRequest): void {
-    console.log("About to update user: ", this.user)
     if (this.user) {
-      console.log("id: " + this.user.id)
       this.authService.updateProfile(updateRequest, this.user).subscribe({
         next: (response) => {
-          console.log("Succesfully edited", response);
           this.alertService.success("Operacja edycji profilu powiodła się");
+
+          if (updateRequest.currentPassword && updateRequest.newPassword) {
+            this.passwordForm.reset();
+          }
         },
-        error: (error: Error) => {
-          console.log(error.message);
-          this.alertService.error("Błąd podczas edycji: " + error.message);
+        error: (error: HttpErrorResponse) => {
+          let errorMessage = error.message;
+          console.log(errorMessage);
+          this.alertService.error(errorMessage);
         } 
       });
     }
@@ -88,17 +91,24 @@ export class ProfileComponent {
 
   submitEditForm(): void {
     if (this.formModel.valid) {
-      console.log("lalall", this.formModel.valid)
       const request = {
         name: this.formModel.get('name')?.value,
         surname: this.formModel.get('surname')?.value,
         dateOfBirth: new Date(this.formModel.get('dateOfBirth')?.value).toISOString().split('T')[0]
       }
-      console.log("request: ", request);
 
       this.updateProfile(request);
-    } else {
-      console.log("Cannot");
+    } 
+  }
+
+  submitPasswordForm(): void {
+    if (this.passwordForm.valid) {
+      const passwordRequest = {
+        currentPassword: this.passwordForm.get('currentPassword')?.value,
+        newPassword: this.passwordForm.get('newPassword')?.value
+      }
+
+      this.updateProfile(passwordRequest);
     } 
   }
 
