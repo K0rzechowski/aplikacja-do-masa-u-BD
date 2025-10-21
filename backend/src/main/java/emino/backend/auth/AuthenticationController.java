@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import emino.backend.exception.DuplicateEmailException;
-import emino.backend.models.User;
 import emino.backend.repositories.AdminRepository;
 import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.UserRepository;
@@ -96,11 +94,11 @@ public class AuthenticationController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<User> editProfile(@PathVariable Long id, @RequestBody UpdateProfileRequest request) {
+    public ResponseEntity<UserResponse> updateProfile(@PathVariable Long id, @RequestBody UpdateProfileRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            User updatedUser = authService.editProfile(id, request);
+            UserResponse updatedUser = authService.updateProfile(id, request);
             return ResponseEntity.ok(updatedUser);
         }
 
@@ -126,12 +124,5 @@ public class AuthenticationController {
                 "authenticated", false,
                 "message", "Not authenticated"
             ));
-    }
-
-    //This is just for now, later the user will get a custom link to reset password
-    @PatchMapping("/{userId}/password")
-    public ResponseEntity<Map> changePassword(@PathVariable Long userId, @RequestBody Map<String, String> request) {
-        authService.changeUserPassword(userId, request.get("newPassword"));
-        return ResponseEntity.ok().build();
     }
 }

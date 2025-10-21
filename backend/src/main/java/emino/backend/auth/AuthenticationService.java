@@ -46,6 +46,7 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
 
         var userResponse = UserResponse.builder()
+            .id(user.getId())
             .name(request.getName())
             .surname(request.getSurname())
             .dateOfBirth(request.getDateOfBirth())
@@ -76,6 +77,7 @@ public class AuthenticationService {
             }
     
             var userResponse = UserResponse.builder()
+                .id(user.getId())
                 .name(user.getName())
                 .surname(user.getSurname())
                 .dateOfBirth(user.getDateOfBirth())
@@ -93,7 +95,7 @@ public class AuthenticationService {
         }
     }
 
-    public User editProfile(Long id, UpdateProfileRequest request ) {
+    public UserResponse updateProfile(Long id, UpdateProfileRequest request ) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego użytkownika"));
 
@@ -113,14 +115,17 @@ public class AuthenticationService {
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         }
      
-        return userRepository.save(user);
-    }
+        User updatedUser = userRepository.save(user);
 
-    public void changeUserPassword(Long userId, String newPassword) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym ID"));
+        var userResponse = UserResponse.builder()
+            .id(user.getId())
+            .name(updatedUser.getName())
+            .surname(updatedUser.getSurname())
+            .dateOfBirth(updatedUser.getDateOfBirth())
+            .email(updatedUser.getEmail())
+            .role(updatedUser.getRole())
+            .build();
 
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        return userResponse;
     }
 }

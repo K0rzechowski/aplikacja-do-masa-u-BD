@@ -4,6 +4,8 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
 import { AuthenticationRequest } from '../../models/auth/authenticationRequest';
 import { CommonModule } from '@angular/common';
+import { AlertComponent } from "../alert/alert.component";
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +21,8 @@ export class LoginComponent {
   constructor (
     private formBuilder: FormBuilder,
     private authService: AuthenticationService, 
-    private router: Router  
+    private router: Router,
+    private alertService: AlertService
   ) {
     let rememberedEmail = localStorage.getItem("email");
     this.formModel = this.formBuilder.group({
@@ -35,10 +38,12 @@ export class LoginComponent {
       next: (response) => {
         console.log("Succesfully logged in");
         this.router.navigate(['/']);
+        this.alertService.success("Logowanie nastąpiło poprawnie");
       },
       error: (error: Error) => {
         this.errorMessage = error.message;
         console.log(error.message);
+        this.alertService.error(this.errorMessage);
       } 
     });
   }

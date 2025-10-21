@@ -45,11 +45,6 @@
                 <div class="mb-4">
                     <label for="password">Hasło</label>
                     <input type="password" id="password" placeholder="Hasło" formControlName="password" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
-                    <p class="warning">
-                        @if(formModel.controls['password'].invalid && formModel.controls['password'].touched ) {
-                            Hasło jest wymagane
-                        }
-                    </p>
                 </div>
             }
             <div class="mb-4">

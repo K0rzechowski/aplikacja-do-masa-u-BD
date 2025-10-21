@@ -7,7 +7,7 @@ export enum UserRole {
 }
 
 export interface User {
-    id?: string,
+    id: string,
     password?: string,
     email: string,
     name: string,
@@ -15,4 +15,12 @@ export interface User {
     dateOfBirth: string,
     role: UserRole,
     companyId?: string
+}
+
+export interface UpdateProfileRequest {
+    name?: string,
+    surname?: string,
+    dateOfBirth?: string,
+    currentPassword?: string,
+    newPassword?: string,
 }

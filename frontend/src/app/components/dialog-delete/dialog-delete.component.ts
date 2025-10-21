@@ -13,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { Employee } from '../../models/employee';
 import { EmployeeService } from '../../services/employee.service';
 import { DialogData } from '../../models/dialog-data';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-dialog',
@@ -21,7 +22,7 @@ import { DialogData } from '../../models/dialog-data';
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose,],
+    MatDialogClose],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './dialog-delete.component.html',
   styleUrl: './dialog-delete.component.css'
@@ -33,8 +34,9 @@ export class DialogDeleteComponent {
   idToDelete: string | undefined = '';
   thingToDelete: String | undefined = '';
 
-  constructor(
-    private emplService: EmployeeService
+  constructor (
+    private emplService: EmployeeService,
+    private alertService: AlertService
   ) {
     this.checkType();
   }
@@ -60,9 +62,11 @@ export class DialogDeleteComponent {
         this.emplService.deleteEmployee(this.idToDelete).subscribe({
           next: () => {
             console.log(`Employee with ID ${this.idToDelete} deleted successfully.`);
+            this.alertService.success(`Poprawnie usunięto pracownika o ID ${this.idToDelete}`);
           },
           error: (error) => {
             console.error(`Error deleting employee with ID ${this.idToDelete}:`, error);
+            this.alertService.error(`Nieudana operacja usunięcia pracownika o ID ${this.idToDelete}`);
           }
         });
       } 

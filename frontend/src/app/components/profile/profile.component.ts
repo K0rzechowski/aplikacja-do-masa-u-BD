@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, LOCALE_ID } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatHint, MatInputModule, MatLabel} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -13,6 +13,9 @@ import PasswordValidator from '../../validators/password.validator';
 import localePl from '@angular/common/locales/pl';
 import 'moment/locale/pl';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
+import { UpdateProfileRequest, User } from '../../models/auth/user';
+import { AlertService } from '../../services/alert.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 registerLocaleData(localePl);
 
@@ -39,43 +42,73 @@ registerLocaleData(localePl);
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
+ 
+  user: User | null | undefined;
 
   formModel: FormGroup;
-
+  passwordForm: FormGroup
+ 
   constructor (
     private formBuilder: FormBuilder,
     private authService: AuthenticationService,
-    private router: Router
-  ) {
-    this.formModel = this.formBuilder.group({
-      name:['', Validators.required],
-      surname:['', Validators.required],
-      dateOfBirth: [null, Validators.required],
-      email: ['', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
-      password: ['', Validators.required],
-      confirmPassword: ['', [Validators.required, PasswordValidator.matchPassword]]
+    private router: Router,
+    private alertService: AlertService
+  ) {    
+    this.authService.currentUser.subscribe(user => {
+      this.user = user;
     });
+
+    this.formModel = this.formBuilder.group({
+      name:[this.user?.name, Validators.required],
+      surname:[this.user?.surname, Validators.required],
+      dateOfBirth: [this.user?.dateOfBirth, Validators.required]
+    });
+
+    this.passwordForm = this.formBuilder.group({
+      currentPassword: ['', Validators.required],
+      newPassword: ['', Validators.required]
+    })
   }
 
-  register(name:string, surname:string, dateOfBirth: LocalDate, email: string, password: string): void {
-    const credentials: RegisterRequest = {name, surname, dateOfBirth: dateOfBirth.toISOString().split('T')[0], email, password} as RegisterRequest;
-    this.authService.register(credentials).subscribe(() => {
-      console.log("Succesfully registered in");
-      this.router.navigate(['/']);
-    }) 
+  updateProfile(updateRequest: UpdateProfileRequest): void {
+    if (this.user) {
+      this.authService.updateProfile(updateRequest, this.user).subscribe({
+        next: (response) => {
+          this.alertService.success("Operacja edycji profilu powiodła się");
+
+          if (updateRequest.currentPassword && updateRequest.newPassword) {
+            this.passwordForm.reset();
+          }
+        },
+        error: (error: HttpErrorResponse) => {
+          let errorMessage = error.message;
+          console.log(errorMessage);
+          this.alertService.error(errorMessage);
+        } 
+      });
+    }
   }
 
-  submitRegisterForm(): void {
+  submitEditForm(): void {
     if (this.formModel.valid) {
-      this.register(
-        this.formModel.value.name,
-        this.formModel.value.surname,
-        this.formModel.value.dateOfBirth,
-        this.formModel.value.email,
-        this.formModel.value.password      
-      );
-    } else {
-      console.log("Cannot");
+      const request = {
+        name: this.formModel.get('name')?.value,
+        surname: this.formModel.get('surname')?.value,
+        dateOfBirth: new Date(this.formModel.get('dateOfBirth')?.value).toISOString().split('T')[0]
+      }
+
+      this.updateProfile(request);
+    } 
+  }
+
+  submitPasswordForm(): void {
+    if (this.passwordForm.valid) {
+      const passwordRequest = {
+        currentPassword: this.passwordForm.get('currentPassword')?.value,
+        newPassword: this.passwordForm.get('newPassword')?.value
+      }
+
+      this.updateProfile(passwordRequest);
     } 
   }
 

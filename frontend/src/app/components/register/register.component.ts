@@ -14,6 +14,7 @@ import localePl from '@angular/common/locales/pl';
 import 'moment/locale/pl';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
+import { AlertService } from '../../services/alert.service';
 
 registerLocaleData(localePl);
 
@@ -48,7 +49,8 @@ export class RegisterComponent {
   constructor (
     private formBuilder: FormBuilder,
     private authService: AuthenticationService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {
     this.formModel = this.formBuilder.group({
       name:['', Validators.required],
@@ -67,10 +69,12 @@ export class RegisterComponent {
       next: (response) => {
         console.log("Succesfully registered");
         this.router.navigate(['/']);
+        this.alertService.success("Rejestracja nastąpiła poprawnie");
       },
       error: (error: Error) => {
         this.errorMessage = error.message;
         console.log(this.errorMessage);
+        this.alertService.error(this.errorMessage);
       } 
     });
   }
