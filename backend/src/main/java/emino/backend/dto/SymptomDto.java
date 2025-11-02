@@ -15,7 +15,5 @@ public class SymptomDto {
     
     private Long id; 
     private String name;
-    private Long companyId;
-    private String companyName;
     private List<String> massageList;
 }

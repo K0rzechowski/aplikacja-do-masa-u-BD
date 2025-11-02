@@ -42,11 +42,11 @@ public class MassageService {
     } 
 
     // TODO for now, no employee is associated with the massage
-    public List<Massage> getMassagesByEmployee(Long employeeId) {
-        var employee = emplRepository.findById(employeeId)
-            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego pracownika"));
-        return massageRepository.findByEmployee(employee);
-    } 
+    // public List<Massage> getMassagesByEmployee(Long employeeId) {
+    //     var employee = emplRepository.findById(employeeId)
+    //         .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego pracownika"));
+    //     return massageRepository.findByEmployee(employee);
+    // } 
 
     public Massage createMassage(MassageDto request, Admin admin) {
         var company = admin.getCompany();

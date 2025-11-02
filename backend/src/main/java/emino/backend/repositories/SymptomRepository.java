@@ -4,16 +4,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import emino.backend.models.Company;
-import emino.backend.models.Employee;
 import emino.backend.models.Massage;
 import emino.backend.models.Symptom;
 
 public interface SymptomRepository extends JpaRepository<Symptom, Long> {
     
     Optional<Symptom> findByName(String name);
-    List<Symptom> findByCompany(Company company);
-    List<Symptom> findByMassage(Massage massage);
-    List<Symptom> findByEmployee(Employee employee);
+    @Query("SELECT s FROM Symptom s JOIN s.massageMatchesForSymptom smfs WHERE smfs.massage = :massage")
+    List<Symptom> findByMassage(@Param("massage") Massage massage);
+    // List<Symptom> findByEmployee(Employee employee);
 }
