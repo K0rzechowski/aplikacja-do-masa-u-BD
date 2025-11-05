@@ -1,6 +1,5 @@
 package emino.backend.services;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,7 +47,6 @@ public class EmployeeService {
             .surname(request.getSurname())
             .dateOfBirth(request.getDateOfBirth())
             .email(request.getEmail())
-            // .password(passwordEncoder.encode(request.getPassword()))
             .password(passwordEncoder.encode(generatedPassword))
             .phoneNumber(request.getPhoneNumber())
             .role(UserRole.EMPLOYEE)

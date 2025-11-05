@@ -17,6 +17,5 @@ public class EmployeeDto {
     private String surname;
     private LocalDate dateOfBirth;
     private String email;
-    // private String password;
     private String phoneNumber;
 }
