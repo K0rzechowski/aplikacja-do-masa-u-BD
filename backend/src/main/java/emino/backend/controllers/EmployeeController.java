@@ -1,5 +1,6 @@
 package emino.backend.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import emino.backend.dto.EmployeeUpdateDto;
 import emino.backend.models.Admin;
 import emino.backend.models.Employee;
 import emino.backend.services.EmployeeService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,7 +33,7 @@ public class EmployeeController {
     private final SecurityService securityService;
 
     @PostMapping("/create")
-    public ResponseEntity createEmployee(@RequestBody EmployeeDto request) {
+    public ResponseEntity createEmployee(@RequestBody EmployeeDto request) throws MessagingException {
         Admin admin = securityService.getCurrentAdmin();
         Employee empl = emplService.createEmployee(request, admin);
         return ResponseEntity.ok(empl);

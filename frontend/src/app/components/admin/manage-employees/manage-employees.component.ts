@@ -49,7 +49,6 @@ export class ManageEmployeesComponent {
       next: (data: Employee[]) => {
         this.emplsInMyCompany = [...data];
         this.cdr.markForCheck();
-        console.log('Employees loaded:', this.emplsInMyCompany);
       },
       error: (error) => {
         console.error('Error loading employees:', error);
@@ -89,9 +88,7 @@ export class ManageEmployeesComponent {
       });
 
       dialogRef.afterClosed().subscribe((newEmployee: Employee | undefined) => {
-        console.log("Dialog closed with: " + newEmployee);
         if (newEmployee) { 
-          console.log('Employee created, reloading list...');
           setTimeout(() => {
             this.loadEmployeesInMyCompany();
           }, 300);
@@ -104,7 +101,6 @@ export class ManageEmployeesComponent {
     this.showEmployeeDetails = true;
     this.emplToEdit = { ...empl }; 
     this.emitter.emit(this.emplToEdit);
-    console.log(this.showEmployeeDetails, this.emplToEdit)
   }
 
   closeEdit(): void {
