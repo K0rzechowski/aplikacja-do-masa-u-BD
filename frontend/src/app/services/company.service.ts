@@ -35,6 +35,11 @@ export class CompanyService {
   }
 
   getCompanyById(id: string): Observable<Company> {
-    return this.httpClient.get<Company>(`${this.baseUrl}/{id}`);
+    return this.httpClient.get<Company>(`${this.baseUrl}/${id}`);
+  }
+
+  deleteCompany(id: string): Observable<void> {
+    console.log("Deleing")
+    return this.httpClient.delete<void>(`${this.baseUrl}/remove/${id}`);
   }
 }

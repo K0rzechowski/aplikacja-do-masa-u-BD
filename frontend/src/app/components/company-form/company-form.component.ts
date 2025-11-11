@@ -38,6 +38,7 @@ import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 export class CompanyFormComponent {
   formModel: FormGroup;
   errorMessage: string = '';
+  page: number = 1;
 
   constructor (
     private formBuilder: FormBuilder,
@@ -54,26 +55,14 @@ export class CompanyFormComponent {
       surname:['', Validators.required],
       dateOfBirth: ['', Validators.required],
     });
-  }
 
-  // createCompany(name: string, city: string): Company {
-  //   const upperCaseCity = city.charAt(0).toUpperCase() + city.slice(1)
-  //   const companyRequest: Company = {name, city: upperCaseCity} as Company;
-  //   this.companyService.createCompany(companyRequest).subscribe({
-  //     next: (response) => {
-  //       console.log("Succesfully created company");
-  //       this.router.navigate(['/']);
-  //       this.alertService.success("Poprawnie dodano firmę");
-  //       return response;
-  //     },
-  //     error: (error: Error) => {
-  //       this.errorMessage = error.message;
-  //       console.log(this.errorMessage);
-  //       this.alertService.error(this.errorMessage);
-  //     } 
-  //   });
-  //   return companyRequest;
-  // }
+    this.formModel.valueChanges.subscribe(() => {
+      const nextButton = document.getElementById('next') as HTMLButtonElement;
+      if (nextButton) {
+        nextButton.disabled = !(this.formModel.value.companyName && this.formModel.value.companyCity);
+      }
+    });
+  }
 
   createAdmin(adminRequest: Admin): void {
     this.adminService.createAdmin(adminRequest).subscribe({
@@ -83,7 +72,9 @@ export class CompanyFormComponent {
       },
       error: (error: Error) => {
         this.errorMessage = error.message;
+        this.companyService.deleteCompany(adminRequest.companyId).subscribe();
         console.log(this.errorMessage);
+        this.alertService.error("Stworzenie administratora nie powiodło się. Usunięto dane firmy");
         this.alertService.error(this.errorMessage);
       } 
     });
@@ -112,7 +103,6 @@ export class CompanyFormComponent {
           this.alertService.error(this.errorMessage);
         } 
       });
-      return companyRequest;
   }
 
   submitForm(): void {
@@ -126,5 +116,13 @@ export class CompanyFormComponent {
         this.formModel.value.dateOfBirth  
       );
     } 
+  }
+
+  nextPage(): void {
+    this.page++;
+  }
+
+  previousPage(): void {
+    this.page--;
   }
 }

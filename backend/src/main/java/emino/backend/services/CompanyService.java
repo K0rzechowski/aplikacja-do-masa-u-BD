@@ -48,4 +48,8 @@ public class CompanyService {
     public Optional<Company> getCompanyById(Long id) {
         return companyRepository.findById(id);
     }
+
+    public void removeCompany(Long id) {
+        companyRepository.deleteById(id);
+    }
 }

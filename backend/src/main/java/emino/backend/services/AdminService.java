@@ -40,8 +40,9 @@ public class AdminService {
             .company(company)
             .build();
 
-        emailService.sendAdminPasswordEmail(admin, generatedPassword, company.getName());
-        return adminRepository.save(admin);
+        Admin savedAdmin = adminRepository.save(admin);
+        emailService.sendAdminPasswordEmail(savedAdmin, generatedPassword, company.getName());
+        return savedAdmin;
     }
     
     public List<Admin> getAdminsByCompany(Long companyId) {

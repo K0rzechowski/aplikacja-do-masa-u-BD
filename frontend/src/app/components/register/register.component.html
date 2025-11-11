@@ -96,7 +96,7 @@
                     </div>
                 </div>
                 <div>
-                    <button class="btn-long btn-sky mb-4">Zarejestruj się</button>
+                    <input [disabled]="!formModel.valid" type="submit" class="btn-long btn-sky cursor-pointer mb-4" data-bs-dismiss="modal" value="Zarejestruj się">
                 </div>
             </form>
             <hr class="mb-4 h-px bg-slate-400 border-0">

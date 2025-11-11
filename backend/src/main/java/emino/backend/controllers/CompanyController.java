@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,12 @@ public class CompanyController {
         Optional<Company> foundCompany = companyService.getCompanyById(id);
         return foundCompany.map(ResponseEntity::ok)
                            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/remove/{id}")
+    public ResponseEntity removeCompany(@PathVariable Long id) {
+        companyService.removeCompany(id);
+        return ResponseEntity.ok().build();
     }
 
 }

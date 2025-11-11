@@ -1,91 +1,102 @@
 <div class="h-175 flex justify-center items-center p-10">
     <div class="splash container py-5 lg:max-w-1/2">
         <div class="max-w-3/4 mx-auto w-full">
-            <h2 class="text-4xl mb-4">Zarejestruj swoją firmę</h2>
+            <h2 class="text-4xl mb-4">Zgłoś swoją firmę</h2>
             <form [formGroup]="formModel" (ngSubmit)="submitForm()">
-                <div class="mb-4">
-                    <label for="companyName">Nazwa firmy</label>
-                    <input type="text" id="companyName" placeholder="Nazwa" formControlName="companyName" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
-                    <p class="warning">
-                        @if(formModel.controls['companyName'].invalid && formModel.controls['companyName'].touched ) {
-                            Nazwa jest wymagana
-                        }
-                    </p>
-                </div>
-                <div class="mb-4">
-                    <label for="companyCity">Miasto, w którym firma się znajduje</label>
-                    <input type="text" id="companyCity" placeholder="Miasto" formControlName="companyCity" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
-                    <p class="warning">
-                        @if(formModel.controls['companyCity'].invalid && formModel.controls['companyCity'].touched ) {
-                            Miasto jest wymagane
-                        }
-                    </p>
-                </div>
-                <div>
-                    <div class="mb-4 md:mb-0">
-                        <label for="name">Imię</label>
-                        <input type="text" id="name" placeholder="Imię" formControlName="name" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                @if (page === 1) {
+                    <div>
+                        <h3 class="text-2xl mb-4">Podaj dane firmy</h3>
+                        <div class="mb-4">
+                            <label for="companyName">Nazwa firmy</label>
+                            <input type="text" id="companyName" placeholder="Nazwa" formControlName="companyName" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                            <p class="warning">
+                                @if(formModel.controls['companyName'].invalid && formModel.controls['companyName'].touched ) {
+                                    Nazwa jest wymagana
+                                }
+                            </p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="companyCity">Miasto, w którym firma się znajduje</label>
+                            <input type="text" id="companyCity" placeholder="Miasto" formControlName="companyCity" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                            <p class="warning">
+                                @if(formModel.controls['companyCity'].invalid && formModel.controls['companyCity'].touched ) {
+                                    Miasto jest wymagane
+                                }
+                            </p>
+                        </div>
+                        <div>
+                            <button id="next" class="btn-long btn-sky mb-4" (click)="nextPage()" disabled>Dalej</button>
+                        </div>
+                    </div>
+                } @else if(page === 2) {
+                    <h3 class="text-2xl mb-4">Podaj dane administratora</h3>
+                    <div class="md:flex md:justify-between md:space-x-2">
+                        <div class="mb-4 md:mb-0">
+                            <label for="name">Imię</label>
+                            <input type="text" id="name" placeholder="Imię" formControlName="name" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                            <p class="warning">
+                                @if(formModel.controls['name'].invalid && formModel.controls['name'].touched ) {
+                                    Imię jest wymagane
+                                }
+                            </p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="surname">Nazwisko</label>
+                            <input type="text" id="surname" placeholder="Nazwisko" formControlName="surname" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                            <p class="warning">
+                                @if(formModel.controls['surname'].invalid && formModel.controls['surname'].touched ) {
+                                    Nazwisko jest wymagane
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="email">Adres e-mail</label>
+                        <input type="text" id="email" placeholder="E-mail" formControlName="email" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
                         <p class="warning">
-                            @if(formModel.controls['name'].invalid && formModel.controls['name'].touched ) {
-                                Imię jest wymagane
+                            @if(formModel.controls['email'].invalid && formModel.controls['email'].touched ) {
+                                Adres e-mail jest wymagany
+                            } @else if(formModel.controls['email'].errors?.['pattern']) {
+                                Adres e-mail musi być poprawny
                             }
                         </p>
                     </div>
                     <div class="mb-4">
-                        <label for="surname">Nazwisko</label>
-                        <input type="text" id="surname" placeholder="Nazwisko" formControlName="surname" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                        <div class="md:block flex" >
+                            <label for="dateOfBirth">Data urodzenia</label>
+                            <mat-datepicker-toggle matIconSuffix [for]="mobilePicker" class="md:hidden"></mat-datepicker-toggle>
+                        </div>
+                
+                        <!-- Mobile: only icon -->
+                        <div class="block md:hidden">
+                            <mat-form-field appearance="outline" class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
+                                <input matInput [matDatepicker]="mobilePicker" formControlName="dateOfBirth" placeholder="DD/MM/YYYY">
+                            </mat-form-field>                        
+                            <mat-datepicker #mobilePicker touchUi></mat-datepicker>
+                        </div>
+                        
+                        <!-- Desktop: full input -->
+                        <div class="hidden md:block">
+                            <mat-form-field appearance="outline" class="date-input w-full bg-slate-300 p-2 rounded">
+                                <mat-label>Data urodzenia</mat-label>
+                                <input matInput [matDatepicker]="desktopPicker" formControlName="dateOfBirth">
+                                <mat-hint>DD/MM/YYYY</mat-hint>
+                                <mat-datepicker-toggle matIconSuffix [for]="desktopPicker"></mat-datepicker-toggle>
+                            </mat-form-field>
+                            <mat-datepicker #desktopPicker></mat-datepicker>
+                        </div>
+                
                         <p class="warning">
-                            @if(formModel.controls['surname'].invalid && formModel.controls['surname'].touched ) {
-                                Nazwisko jest wymagane
+                            @if(formModel.controls['dateOfBirth'].invalid && formModel.controls['dateOfBirth'].touched) {
+                                Data urodzenia jest wymagana
                             }
                         </p>
                     </div>
-                </div>
-                <div class="mb-4">
-                    <label for="email">Adres e-mail</label>
-                    <input type="text" id="email" placeholder="E-mail" formControlName="email" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
-                    <p class="warning">
-                        @if(formModel.controls['email'].invalid && formModel.controls['email'].touched ) {
-                            Adres e-mail jest wymagany
-                        } @else if(formModel.controls['email'].errors?.['pattern']) {
-                            Adres e-mail musi być poprawny
-                        }
-                    </p>
-                </div>
-                <div class="mb-4">
-                    <div class="md:block flex" >
-                        <label for="dateOfBirth">Data urodzenia</label>
-                        <mat-datepicker-toggle matIconSuffix [for]="mobilePicker" class="md:hidden"></mat-datepicker-toggle>
+                    <div class="md:flex">
+                        <button class="btn-long btn-gray mb-4 mr-2" (click)="previousPage()">Powróć</button>
+                        <input type="submit" class="btn-long btn-sky mb-4 cursor-pointer" value="Zgłoś firmę"/>
                     </div>
-            
-                    <!-- Mobile: only icon -->
-                    <div class="block md:hidden">
-                        <mat-form-field appearance="outline" class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
-                            <input matInput [matDatepicker]="mobilePicker" formControlName="dateOfBirth" placeholder="DD/MM/YYYY">
-                        </mat-form-field>                        
-                        <mat-datepicker #mobilePicker touchUi></mat-datepicker>
-                    </div>
-                    
-                    <!-- Desktop: full input -->
-                    <div class="hidden md:block">
-                        <mat-form-field appearance="outline" class="date-input w-full bg-slate-300 p-2 rounded">
-                            <mat-label>Data urodzenia</mat-label>
-                            <input matInput [matDatepicker]="desktopPicker" formControlName="dateOfBirth">
-                            <mat-hint>DD/MM/YYYY</mat-hint>
-                            <mat-datepicker-toggle matIconSuffix [for]="desktopPicker"></mat-datepicker-toggle>
-                        </mat-form-field>
-                        <mat-datepicker #desktopPicker></mat-datepicker>
-                    </div>
-            
-                    <p class="warning">
-                        @if(formModel.controls['dateOfBirth'].invalid && formModel.controls['dateOfBirth'].touched) {
-                            Data urodzenia jest wymagana
-                        }
-                    </p>
-                </div>
-                <div>
-                    <button class="btn-long btn-sky mb-4">Zarejestruj firmę</button>
-                </div>
+                }
             </form>
         </div>
     </div>

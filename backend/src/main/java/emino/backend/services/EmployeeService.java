@@ -57,8 +57,9 @@ public class EmployeeService {
             throw new AccessDeniedException("Nie można dodać pracownika do innej firmy");
         }
 
-        emailService.sendHtmlPasswordEmail(employee, generatedPassword, company.getName());
-        return emplRepository.save(employee);
+        Employee savedEmployee = emplRepository.save(employee); 
+        emailService.sendHtmlPasswordEmail(savedEmployee, generatedPassword, company.getName());
+        return savedEmployee;
     }
 
     public void removeEmployee(Long id) {
