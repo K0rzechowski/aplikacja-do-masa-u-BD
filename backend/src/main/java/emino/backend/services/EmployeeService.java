@@ -12,9 +12,11 @@ import emino.backend.mail.EmailService;
 import emino.backend.mail.GenerateCustomPassword;
 import emino.backend.models.Admin;
 import emino.backend.models.Employee;
+import emino.backend.models.Massage;
 import emino.backend.models.UserRole;
 import emino.backend.repositories.CompanyRepository;
 import emino.backend.repositories.EmployeeRepository;
+import emino.backend.repositories.MassageRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +26,7 @@ public class EmployeeService {
     
     private final EmployeeRepository emplRepository;
     private final CompanyRepository companyRepository;
+    private final MassageRepository massageRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final GenerateCustomPassword passwordGenerator;
@@ -91,5 +94,12 @@ public class EmployeeService {
         }
      
         return emplRepository.save(employee);
+    }
+
+    public List<Employee> getEmployeesByMassage(Long massageId) {
+        Massage massage = massageRepository.findById(massageId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego masażu"));
+        
+        return emplRepository.findByMassageId(massage.getId());
     }
 }

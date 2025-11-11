@@ -2,12 +2,15 @@ package emino.backend.models;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -33,6 +36,13 @@ public class Employee extends User {
 
     @OneToMany(mappedBy = "employee")
     private List<Reservation> emplReservations;
+
+    @ManyToMany
+    @JoinTable(
+        name = "handled_massage", 
+        joinColumns = @JoinColumn(name = "employee_id"), 
+        inverseJoinColumns = @JoinColumn(name = "massage_id"))
+    Set<Massage> massagesToHandle;
 
     @Builder(builderMethodName = "emplBuilder") 
     public Employee(Long id, String password, String email, String name, String surname, LocalDate dateOfBirth, UserRole role, Company company, String phoneNumber) {

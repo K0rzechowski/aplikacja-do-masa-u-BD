@@ -19,5 +19,5 @@ public class MassageDto {
     private int minutes;
     private Long companyId;
     private String companyName;
-    private List<String> symptomList;
+    private List<SymptomDto> symptoms;
 }

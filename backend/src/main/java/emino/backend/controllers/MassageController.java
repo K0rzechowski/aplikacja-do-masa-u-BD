@@ -1,13 +1,23 @@
 package emino.backend.controllers;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import emino.backend.services.EmployeeService;
+import emino.backend.config.SecurityService;
+import emino.backend.dto.MassageCreateDto;
+import emino.backend.dto.MassageDto;
+import emino.backend.models.Admin;
+import emino.backend.models.Massage;
 import emino.backend.services.MassageService;
 import lombok.RequiredArgsConstructor;
 
@@ -17,59 +27,64 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class MassageController {
     
-    private final EmployeeService emplService;
+    private final SecurityService securityService;
     private final MassageService massageService;
 
-    // TODO
-    // @PostMapping("/create")
-    // public ResponseEntity createMassage(@RequestBody MassageDto request) {
-    //     Admin admin = securityService.getCurrentAdmin();
-    //     Massage empl = massageService.createMassage(request, admin);
-    //     return ResponseEntity.ok(empl);
-    // }
+    @PostMapping("/create")
+    public ResponseEntity<MassageDto> createMassage(@RequestBody MassageCreateDto request) {
+        Admin admin = securityService.getCurrentAdmin();
+        Massage msg = massageService.createMassage(request, admin);
+        MassageDto msgDto = massageService.getMassageResponse(msg);
+        return ResponseEntity.ok(msgDto);
+    }
 
-    // TODO 
-    // @GetMapping("/getByCompany/{companyId}")
-    // public ResponseEntity<List<Massage>> getMassagesByCompany() {
-    //     Admin admin = securityService.getCurrentAdmin();
-    //     Long companyId = admin.getCompany().getId();
-    //     List<Massage> massage = massageService.getMassagesByCompany(companyId);
-    //     List<Massage> massagesAlphabetically = massage.stream()
-    //         .sorted((e1, e2) -> {
-    //             return e1.getName().compareToIgnoreCase(e2.getName());
-    //         })
-    //         .toList();
-    //     return  ResponseEntity.ok(massagesAlphabetically);
-    // }
+    @GetMapping
+    public ResponseEntity<List<MassageDto>> getMassagesForMyCompany() {
+        Admin admin = securityService.getCurrentAdmin();
+        Long companyId = admin.getCompany().getId();
+        List<Massage> msgs = massageService.getMassagesByCompany(companyId);
 
-    // TODO
-    // @GetMapping("/{companyId}")
-    // public ResponseEntity<List<Massage>> getMassagesByCompany() {
-    //     Admin admin = securityService.getCurrentAdmin();
-    //     Long companyId = admin.getCompany().getId();
-    //     List<Massage> empls = massageService.getMassagesByCompany(companyId);
-    //     List<Massage> emplsAlphabetically = empls.stream()
-    //         .sorted((e1, e2) -> {
-    //             int surnameComparison = e1.getSurname().compareToIgnoreCase(e2.getSurname());
-    //             return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
-    //         })
-    //         .toList();
-    //     return  ResponseEntity.ok(emplsAlphabetically);
-    // }
+        List<MassageDto> massagesAlphabetically = msgs.stream()
+            .sorted((e1, e2) -> {
+                return e1.getName().compareToIgnoreCase(e2.getName());
+            })
+            .map(massageService::getMassageResponse)
+            .toList();
 
-    // @GetMapping("/all")
-    // public ResponseEntity<List<Massage>> getAllMassages() {
-    //     List<Massage> massages = massageService.getAllMassages();
-    //     return  ResponseEntity.ok(massages);
-    // }
+        return ResponseEntity.ok(massagesAlphabetically);
+    }
 
-    // TODO
-    // @PutMapping("/edit/{id}")
-    // public ResponseEntity editMassage(@PathVariable Long id, @RequestBody MassageUpdateDto request) {
-    //     Admin admin = securityService.getCurrentAdmin();
-    //     Massage updatedMassage = massageService.editMassage(id, request, admin);
-    //     return ResponseEntity.ok(updatedMassage);
-    // }
+    @GetMapping("/company{id}")
+    public ResponseEntity<List<MassageDto>> getMassagesByCompany(@PathVariable Long id) {
+        List<Massage> msg = massageService.getMassagesByCompany(id);
+        List<MassageDto> massagesAlphabetically = msg.stream()
+            .sorted((e1, e2) -> {
+                return e1.getName().compareToIgnoreCase(e2.getName());
+            })
+            .map(massageService::getMassageResponse)
+            .toList();
+        return ResponseEntity.ok(massagesAlphabetically);
+    }
+
+    @GetMapping("/employee{id}")
+    public ResponseEntity<List<Massage>> getMassagesByEmployee(@PathVariable Long employeeId) {
+        List<Massage> msgs = massageService.getMassagesByEmployee(employeeId);
+        return ResponseEntity.ok(msgs);
+    }
+
+    @GetMapping("/symptom{id}")
+    public ResponseEntity<List<Massage>> getMassagesBySymptom(@PathVariable Long symptopmId) {
+        List<Massage> msgs = massageService.getMassagesBySymptom(symptopmId);
+        return ResponseEntity.ok(msgs);
+    }
+
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<MassageDto> editMassage(@PathVariable Long id, @RequestBody MassageCreateDto request) {
+        Admin admin = securityService.getCurrentAdmin();
+        Massage updatedMassage = massageService.editMassage(id, request, admin);
+        MassageDto msgDto = massageService.getMassageResponse(updatedMassage);
+        return ResponseEntity.ok(msgDto);
+    }
 
     @DeleteMapping("/remove/{id}")
     public ResponseEntity removeMassage(@PathVariable Long id) {

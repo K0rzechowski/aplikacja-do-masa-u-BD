@@ -1,6 +1,5 @@
 package emino.backend.controllers;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -50,28 +49,31 @@ public class EmployeeController {
                 return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
             })
             .toList();
-        return  ResponseEntity.ok(emplsAlphabetically);
+        return ResponseEntity.ok(emplsAlphabetically);
     }
 
-    // TODO
-    // @GetMapping("/{companyId}")
-    // public ResponseEntity<List<Employee>> getEmployeesByCompany() {
-    //     Admin admin = securityService.getCurrentAdmin();
-    //     Long companyId = admin.getCompany().getId();
-    //     List<Employee> empls = emplService.getEmployeesByCompany(companyId);
-    //     List<Employee> emplsAlphabetically = empls.stream()
-    //         .sorted((e1, e2) -> {
-    //             int surnameComparison = e1.getSurname().compareToIgnoreCase(e2.getSurname());
-    //             return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
-    //         })
-    //         .toList();
-    //     return  ResponseEntity.ok(emplsAlphabetically);
-    // }
+    @GetMapping("/company{id}")
+    public ResponseEntity<List<Employee>> getEmployeesByCompany(@PathVariable Long id) {
+        List<Employee> empls = emplService.getEmployeesByCompany(id);
+        List<Employee> emplsAlphabetically = empls.stream()
+            .sorted((e1, e2) -> {
+                int surnameComparison = e1.getSurname().compareToIgnoreCase(e2.getSurname());
+                return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
+            })
+            .toList();
+        return ResponseEntity.ok(emplsAlphabetically);
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<Employee>> getAllEmployees() {
         List<Employee> empls = emplService.getAllEmployees();
-        return  ResponseEntity.ok(empls);
+        return ResponseEntity.ok(empls);
+    }
+
+    @GetMapping("/massage{id}")
+    public ResponseEntity<List<Employee>> getEmployeesByMassage(@PathVariable Long massageId) {
+        List<Employee> empls = emplService.getEmployeesByMassage(massageId);
+        return ResponseEntity.ok(empls);
     }
 
     @PutMapping("/edit/{id}")
