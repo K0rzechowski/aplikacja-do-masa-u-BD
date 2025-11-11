@@ -2,6 +2,7 @@ package emino.backend.services;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -43,4 +44,12 @@ public class CompanyService {
                 .thenComparing(Company::getName))
             .collect(Collectors.toList());
     } 
+
+    public Optional<Company> getCompanyById(Long id) {
+        return companyRepository.findById(id);
+    }
+
+    public void removeCompany(Long id) {
+        companyRepository.deleteById(id);
+    }
 }

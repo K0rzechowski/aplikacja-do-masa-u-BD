@@ -1,4 +1,4 @@
-<div class=" flex justify-center items-center p-10 md:hv-200">
+<div class="flex justify-center items-center p-10 md:hv-200">
     <div class="splash container py-5 lg:max-w-1/2">
         <div class="max-w-3/4 mx-auto w-full">
             <h2 class="text-4xl mb-4">Załóż konto</h2>
@@ -96,7 +96,7 @@
                     </div>
                 </div>
                 <div>
-                    <button class="btn-long btn-sky mb-4">Zarejestruj się</button>
+                    <input [disabled]="!formModel.valid" type="submit" class="btn-long btn-sky cursor-pointer mb-4" data-bs-dismiss="modal" value="Zarejestruj się">
                 </div>
             </form>
             <hr class="mb-4 h-px bg-slate-400 border-0">

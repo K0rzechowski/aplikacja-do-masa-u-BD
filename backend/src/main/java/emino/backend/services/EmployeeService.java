@@ -8,11 +8,14 @@ import org.springframework.stereotype.Service;
 import emino.backend.dto.EmployeeDto;
 import emino.backend.dto.EmployeeUpdateDto;
 import emino.backend.exception.AccessDeniedException;
+import emino.backend.mail.EmailService;
+import emino.backend.mail.GenerateCustomPassword;
 import emino.backend.models.Admin;
 import emino.backend.models.Employee;
 import emino.backend.models.UserRole;
 import emino.backend.repositories.CompanyRepository;
 import emino.backend.repositories.EmployeeRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,7 +25,8 @@ public class EmployeeService {
     private final EmployeeRepository emplRepository;
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final EmailService emailService;
+    private final GenerateCustomPassword passwordGenerator;
     
     public List<Employee> getEmployeesByCompany(Long companyId) {
         var company = companyRepository.findById(companyId)
@@ -34,15 +38,16 @@ public class EmployeeService {
         return emplRepository.findAll();
     }
 
-    public Employee createEmployee(EmployeeDto request, Admin admin) {
+    public Employee createEmployee(EmployeeDto request, Admin admin) throws MessagingException {
         var company = admin.getCompany();
+        String generatedPassword = passwordGenerator.generatePassayPassword();
 
         Employee employee = Employee.emplBuilder()
             .name(request.getName())
             .surname(request.getSurname())
             .dateOfBirth(request.getDateOfBirth())
             .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
+            .password(passwordEncoder.encode(generatedPassword))
             .phoneNumber(request.getPhoneNumber())
             .role(UserRole.EMPLOYEE)
             .company(company)
@@ -51,7 +56,10 @@ public class EmployeeService {
         if (!employee.getCompany().equals(admin.getCompany())) {
             throw new AccessDeniedException("Nie można dodać pracownika do innej firmy");
         }
-        return emplRepository.save(employee);
+
+        Employee savedEmployee = emplRepository.save(employee); 
+        emailService.sendHtmlPasswordEmail(savedEmployee, generatedPassword, company.getName());
+        return savedEmployee;
     }
 
     public void removeEmployee(Long id) {

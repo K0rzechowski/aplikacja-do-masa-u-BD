@@ -1,4 +1,4 @@
-<div class="absolute  right-2 p-1 btn z-10 top-27">
+<div class="absolute right-2 p-1 btn z-10 top-27">
   @for (alert of alerts$ | async; track alert.id) {
     <div [ngClass]="getAlertClass(alert.type)" class="flex items-center p-5 mb-5 text-base border shadow-lg rounded-lg" role="alert">
       <button class="absolute top-1 right-2 p-1 btn z-10" (click)="close(alert.id)">

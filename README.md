@@ -20,7 +20,7 @@ właścicielom firm, jak i klientom, ułatwiając proces organizacji i rezerwacj
     Przykładowe uzupełnienie:    
     > POSTGRES_USER=my_user_name
 
-3. W folderze */backend/resources/* stwórz plik *.env* i uzupełnij go zawartością z pliku *.env.dist*, wpisując utworzony klucz według przykładu
+3. W folderze */backend/resources/* stwórz plik *.env* i uzupełnij go zawartością z pliku *.env.dist*, wpisując wartości według przykładów i insturukcji
     ```bash
     cp .env.dist .env
     ```
@@ -61,7 +61,7 @@ The goal of this project is to implement a web application that will enable mass
     Example configuration:
     > POSTGRES_USER=my_user_name
 
-3. In folder */backend/resources/* create file *.env* and into the file write the contents of *.env.dist*, entering the created key according to the example 
+3. In folder */backend/resources/* create file *.env* and into the file write the contents of *.env.dist*, entering values according to the example and instruction 
     ```bash
     cp .env.dist .env
     ```

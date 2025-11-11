@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import emino.backend.dto.AdminDto;
 import emino.backend.models.Admin;
 import emino.backend.services.AdminService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,7 +22,7 @@ public class AdminController {
     private final AdminService adminService;
 
     @PostMapping("/create")
-    public ResponseEntity<Admin> createAdmin(@RequestBody AdminDto request) {
+    public ResponseEntity<Admin> createAdmin(@RequestBody AdminDto request) throws MessagingException {
         Admin admin = adminService.createAdmin(request);
         return ResponseEntity.ok(admin);
     }

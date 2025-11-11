@@ -17,6 +17,5 @@ public class AdminDto {
     private String surname;
     private LocalDate dateOfBirth;
     private String email;
-    private String password;
     private Long companyId;
 }

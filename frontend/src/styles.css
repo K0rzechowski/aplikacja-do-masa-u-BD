@@ -15,8 +15,21 @@ body {
 .btn-sky {
     @apply bg-sky-300 text-slate-800;
 }
+
 .btn-sky:hover {
     @apply bg-sky-400;
+}
+
+.btn-sky:disabled {
+    @apply bg-sky-300 text-slate-800 cursor-not-allowed;
+}
+
+.btn-gray {
+    @apply bg-slate-200 border-2 border-slate-300 text-slate-800;
+}
+
+.btn-gray:hover {
+    @apply bg-slate-300;
 }
 
 .warning {

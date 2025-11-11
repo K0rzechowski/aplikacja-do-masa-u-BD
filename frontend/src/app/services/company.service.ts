@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Company } from '../models/company';
-import { Observable } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 
 
 @Injectable({
@@ -14,11 +14,32 @@ export class CompanyService {
 
   constructor(private httpClient: HttpClient) { }
 
-  createCompany(request: Company): Observable<void> {
-    return this.httpClient.post<void>(`${this.baseUrl}/create`, request);
+  createCompany(request: Company): Observable<Company> {
+    return this.httpClient.post<Company>(`${this.baseUrl}/create`, request).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Nieudana autoryzacja';
+        
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.status === 409 ) {
+          errorMessage = 'Firma o danej nazwie i danym mieście już istnieje';
+        }
+        
+        return throwError(() => new Error(errorMessage));
+      })
+    );
   }
 
   getAll(): Observable<Company[]> {
     return this.httpClient.get<Company[]>(`${this.baseUrl}/getAll`);
+  }
+
+  getCompanyById(id: string): Observable<Company> {
+    return this.httpClient.get<Company>(`${this.baseUrl}/${id}`);
+  }
+
+  deleteCompany(id: string): Observable<void> {
+    console.log("Deleing")
+    return this.httpClient.delete<void>(`${this.baseUrl}/remove/${id}`);
   }
 }

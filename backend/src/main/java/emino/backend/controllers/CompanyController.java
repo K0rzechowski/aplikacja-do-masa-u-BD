@@ -1,10 +1,13 @@
 package emino.backend.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +38,19 @@ public class CompanyController {
         List<CompanyDto> companyRequests = companies.stream().map(company -> new CompanyDto(company.getName(), company.getCity()))
         .toList();
         return ResponseEntity.ok(companyRequests);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Company> getById(@PathVariable Long id) {
+        Optional<Company> foundCompany = companyService.getCompanyById(id);
+        return foundCompany.map(ResponseEntity::ok)
+                           .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/remove/{id}")
+    public ResponseEntity removeCompany(@PathVariable Long id) {
+        companyService.removeCompany(id);
+        return ResponseEntity.ok().build();
     }
 
 }
