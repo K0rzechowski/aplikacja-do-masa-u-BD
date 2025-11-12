@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import emino.backend.config.SecurityService;
+import emino.backend.dto.EmployeeCreateDto;
 import emino.backend.dto.EmployeeDto;
-import emino.backend.dto.EmployeeUpdateDto;
 import emino.backend.models.Admin;
 import emino.backend.models.Employee;
 import emino.backend.services.EmployeeService;
@@ -32,18 +32,20 @@ public class EmployeeController {
     private final SecurityService securityService;
 
     @PostMapping("/create")
-    public ResponseEntity createEmployee(@RequestBody EmployeeDto request) throws MessagingException {
+    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeCreateDto request) throws MessagingException {
         Admin admin = securityService.getCurrentAdmin();
         Employee empl = emplService.createEmployee(request, admin);
-        return ResponseEntity.ok(empl);
+        EmployeeDto emplDto = emplService.getEmployeeResponse(empl);
+        return ResponseEntity.ok(emplDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<Employee>> getEmployeesForMyCompany() {
+    public ResponseEntity<List<EmployeeDto>> getEmployeesForMyCompany() {
         Admin admin = securityService.getCurrentAdmin();
         Long companyId = admin.getCompany().getId();
         List<Employee> empls = emplService.getEmployeesByCompany(companyId);
-        List<Employee> emplsAlphabetically = empls.stream()
+        List<EmployeeDto> emplsAlphabetically = empls.stream()
+            .map(emplService::getEmployeeResponse)
             .sorted((e1, e2) -> {
                 int surnameComparison = e1.getSurname().compareToIgnoreCase(e2.getSurname());
                 return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
@@ -53,9 +55,10 @@ public class EmployeeController {
     }
 
     @GetMapping("/company{id}")
-    public ResponseEntity<List<Employee>> getEmployeesByCompany(@PathVariable Long id) {
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByCompany(@PathVariable Long id) {
         List<Employee> empls = emplService.getEmployeesByCompany(id);
-        List<Employee> emplsAlphabetically = empls.stream()
+        List<EmployeeDto> emplsAlphabetically = empls.stream()
+            .map(emplService::getEmployeeResponse)
             .sorted((e1, e2) -> {
                 int surnameComparison = e1.getSurname().compareToIgnoreCase(e2.getSurname());
                 return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
@@ -65,22 +68,37 @@ public class EmployeeController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Employee>> getAllEmployees() {
+    public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
         List<Employee> empls = emplService.getAllEmployees();
-        return ResponseEntity.ok(empls);
+        List<EmployeeDto> emplsAlphabetically = empls.stream()
+            .map(emplService::getEmployeeResponse)
+            .sorted((e1, e2) -> {
+                int surnameComparison = e1.getSurname().compareToIgnoreCase(e2.getSurname());
+                return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
+            })
+            .toList();
+        return ResponseEntity.ok(emplsAlphabetically);
     }
 
     @GetMapping("/massage{id}")
-    public ResponseEntity<List<Employee>> getEmployeesByMassage(@PathVariable Long massageId) {
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByMassage(@PathVariable Long massageId) {
         List<Employee> empls = emplService.getEmployeesByMassage(massageId);
-        return ResponseEntity.ok(empls);
+        List<EmployeeDto> emplsAlphabetically = empls.stream()
+            .map(emplService::getEmployeeResponse)
+            .sorted((e1, e2) -> {
+                int surnameComparison = e1.getSurname().compareToIgnoreCase(e2.getSurname());
+                return surnameComparison != 0 ? surnameComparison : e1.getName().compareToIgnoreCase(e2.getName());
+            })
+            .toList();
+        return ResponseEntity.ok(emplsAlphabetically);
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity editEmployee(@PathVariable Long id, @RequestBody EmployeeUpdateDto request) {
+    public ResponseEntity<EmployeeDto> editEmployee(@PathVariable Long id, @RequestBody EmployeeCreateDto request) {
         Admin admin = securityService.getCurrentAdmin();
         Employee updatedEmpl = emplService.editEmployee(id, request, admin);
-        return ResponseEntity.ok(updatedEmpl);
+        EmployeeDto emplDto = emplService.getEmployeeResponse(updatedEmpl);
+        return ResponseEntity.ok(emplDto);
     }
 
     @DeleteMapping("/remove/{id}")

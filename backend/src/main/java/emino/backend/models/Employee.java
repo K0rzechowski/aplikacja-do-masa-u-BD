@@ -42,7 +42,7 @@ public class Employee extends User {
         name = "handled_massage", 
         joinColumns = @JoinColumn(name = "employee_id"), 
         inverseJoinColumns = @JoinColumn(name = "massage_id"))
-    Set<Massage> massagesToHandle;
+    private Set<Massage> massagesToHandle;
 
     @Builder(builderMethodName = "emplBuilder") 
     public Employee(Long id, String password, String email, String name, String surname, LocalDate dateOfBirth, UserRole role, Company company, String phoneNumber) {
