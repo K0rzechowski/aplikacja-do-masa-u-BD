@@ -28,37 +28,41 @@ public class SymptomController {
     private final SymptomService symptomService;
 
     @PostMapping("/create")
-    public ResponseEntity createSymptom(@RequestBody SymptomDto request) {
+    public ResponseEntity<SymptomDto> createSymptom(@RequestBody SymptomDto request) {
         Symptom symptom = symptomService.createSymptom(request);
-        return ResponseEntity.ok(symptom);
+        SymptomDto dto = symptomService.getSymptomResponse(symptom);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping
-    public ResponseEntity<List<Symptom>> getAllSymptoms() {
+    public ResponseEntity<List<SymptomDto>> getAllSymptoms() {
         List<Symptom> symptom = symptomService.getAll();
-        List<Symptom> symptomsAlphabetically = symptom.stream()
+        List<SymptomDto> symptomsAlphabetically = symptom.stream()
             .sorted((e1, e2) -> {
                 return e1.getName().compareToIgnoreCase(e2.getName());
             })
+            .map(symptomService::getSymptomResponse)
             .toList();
         return  ResponseEntity.ok(symptomsAlphabetically);
     }
 
-    @GetMapping("/massage{id}")
-    public ResponseEntity<List<Symptom>> getSymptomsByMassage(@PathVariable Long id) {
+    @GetMapping("/massage/{id}")
+    public ResponseEntity<List<SymptomDto>> getSymptomsByMassage(@PathVariable Long id) {
         List<Symptom> symptom = symptomService.getSymptomsByMassage(id);
-        List<Symptom> symptomsAlphabetically = symptom.stream()
+        List<SymptomDto> symptomsAlphabetically = symptom.stream()
             .sorted((e1, e2) -> {
                 return e1.getName().compareToIgnoreCase(e2.getName());
             })
+            .map(symptomService::getSymptomResponse)
             .toList();
         return ResponseEntity.ok(symptomsAlphabetically);
     }
     
     @PutMapping("/edit/{id}")
-    public ResponseEntity editSymptom(@PathVariable Long id, @RequestBody SymptomDto request) {
+    public ResponseEntity<SymptomDto> editSymptom(@PathVariable Long id, @RequestBody SymptomDto request) {
         Symptom updatedSymptom = symptomService.editSymptom(id, request);
-        return ResponseEntity.ok(updatedSymptom);
+        SymptomDto dto = symptomService.getSymptomResponse(updatedSymptom);
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/remove/{id}")

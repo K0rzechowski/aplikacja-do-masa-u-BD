@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 import emino.backend.dto.SymptomDto;
 import emino.backend.models.Symptom;
+import emino.backend.repositories.MassageForSymptomRepository;
 import emino.backend.repositories.MassageRepository;
 import emino.backend.repositories.SymptomRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -17,6 +19,7 @@ public class SymptomService {
     
     private final MassageRepository massageRepository;
     private final SymptomRepository symptomRepository;
+    private final MassageForSymptomRepository msRepository;
 
     public List<Symptom> getAll() {
         return symptomRepository.findAll();
@@ -41,7 +44,9 @@ public class SymptomService {
         return symptomRepository.save(symptom);
     }
 
+    @Transactional
     public void removeSymptom(Long id) {
+        msRepository.deleteBySymptomId(id);
         symptomRepository.deleteById(id);
     }
 
@@ -54,5 +59,12 @@ public class SymptomService {
         }
      
         return symptomRepository.save(symptom);
+    }
+
+    public SymptomDto getSymptomResponse(Symptom symptom) {
+        SymptomDto dto = new SymptomDto();
+        dto.setId(symptom.getId());
+        dto.setName(symptom.getName());
+        return dto;
     }
 }

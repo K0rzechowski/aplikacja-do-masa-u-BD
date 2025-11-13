@@ -62,7 +62,6 @@ export class EmployeeFormComponent {
   employeeBeforeUpdate!: Employee;
   allMassages: Massage[] = [];
   selectedMassages = signal<Massage[]>([]);
-  massagesToEdit = signal<Massage[]>([]);
   
   @Input() employee?: Employee;
 
@@ -150,7 +149,6 @@ export class EmployeeFormComponent {
   }
 
   edit(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate) {
-    console.log(this.employee);
     const updatedEmployee: Employee = {
       id: this.employee?.id,
       name,
@@ -162,10 +160,8 @@ export class EmployeeFormComponent {
       company: this.employee?.company!,
       massageIds: this.getSelectedMassagesIds(),  
     } as Employee;
-    console.log("Updated employee: ", updatedEmployee);
     this.emplService.editEmployee(updatedEmployee).subscribe({
       next: (response) => {
-        console.log("Succesfully edited", response);
         this.alertService.success("Operacja edycji powiodła się");
         this.alertService.info("Możesz zamknąć okno edycji");
       },
@@ -189,7 +185,6 @@ export class EmployeeFormComponent {
     console.log(newEmployee);
     this.emplService.createEmployee(newEmployee).subscribe({
       next: (response) => {
-        console.log("Succesfully added", response);
         this.alertService.success("Operacja dodania pracownika powiodła się");
       },
       error: (error: Error) => {

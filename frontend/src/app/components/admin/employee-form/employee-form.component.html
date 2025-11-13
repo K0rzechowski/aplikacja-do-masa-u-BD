@@ -117,9 +117,9 @@
             </div>
             <div class="grid-cols-2">
                 @if (employee) {
-                    <button class="btn-long btn-sky mb-4"> Zapisz</button>
+                    <button class="btn-long btn-sky cursor-pointer mb-4"> Zapisz</button>
                 } @else {
-                    <button mat-button mat-dialog-close class="btn-long btn-sky mb-4" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="submitForm()">Stwórz</button>
+                    <button mat-button mat-dialog-close class="btn-long btn-sky mb-4 cursor-pointer" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="submitForm()">Stwórz</button>
                 }
             </div>
         </form>

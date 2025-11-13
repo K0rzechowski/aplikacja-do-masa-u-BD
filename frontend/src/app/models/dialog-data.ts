@@ -1,5 +1,4 @@
-
 export interface DialogData<T = any> {
-    item: T,
-    type: 'employee' | 'other'
-  }
+  item: T,
+  type: 'employee' | 'massage' | 'other'
+}

@@ -3,6 +3,7 @@ import { environment } from '../../environments/environment';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Massage } from '../models/massage';
 import { catchError, Observable, throwError } from 'rxjs';
+import { Symptom } from '../models/symptom';
 
 @Injectable({
   providedIn: 'root'
@@ -10,10 +11,11 @@ import { catchError, Observable, throwError } from 'rxjs';
 export class MassageService {
 
   private baseUrl = `${environment.baseUrl}/massages`;
+  private symptomBaseUrl = `${environment.baseUrl}/symptoms`;
 
   constructor(private httpClient: HttpClient) { }
 
-  createMassage(request: Massage): Observable<Massage> {
+  createMassage(request: Partial<Massage>): Observable<Massage> {
     return this.httpClient.post<Massage>(`${this.baseUrl}/create`, request).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMessage = 'Błąd podczas tworzenia masażu';
@@ -27,6 +29,10 @@ export class MassageService {
         return throwError(() => new Error(errorMessage));
       })
     );
+  }
+
+  editMassage(request: Massage): Observable<Massage> {
+    return this.httpClient.put<Massage>(`${this.baseUrl}/edit/${request.id}`, request);
   }
 
   getMassagesByAdminsCompany(): Observable<Massage[]> {
@@ -51,5 +57,13 @@ export class MassageService {
 
   deleteMassage(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.baseUrl}/remove/${id}`);
+  }
+
+  getAllSymptoms(): Observable<Symptom[]> {
+    return this.httpClient.get<Symptom[]>(`${this.symptomBaseUrl}`);
+  }
+
+  getSymptomsByMassage(massageId: string): Observable<Symptom[]> {
+    return this.httpClient.get<Symptom[]>(`${this.symptomBaseUrl}/massage/${massageId}`);
   }
 }

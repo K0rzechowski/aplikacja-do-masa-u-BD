@@ -20,6 +20,7 @@ import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.MassageForSymptomRepository;
 import emino.backend.repositories.MassageRepository;
 import emino.backend.repositories.SymptomRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -54,6 +55,7 @@ public class MassageService {
         return massageRepository.findByEmployeeId(employee.getId());
     } 
 
+    @Transactional
     public Massage createMassage(MassageCreateDto request, Admin admin) {
         var company = admin.getCompany();
 
@@ -77,10 +79,13 @@ public class MassageService {
         return massage;
     }
 
+    @Transactional
     public void removeMassage(Long id) {
+        msRepository.deleteByMassageId(id);
         massageRepository.deleteById(id);
     }
 
+    @Transactional
     public Massage editMassage(Long id, MassageCreateDto request, Admin admin ) {
         Massage massage = massageRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego masażu"));

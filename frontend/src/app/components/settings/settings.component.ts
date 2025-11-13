@@ -44,6 +44,7 @@ export class SettingsComponent {
       ];
       if (authService.isAdmin() == true) {
         this.settingsChoices.push({ label: 'Zarządzaj pracownikami', route: 'employees' });
+        this.settingsChoices.push({ label: 'Zarządzaj masażami', route: 'massages' });
       } else if(authService.isEmployee() == true) {
         this.settingsChoices.push({ label: 'Coś dla zwykłego robola', route: 'employee' });
       }
@@ -53,11 +54,9 @@ export class SettingsComponent {
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {
-        console.log('Logged out successfully');
         this.alertService.success("Wylogowanie powiodło się")
       },
       error: (err) => {
-        console.error('Logout error:', err);
         this.alertService.error(err);
       }
     });
