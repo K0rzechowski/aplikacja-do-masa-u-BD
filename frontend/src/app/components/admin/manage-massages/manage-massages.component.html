@@ -1,0 +1,62 @@
+<div class="md:grid grid-cols-3">
+    <div class="md:col-span-2">
+      <h2 class="text-4xl mb-2">Zarządzaj masażami</h2>
+      <h3 class="text-lg mb-2">Przeglądaj, edytuj i dodawaj nowe masaże</h3>
+    </div>
+    <div class="md:col-span-1 flex justify-end items-start">
+      <button class="btn btn-sky" (click)="openCreateDialog('0ms', '0ms')">+ Dodaj masaż</button>
+    </div>
+  </div>
+  <div class="overflow-auto max-h-145 rounded-md border border-gray-300 shadow-sm mt-5">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="px-4 py-2">Nazwa</th>
+          <th class="px-4 py-2">Czas trwania</th>
+          <th class="px-4 py-2">Cena</th>
+          <th class="px-4 py-2">Powiązane symptomy</th>
+          <th class="px-4 py-2 text-right">Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (msg of msgsInMyCompany; track $index) {
+          <tr>
+            <td class="px-4 py-2 border-t border-gray-200">{{ msg.name }}</td>
+            <td class="px-4 py-2 border-t border-gray-200">{{ msg.minutes }} min</td>
+            <td class="px-4 py-2 border-t border-gray-200">{{ msg.price }} zł</td>
+                <td class="px-4 py-2 border-t border-gray-200">
+                  <ul>
+                  @if (msg.symptoms && msg.symptoms.length > 0) {
+                    @for (sym of msg.symptoms; track $index) {
+                      <li>{{ sym.name }}</li>
+                    }
+                  } @else {
+                    <li>Brak</li>
+                  }
+                  </ul>
+                </td>
+            <td class="px-4 py-2 border-t border-gray-200 text-right">
+              <div class="inline-flex justify-end gap-2">
+                <img src="icons/edit.png" alt="Edytuj masaż" title="Edytuj masaż" class="cursor-pointer" (click)="edit(msg)">
+                <img src="icons/delete.png" alt="Usuń masaż" title="Usuń masaż" class="cursor-pointer" (click)="openDeleteDialog('0ms', '0ms', { item: msg, type: 'massage' })" />
+              </div>
+            </td>
+          </tr>     
+          @if (showMassageDetails && msgToEdit && msgToEdit.id === msg.id) {
+            <tr>
+              <td colspan="5" class="w-full bg-gray-50 border-t border-gray-200 px-4">
+                <div class="flex justify-between items-center mb-2">
+                  <p class="font-semibold">Edycja</p>
+                  <button (click)="closeEdit()" class="p-1 btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                  </button>
+                </div>
+                <app-massage-form [massage]="msgToEdit"></app-massage-form>
+              </td>
+            </tr>
+          }
+        }
+       
+      </tbody>
+    </table>
+  </div>
