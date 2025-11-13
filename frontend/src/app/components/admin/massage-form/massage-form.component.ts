@@ -79,12 +79,10 @@ export class MassageFormComponent {
   loadSymptoms() {
     this.msgService.getAllSymptoms().subscribe((data: Symptom[]) => {
       this.allSymptoms = data;
-      // console.log("All symptoms:", this.allSymptoms)
       this.cdr.detectChanges(); 
     });
   }
 
-  // TODO
   loadAlreadySelectedSymptoms() {
     if (this.massage && this.massage.symptoms) {
       this.msgService.getSymptomsByMassage(this.massage.id!).subscribe((data: Symptom[]) => {
@@ -119,9 +117,7 @@ export class MassageFormComponent {
 
   getAvaiableSymptoms(): Symptom[] {
     const selectedIds = this.getSelectedSymptomsIds();
-    // console.log("aelected: ", selectedIds)
     const view = this.allSymptoms.filter(symptom => !selectedIds.includes(symptom.id!));
-    // console.log("View", view);
     return this.allSymptoms.filter(symptom => !selectedIds.includes(symptom.id!));
   }
 
@@ -136,19 +132,16 @@ export class MassageFormComponent {
     } as Massage;
     this.msgService.editMassage(updatedMassage).subscribe({
       next: (response) => {
-        console.log(response)
         this.alertService.success("Operacja edycji powiodła się");
         this.alertService.info("Możesz zamknąć okno edycji");
       },
       error: (error: Error) => {
-        console.log(error.message);
         this.alertService.error("Błąd podczas edycji: " + error.message);
       } 
     });
   }
 
-  create(name: string, minutes: number, price: number,) {
-    console.log(this.massage);
+  create(name: string, minutes: number, price: number) {
     const upperName = name.charAt(0).toUpperCase() + name.slice(1)
     const newMassage = {
       name: upperName,
@@ -156,13 +149,11 @@ export class MassageFormComponent {
       minutes,
       symptomIds: this.getSelectedSymptomsIds()
     };
-    console.log(newMassage);
     this.msgService.createMassage(newMassage).subscribe({
       next: (response) => {
         this.alertService.success("Operacja dodania masażu powiodła się");
       },
       error: (error: Error) => {
-        console.log(error.message);
         this.alertService.error("Błąd podczas dodawania masażu: " + error.message);
       } 
     });
@@ -173,7 +164,6 @@ export class MassageFormComponent {
   }
 
   submitForm(): void {
-    // console.log("Submitting...", this.massage, this.formModel.valid)
     if (this.massage && this.formModel.valid) {
       this.edit(
         this.formModel.value.name,
