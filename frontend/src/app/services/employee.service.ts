@@ -16,11 +16,6 @@ export class EmployeeService {
     private httpClient: HttpClient
   ) {}
 
-  // TODO
-  getAll(): Observable<Employee[]> {
-    return this.httpClient.get<Employee[]>(`${this.baseUrl}/getAll`);
-  }
-
   getEmployeesByAdminsCompany(): Observable<Employee[]> {
     return this.httpClient.get<Employee[]>(`${this.baseUrl}`);
   }
@@ -40,7 +35,8 @@ export class EmployeeService {
       phoneNumber: employee.phoneNumber,
       dateOfBirth: employee.dateOfBirth,
       email: employee.email,
-      password: employee.password
+      password: employee.password,
+      massageIds: employee.massageIds || []
     };
         
     return this.httpClient.post<Employee>(`${this.baseUrl}/create`, createRequest);

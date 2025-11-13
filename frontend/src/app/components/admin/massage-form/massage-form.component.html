@@ -1,0 +1,81 @@
+<div>
+    <div class="d-flex justify-content-between p-5">
+        @if(!massage) {
+            <div class="flex justify-between items-center mb-2">
+                <h2 mat-dialog-title>Dodaj masaż</h2>
+                <button mat-dialog-close class="p-1 btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                </button>
+            </div>
+            
+        }
+        <form [formGroup]="formModel" (ngSubmit)="submitForm()">
+            <div class="mb-4">
+                <label for="name">Nazwa</label>
+                <input type="text" id="name" placeholder="Nazwa" formControlName="name" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <p class="warning">
+                    @if(formModel.controls['name'].invalid && formModel.controls['name'].touched ) {
+                        Nazwa jest wymagana
+                    }
+                </p>
+            </div>
+            <div class="mb-4">
+                <label for="minutes">Czas trwania</label>
+                <input type="text" id="minutes" placeholder="Czas trwania" formControlName="minutes" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <p class="warning">
+                    @if(formModel.controls['minutes'].invalid && formModel.controls['minutes'].touched ) {
+                        Czas trwania jest wymagane
+                    }
+                </p>
+            </div>
+            <div class="mb-4">
+                <label for="price">Cena</label>
+                <input type="text" id="price" placeholder="Cena" formControlName="price" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <p class="warning">
+                    @if(formModel.controls['price'].invalid && formModel.controls['price'].touched ) {
+                        Cena jest wymagana
+                    } @else if(formModel.controls['price'].errors?.['price']) {
+                        Cena musi być poprawny
+                    }
+                </p>
+            </div>
+            <div class="mb-4">
+                <label for="symptom">Symptomy</label>
+                <div class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
+                    <mat-chip-set>
+                            @for (symptom of selectedSymptoms(); track symptom) {
+                                <mat-chip (removed)="removeSymptom(symptom)" [removable]="true">
+                                    {{symptom.name}}
+                                    <button matChipRemove [attr.aria-label]="'Usuń' + symptom.name">
+                                        <mat-icon>cancel</mat-icon>
+                                    </button>
+                                </mat-chip>
+                            }
+                    </mat-chip-set>
+                    <mat-form-field appearance="outline" class="w-full" >
+                        <!-- <input
+                          placeholder="Wyszukaj masażu..."
+                          [matChipInputFor]="reactiveChipGrid"
+                          (matChipInputTokenEnd)="addMassage($event)"
+                        /> -->
+                        <mat-select [formControl]="symptomForm" placeholder="Wybierz symptom do dodania..." required>
+                            @for (symptom of getAvaiableSymptoms(); track symptom) {
+                              <mat-option [value]="symptom">{{symptom.name}}</mat-option>
+                            }
+                            @empty {
+                                <mat-option disabled>Brak dostępnych symptomów</mat-option>
+                            }
+                          </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="grid-cols-2">
+                @if (massage) {
+                    <button class="btn-long btn-sky cursor-pointer mb-4"> Zapisz</button>
+                } @else {
+                    <button mat-button mat-dialog-close class="btn-long btn-sky mb-4 cursor-pointer" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="submitForm()">Stwórz</button>
+                }
+            </div>
+        </form>
+    </div>
+</div>

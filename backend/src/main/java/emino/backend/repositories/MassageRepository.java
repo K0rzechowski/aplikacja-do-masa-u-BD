@@ -15,7 +15,10 @@ public interface MassageRepository extends JpaRepository<Massage, Long> {
     
     Optional<Massage> findByName(String name);
     List<Massage> findByCompany(Company company);
-    @Query("SELECT m FROM Massage m JOIN m.massageMatchesForSymptom mfs WHERE mfs.symptom = :symptom")
+
+    @Query("SELECT m FROM Massage m JOIN m.massageMatchesForSymptom ms WHERE ms.symptom = :symptom")
     List<Massage> findBySymptom(@Param("symptom") Symptom symptom);
-    // List<Massage> findByEmployee(Employee employee);
+    
+    @Query("SELECT DISTINCT m FROM Massage m JOIN m.employees e WHERE e.id = :employeeId")
+    List<Massage> findByEmployeeId(@Param("employeeId") Long employeeId);
 }

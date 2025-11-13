@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -36,7 +37,7 @@ public class Massage {
     private int price;
 
     @Column(nullable = false)
-    private int minutes;
+    private int durationInMinutes;
 
     @OneToMany(mappedBy = "massage")
     Set<MassageForSymptom> massageMatchesForSymptom;
@@ -47,4 +48,7 @@ public class Massage {
 
     @OneToOne(mappedBy = "massage")
     private Reservation reservation;
+
+    @ManyToMany(mappedBy = "massagesToHandle")
+    Set<Employee> employees;
 }

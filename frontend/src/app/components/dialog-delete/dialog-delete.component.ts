@@ -14,6 +14,9 @@ import { Employee } from '../../models/employee';
 import { EmployeeService } from '../../services/employee.service';
 import { DialogData } from '../../models/dialog-data';
 import { AlertService } from '../../services/alert.service';
+import { MatSingleDateSelectionModel } from '@angular/material/datepicker';
+import { MassageService } from '../../services/massage.service';
+import { Massage } from '../../models/massage';
 
 @Component({
   selector: 'app-dialog',
@@ -36,6 +39,7 @@ export class DialogDeleteComponent {
 
   constructor (
     private emplService: EmployeeService,
+    private msgService: MassageService,
     private alertService: AlertService
   ) {
     this.checkType();
@@ -50,6 +54,11 @@ export class DialogDeleteComponent {
         this.idToDelete = employee.id ?? '';
         this.thingToDelete = `pracownika ${employee.name} ${employee.surname}`;
         return this.data.type;
+      case 'massage':
+        const massage = this.data.item as Massage;
+        this.idToDelete = massage.id ?? '';
+        this.thingToDelete = `${massage.name}`;
+        return this.data.type;
       default:
         return "";
     }
@@ -57,16 +66,23 @@ export class DialogDeleteComponent {
 
   delete(): void {
     console.log(this.data)
-    if(this.data.type === 'employee'){ 
-      if (this.idToDelete) {
-        this.emplService.deleteEmployee(this.idToDelete).subscribe({
+    if (this.idToDelete) {
+      if(this.data.type === 'employee'){ 
+          this.emplService.deleteEmployee(this.idToDelete).subscribe({
+            next: () => {
+              this.alertService.success(`Poprawnie usunięto pracownika o ID ${this.idToDelete}`);
+            },
+            error: (error) => {
+              this.alertService.error(`Nieudana operacja usunięcia pracownika o ID ${this.idToDelete}`);
+            }
+          });
+      } else if(this.data.type === 'massage'){ 
+        this.msgService.deleteMassage(this.idToDelete).subscribe({
           next: () => {
-            console.log(`Employee with ID ${this.idToDelete} deleted successfully.`);
-            this.alertService.success(`Poprawnie usunięto pracownika o ID ${this.idToDelete}`);
+            this.alertService.success(`Poprawnie usunięto masaż o ID ${this.idToDelete}`);
           },
           error: (error) => {
-            console.error(`Error deleting employee with ID ${this.idToDelete}:`, error);
-            this.alertService.error(`Nieudana operacja usunięcia pracownika o ID ${this.idToDelete}`);
+            this.alertService.error(`Nieudana operacja usunięcia masażu o ID ${this.idToDelete}`);
           }
         });
       } 

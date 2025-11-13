@@ -5,14 +5,22 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import emino.backend.dto.MassageCreateDto;
 import emino.backend.dto.MassageDto;
+import emino.backend.dto.SymptomDto;
 import emino.backend.exception.AccessDeniedException;
 import emino.backend.models.Admin;
+import emino.backend.models.Employee;
 import emino.backend.models.Massage;
+import emino.backend.models.MassageForSymptom;
+import emino.backend.models.MassageSymptom;
+import emino.backend.models.Symptom;
 import emino.backend.repositories.CompanyRepository;
 import emino.backend.repositories.EmployeeRepository;
+import emino.backend.repositories.MassageForSymptomRepository;
 import emino.backend.repositories.MassageRepository;
 import emino.backend.repositories.SymptomRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,7 +31,7 @@ public class MassageService {
     private final SymptomRepository symptomRepository;
     private final EmployeeRepository emplRepository;
     private final CompanyRepository companyRepository;
-
+    private final MassageForSymptomRepository msRepository;
     
     public List<Massage> getMassagesByCompany(Long companyId) {
         var company = companyRepository.findById(companyId)
@@ -41,51 +49,105 @@ public class MassageService {
         return massageRepository.findBySymptom(symptom);
     } 
 
-    // TODO for now, no employee is associated with the massage
-    // public List<Massage> getMassagesByEmployee(Long employeeId) {
-    //     var employee = emplRepository.findById(employeeId)
-    //         .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego pracownika"));
-    //     return massageRepository.findByEmployee(employee);
-    // } 
+    public List<Massage> getMassagesByEmployee(Long employeeId) {
+        Employee employee = emplRepository.findById(employeeId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego pracownika"));
+        return massageRepository.findByEmployeeId(employee.getId());
+    } 
 
-    public Massage createMassage(MassageDto request, Admin admin) {
+    @Transactional
+    public Massage createMassage(MassageCreateDto request, Admin admin) {
         var company = admin.getCompany();
 
         Massage massage = Massage.builder()
             .name(request.getName())
             .price(request.getPrice())
-            .minutes(request.getMinutes())
+            .durationInMinutes(request.getMinutes())
             .company(company)
             .build();
 
         if (!massage.getCompany().equals(admin.getCompany())) {
             throw new AccessDeniedException("Nie można dodać masażu do nie swojej firmy");
         }
-        return massageRepository.save(massage);
+
+        massage = massageRepository.save(massage); 
+
+        if (request.getSymptomIds() != null && !request.getSymptomIds().isEmpty()) {
+            createMassageSymptomAssociations(massage, request.getSymptomIds());
+        }
+
+        return massage;
     }
 
+    @Transactional
     public void removeMassage(Long id) {
+        msRepository.deleteByMassageId(id);
         massageRepository.deleteById(id);
     }
 
-    public Massage editMassage(Long id, MassageDto request, Admin admin ) {
+    @Transactional
+    public Massage editMassage(Long id, MassageCreateDto request, Admin admin ) {
         Massage massage = massageRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego masażu"));
 
         if (request.getName() != null) {
             massage.setName(request.getName());
         }
-        if (request.getPrice() != 0) {
+        if (request.getPrice() > 0) {
             massage.setPrice(request.getPrice());
         }
-        if (request.getMinutes() != 0) {
-            massage.setMinutes(request.getMinutes());
+        if (request.getMinutes() > 0) {
+            massage.setDurationInMinutes(request.getMinutes());
         }
 
         if (!massage.getCompany().equals(admin.getCompany())) {
             throw new AccessDeniedException("Nie można dodać masażu do nie swojej firmy");
         }
      
+        if (request.getSymptomIds() != null) {
+            msRepository.deleteByMassageId(id);
+
+            if( !request.getSymptomIds().isEmpty()) {
+                createMassageSymptomAssociations(massage, request.getSymptomIds());
+            }
+        }
+
         return massageRepository.save(massage);
+    }
+
+    private void createMassageSymptomAssociations(Massage massage, List<Long> symptomIds) {
+        for (Long symptomId : symptomIds) {
+            Symptom symptom = symptomRepository.findById(symptomId)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego symptomu"));
+
+            MassageSymptom id = new MassageSymptom();
+            id.setMassageId(massage.getId());
+            id.setSymptomId(symptom.getId());
+
+            MassageForSymptom massageForSymptom = new MassageForSymptom();
+            massageForSymptom.setId(id);
+            massageForSymptom.setMassage(massage);
+            massageForSymptom.setSymptom(symptom);
+
+            msRepository.save(massageForSymptom);
+        }
+    }
+
+    public MassageDto getMassageResponse(Massage massage) {
+        List<Symptom> symptoms = symptomRepository.findByMassage(massage);
+
+        MassageDto dto = new MassageDto();
+        dto.setId(massage.getId());
+        dto.setName(massage.getName());
+        dto.setPrice(massage.getPrice());
+        dto.setMinutes(massage.getDurationInMinutes());
+        dto.setCompanyId(massage.getCompany().getId());
+        dto.setCompanyName(massage.getCompany().getName());
+        dto.setSymptoms(
+            symptoms.stream()
+                .map(s -> new SymptomDto(s.getId(), s.getName()))
+                .toList());
+
+        return dto;
     }
 }

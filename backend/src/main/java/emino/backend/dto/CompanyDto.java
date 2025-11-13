@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CompanyDto {
     
-    String name;
-    String city;
+    private String name;
+    private String city;
 }

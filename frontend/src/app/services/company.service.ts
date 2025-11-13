@@ -17,7 +17,7 @@ export class CompanyService {
   createCompany(request: Company): Observable<Company> {
     return this.httpClient.post<Company>(`${this.baseUrl}/create`, request).pipe(
       catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Nieudana autoryzacja';
+        let errorMessage = 'Błąd podczas tworzenia firmy';
         
         if (error.error && error.error.message) {
           errorMessage = error.error.message;
@@ -39,7 +39,6 @@ export class CompanyService {
   }
 
   deleteCompany(id: string): Observable<void> {
-    console.log("Deleing")
     return this.httpClient.delete<void>(`${this.baseUrl}/remove/${id}`);
   }
 }

@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 
 import emino.backend.dto.SymptomDto;
 import emino.backend.models.Symptom;
-import emino.backend.repositories.CompanyRepository;
-import emino.backend.repositories.EmployeeRepository;
+import emino.backend.repositories.MassageForSymptomRepository;
 import emino.backend.repositories.MassageRepository;
 import emino.backend.repositories.SymptomRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,8 +19,11 @@ public class SymptomService {
     
     private final MassageRepository massageRepository;
     private final SymptomRepository symptomRepository;
-    private final EmployeeRepository emplRepository;
-    private final CompanyRepository companyRepository;
+    private final MassageForSymptomRepository msRepository;
+
+    public List<Symptom> getAll() {
+        return symptomRepository.findAll();
+    }
 
     public Optional<Symptom> getMassageBySymptom(String name) {
         return symptomRepository.findByName(name);
@@ -32,13 +35,6 @@ public class SymptomService {
         return symptomRepository.findByMassage(massage);
     } 
 
-    // TODO for now, no employee is associated with the symptoms
-    // public List<Symptom> getSymptomsByEmployee(Long employeeId) {
-    //     var employee = emplRepository.findById(employeeId)
-    //         .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego pracownika"));
-    //     return symptomRepository.findByEmployee(employee);
-    // } 
-
     public Symptom createSymptom(SymptomDto request) {
 
         Symptom symptom = Symptom.builder()
@@ -48,7 +44,9 @@ public class SymptomService {
         return symptomRepository.save(symptom);
     }
 
+    @Transactional
     public void removeSymptom(Long id) {
+        msRepository.deleteBySymptomId(id);
         symptomRepository.deleteById(id);
     }
 
@@ -61,5 +59,12 @@ public class SymptomService {
         }
      
         return symptomRepository.save(symptom);
+    }
+
+    public SymptomDto getSymptomResponse(Symptom symptom) {
+        SymptomDto dto = new SymptomDto();
+        dto.setId(symptom.getId());
+        dto.setName(symptom.getName());
+        return dto;
     }
 }

@@ -41,12 +41,6 @@
                     }
                 </p>
             </div>
-            <!-- @if(!employee) {
-                <div class="mb-4">
-                    <label for="password">Hasło</label>
-                    <input type="password" id="password" placeholder="Hasło" formControlName="password" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
-                </div>
-            } -->
             <div class="mb-4">
                 <label for="phoneNumber">Numer telefonu</label>
                 <input type="text" id="phoneNumber" placeholder="Nr telefonu" formControlName="phoneNumber" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
@@ -91,11 +85,41 @@
                     }
                 </p>
             </div>
+            <div class="mb-4">
+                <label for="massage">Masaże</label>
+                <div class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
+                    <mat-chip-set>
+                            @for (massage of selectedMassages(); track massage) {
+                                <mat-chip (removed)="removeMassage(massage)" [removable]="true">
+                                    {{massage.name}}
+                                    <button matChipRemove [attr.aria-label]="'Usuń' + massage.name">
+                                        <mat-icon>cancel</mat-icon>
+                                    </button>
+                                </mat-chip>
+                            }
+                    </mat-chip-set>
+                    <mat-form-field appearance="outline" class="w-full" >
+                        <!-- <input
+                          placeholder="Wyszukaj masażu..."
+                          [matChipInputFor]="reactiveChipGrid"
+                          (matChipInputTokenEnd)="addMassage($event)"
+                        /> -->
+                        <mat-select [formControl]="massageForm" placeholder="Wybierz masaż do dodania..." required>
+                            @for (massage of getAvaiableMassages(); track massage) {
+                              <mat-option [value]="massage">{{massage.name}}</mat-option>
+                            }
+                            @empty {
+                                <mat-option disabled>Brak dostępnych masaży</mat-option>
+                            }
+                          </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
             <div class="grid-cols-2">
                 @if (employee) {
-                    <button class="btn-long btn-sky mb-4"> Zapisz</button>
+                    <button class="btn-long btn-sky cursor-pointer mb-4"> Zapisz</button>
                 } @else {
-                    <button mat-button mat-dialog-close class="btn-long btn-sky mb-4" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="submitForm()">Stwórz</button>
+                    <button mat-button mat-dialog-close class="btn-long btn-sky mb-4 cursor-pointer" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="submitForm()">Stwórz</button>
                 }
             </div>
         </form>
