@@ -54,7 +54,7 @@ public class EmployeeController {
         return ResponseEntity.ok(emplsAlphabetically);
     }
 
-    @GetMapping("/company{id}")
+    @GetMapping("/company/{id}")
     public ResponseEntity<List<EmployeeDto>> getEmployeesByCompany(@PathVariable Long id) {
         List<Employee> empls = emplService.getEmployeesByCompany(id);
         List<EmployeeDto> emplsAlphabetically = empls.stream()
@@ -80,9 +80,9 @@ public class EmployeeController {
         return ResponseEntity.ok(emplsAlphabetically);
     }
 
-    @GetMapping("/massage{id}")
-    public ResponseEntity<List<EmployeeDto>> getEmployeesByMassage(@PathVariable Long massageId) {
-        List<Employee> empls = emplService.getEmployeesByMassage(massageId);
+    @GetMapping("/massage/{id}")
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByMassage(@PathVariable Long id) {
+        List<Employee> empls = emplService.getEmployeesByMassage(id);
         List<EmployeeDto> emplsAlphabetically = empls.stream()
             .map(emplService::getEmployeeResponse)
             .sorted((e1, e2) -> {

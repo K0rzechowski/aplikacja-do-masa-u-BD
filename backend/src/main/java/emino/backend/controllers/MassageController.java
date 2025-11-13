@@ -54,10 +54,10 @@ public class MassageController {
         return ResponseEntity.ok(massagesAlphabetically);
     }
 
-    @GetMapping("/company{id}")
+    @GetMapping("/company/{id}")
     public ResponseEntity<List<MassageDto>> getMassagesByCompany(@PathVariable Long id) {
-        List<Massage> msg = massageService.getMassagesByCompany(id);
-        List<MassageDto> massagesAlphabetically = msg.stream()
+        List<Massage> msgs = massageService.getMassagesByCompany(id);
+        List<MassageDto> massagesAlphabetically = msgs.stream()
             .sorted((e1, e2) -> {
                 return e1.getName().compareToIgnoreCase(e2.getName());
             })
@@ -66,16 +66,28 @@ public class MassageController {
         return ResponseEntity.ok(massagesAlphabetically);
     }
 
-    @GetMapping("/employee{id}")
-    public ResponseEntity<List<Massage>> getMassagesByEmployee(@PathVariable Long employeeId) {
-        List<Massage> msgs = massageService.getMassagesByEmployee(employeeId);
-        return ResponseEntity.ok(msgs);
+    @GetMapping("/employee/{id}")
+    public ResponseEntity<List<MassageDto>> getMassagesByEmployee(@PathVariable Long id) {
+        List<Massage> msgs = massageService.getMassagesByEmployee(id);
+        List<MassageDto> massagesAlphabetically = msgs.stream()
+        .sorted((e1, e2) -> {
+            return e1.getName().compareToIgnoreCase(e2.getName());
+        })
+        .map(massageService::getMassageResponse)
+        .toList();
+    return ResponseEntity.ok(massagesAlphabetically);
     }
 
-    @GetMapping("/symptom{id}")
-    public ResponseEntity<List<Massage>> getMassagesBySymptom(@PathVariable Long symptopmId) {
-        List<Massage> msgs = massageService.getMassagesBySymptom(symptopmId);
-        return ResponseEntity.ok(msgs);
+    @GetMapping("/symptom/{id}")
+    public ResponseEntity<List<MassageDto>> getMassagesBySymptom(@PathVariable Long id) {
+        List<Massage> msgs = massageService.getMassagesBySymptom(id);
+        List<MassageDto> massagesAlphabetically = msgs.stream()
+        .sorted((e1, e2) -> {
+            return e1.getName().compareToIgnoreCase(e2.getName());
+        })
+        .map(massageService::getMassageResponse)
+        .toList();
+    return ResponseEntity.ok(massagesAlphabetically);
     }
 
     @PutMapping("/edit/{id}")

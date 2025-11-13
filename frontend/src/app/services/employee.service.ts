@@ -36,7 +36,7 @@ export class EmployeeService {
       dateOfBirth: employee.dateOfBirth,
       email: employee.email,
       password: employee.password,
-      massages: employee.massages || []
+      massageIds: employee.massageIds || []
     };
         
     return this.httpClient.post<Employee>(`${this.baseUrl}/create`, createRequest);

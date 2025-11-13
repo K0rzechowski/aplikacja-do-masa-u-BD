@@ -5,5 +5,6 @@ import { Massage } from "./massage";
 export interface Employee extends User {
     company: Company,
     phoneNumber: string
-    massages?: Massage[]
+    massages?: Massage[],
+    massageIds?: string[]
 }

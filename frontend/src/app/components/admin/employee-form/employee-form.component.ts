@@ -62,6 +62,7 @@ export class EmployeeFormComponent {
   employeeBeforeUpdate!: Employee;
   allMassages: Massage[] = [];
   selectedMassages = signal<Massage[]>([]);
+  massagesToEdit = signal<Massage[]>([]);
   
   @Input() employee?: Employee;
 
@@ -80,7 +81,6 @@ export class EmployeeFormComponent {
       dateOfBirth: [this.employee?.dateOfBirth, Validators.required],
       email: [this.employee?.email, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberLength]],
-      
     })
 
     this.loadMassages();
@@ -102,14 +102,23 @@ export class EmployeeFormComponent {
         phoneNumber: this.employee.phoneNumber,
         dateOfBirth: this.employee.dateOfBirth })
     }
+    this.loadAlreadySelectedMassages();
   }
 
   loadMassages() {
     this.massageService.getMassagesByAdminsCompany().subscribe((data: Massage[]) => {
       this.allMassages = data;
-      console.log("All massages: ", this.allMassages);
       this.cdr.detectChanges(); 
     });
+  }
+
+  loadAlreadySelectedMassages() {
+    if (this.employee && this.employee.massages) {
+      this.massageService.getMassagesByEmployee(this.employee.id!).subscribe((data: Massage[]) => {
+        this.selectedMassages.set(data);
+        this.cdr.detectChanges(); 
+      });
+    }
   }
 
   addMassage(massage: Massage) {
@@ -142,7 +151,17 @@ export class EmployeeFormComponent {
 
   edit(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate) {
     console.log(this.employee);
-    const updatedEmployee: Employee = {id: this.employee?.id, name, surname, phoneNumber, dateOfBirth: new Date(dateOfBirth).toISOString().split('T')[0], email, role: this.employee?.role!, company: this.employee?.company!} as Employee;
+    const updatedEmployee: Employee = {
+      id: this.employee?.id,
+      name,
+      surname,
+      phoneNumber,
+      dateOfBirth: new Date(dateOfBirth).toISOString().split('T')[0],
+      email,
+      role: this.employee?.role!,
+      company: this.employee?.company!,
+      massageIds: this.getSelectedMassagesIds(),  
+    } as Employee;
     console.log("Updated employee: ", updatedEmployee);
     this.emplService.editEmployee(updatedEmployee).subscribe({
       next: (response) => {
@@ -164,7 +183,8 @@ export class EmployeeFormComponent {
       surname,
       phoneNumber,
       dateOfBirth: new Date(dateOfBirth).toISOString().split('T')[0],
-      email
+      email,
+      massageIds: this.getSelectedMassagesIds()
     };
     console.log(newEmployee);
     this.emplService.createEmployee(newEmployee).subscribe({
@@ -184,9 +204,8 @@ export class EmployeeFormComponent {
   }
 
   submitForm(): void {
-    console.log("Submitting...", this.employee, this.formModel.valid)
+    // console.log("Submitting...", this.employee, this.formModel.valid)
     if (this.employee && this.formModel.valid) {
-      console.log("editing")
       this.edit(
         this.formModel.value.name,
         this.formModel.value.surname,
