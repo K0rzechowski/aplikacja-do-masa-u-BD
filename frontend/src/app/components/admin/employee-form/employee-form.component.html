@@ -104,7 +104,7 @@
                           [matChipInputFor]="reactiveChipGrid"
                           (matChipInputTokenEnd)="addMassage($event)"
                         /> -->
-                        <mat-select [formControl]="massageForm" placeholder="Wybierz masaż do dodania..." required>
+                        <mat-select [formControl]="massageForm" placeholder="Wybierz masaż do dodania...">
                             @for (massage of getAvaiableMassages(); track massage) {
                               <mat-option [value]="massage">{{massage.name}}</mat-option>
                             }

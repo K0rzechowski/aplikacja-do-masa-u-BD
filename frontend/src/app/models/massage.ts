@@ -6,6 +6,7 @@ export interface Massage {
     id?: string,
     name: string,
     company: Company,
+    companyId?: string,
     price: number,
     minutes: number,
     employees?: Employee[],

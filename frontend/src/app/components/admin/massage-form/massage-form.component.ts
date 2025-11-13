@@ -128,6 +128,7 @@ export class MassageFormComponent {
       price,
       minutes,
       company: this.massage?.company!,
+      companyId: this.massage?.companyId!,
       symptomIds: this.getSelectedSymptomsIds(),  
     } as Massage;
     this.msgService.editMassage(updatedMassage).subscribe({

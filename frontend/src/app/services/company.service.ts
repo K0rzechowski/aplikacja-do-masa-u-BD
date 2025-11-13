@@ -38,6 +38,10 @@ export class CompanyService {
     return this.httpClient.get<Company>(`${this.baseUrl}/${id}`);
   }
 
+  getCompaniesByCity(city: string): Observable<Company[]> {
+    return this.httpClient.get<Company[]>(`${this.baseUrl}/city/${city}`);
+  }
+
   deleteCompany(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.baseUrl}/remove/${id}`);
   }

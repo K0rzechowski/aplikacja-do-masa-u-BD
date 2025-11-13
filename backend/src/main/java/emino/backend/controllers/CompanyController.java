@@ -53,4 +53,13 @@ public class CompanyController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/city/{cityName}")
+    public ResponseEntity<List<CompanyDto>> getCompaniesByCity(@PathVariable String cityName) {
+        List<Company> companies = companyService.getCompaniesByCity(cityName);
+        List<CompanyDto> companyRequests = companies
+            .stream()
+            .map(company -> new CompanyDto(company.getName(), company.getCity()))
+            .toList();
+        return ResponseEntity.ok(companyRequests);
+    }
 }
