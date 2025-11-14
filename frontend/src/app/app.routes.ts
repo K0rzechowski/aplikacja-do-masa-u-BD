@@ -8,6 +8,7 @@ import { CompanyFormComponent } from './components/company-form/company-form.com
 import { ManageMassagesComponent } from './components/admin/manage-massages/manage-massages.component';
 import { MainPageComponent } from './components/main-page/main-page.component';
 import { RecommendationsComponent } from './components/recommendations/recommendations.component';
+import { MassagesComponent } from './components/massages/massages.component';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
@@ -21,6 +22,6 @@ export const routes: Routes = [
     ]
   },
   { path: 'forCompanies', component: CompanyFormComponent },
-  { path: 'recommendations', component: RecommendationsComponent }
-
+  { path: 'recommendations', component: RecommendationsComponent },
+  { path: 'massages/:city/:name', component: MassagesComponent },
 ];

@@ -3,17 +3,20 @@
         <div class="flex flex-row items-center space-x-2">
             <div class="relative group">
                 <button id="dropdownDefaultButton" data-dropdown-toggle="dropdownHover" class="btn bg-sky-200 border border-2 border-blue-200 flex flex-row space-x-2">
-                    <p>Wybierz placówkę</p> 
+                    @if(currentCompany$ | async; as company) {
+                        <p><span class="font-medium">{{ company.city }}</span> "{{ company.name }}"</p>
+                    } @else {
+                        <p>Wybierz placówkę</p> 
+                    }
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                     </svg>
-                    
                 </button>
                 <!-- Dropdown menu -->
                 <div id="dropdown" class="absolute z-10 hidden group-hover:block bg-sky-200 divide-y divide-sky-300 rounded-lg shadow-sm w-full">
                     <ul class="py-2 text-sm max-h-60 overflow-y-auto" aria-labelledby="dropdownDefaultButton">
                         @for(company of companies; track $index) {
-                            <li class="block px-4 py-2 hover:bg-sky-100 rounded-sm">
+                            <li class="block px-4 py-2 hover:bg-sky-100 rounded-sm" (click)="setCurrentCompany(company)">
                                 <span class="font-medium">{{company.city}}</span> "{{company.name}}"
                             </li>
                         }
@@ -43,13 +46,15 @@
     </div>
 </nav>
 
-<nav>
-    <div class="px-5 py-2 md:max-w-3/4 mx-auto w-full bg-slate-50">
-        <div class="flex justify-end items-center space-x-3 md:space-x-4">
-            <a routerLink="/">Usługi</a>
-            <a routerLink="/">Cennik</a>
-            <a routerLink="/">Kontakt</a>
+@if(currentCompany$ | async; as company) {
+    <nav>
+        <div class="px-5 py-2 md:max-w-3/4 mx-auto w-full bg-slate-50">
+            <div class="flex justify-end items-center space-x-3 md:space-x-4">
+                <a [routerLink]="['/massages', company.city, company.name]">Usługi</a>
+                <a routerLink="/">Cennik</a>
+                <a routerLink="/">Kontakt</a>
+            </div>
         </div>
-    </div>
-    <hr class="h-px bg-slate-300 border-0">
-</nav>
+        <hr class="h-px bg-slate-300 border-0">
+    </nav>
+}

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
 import { User } from '../../models/auth/user';
 import { Observable } from 'rxjs';
@@ -15,6 +15,7 @@ import { Company } from '../../models/company';
   styleUrl: './navbar.component.css'
 }) 
 export class NavbarComponent {
+  companies: Company[] = [];
 
   get isAuthenticated$(): Observable<boolean> {
     return this.authService.isAuthenticated;
@@ -24,11 +25,22 @@ export class NavbarComponent {
     return this.authService.currentUser;
   }
 
-  companies: Company[] = [];
+  get currentCompany$(): Observable<Company | null> {
+    return this.companyService.currentCompany;
+  }
 
-  constructor(private authService: AuthenticationService, private companyService: CompanyService) {
+  constructor(
+    private authService: AuthenticationService,
+    private companyService: CompanyService,
+    private router: Router
+  ) {
     this.companyService.getAll().subscribe((data: Company[]) => {
       this.companies = data;
     });
+  }
+
+  setCurrentCompany(company: Company) {
+    this.companyService.setCurrentCompany(company);
+    this.router.navigate(['/massages', company.city, company.name]);
   }
 }

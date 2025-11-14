@@ -6,6 +6,8 @@ import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } fro
 import { AuthenticationResponse } from '../models/auth/authenticationResponse';
 import { AuthenticationRequest } from '../models/auth/authenticationRequest';
 import { RegisterRequest } from '../models/auth/registerRequest';
+import { CompanyService } from './company.service';
+import { Company } from '../models/company';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +23,10 @@ export class AuthenticationService {
   public currentUser = this.currentUserSubject.asObservable();
   public isAuthenticated = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private httpClient: HttpClient) { 
+  constructor(
+    private httpClient: HttpClient,
+    private companyService: CompanyService
+  ) { 
     this.checkAuthStatus();
   }
 
@@ -65,7 +70,12 @@ export class AuthenticationService {
     return this.httpClient.post(`${this.baseUrl}/authenticate`, request).pipe(
       tap((response: any) => {
         this.currentUserSubject.next(response.user);
-      }),
+        if (this.isAdmin() || this.isEmployee()) {
+          this.companyService.getCompanyById(response.user.companyId).subscribe((c: Company) => {
+            this.companyService.setCurrentCompany(c);
+          });
+        }
+      }), 
       catchError((error: HttpErrorResponse) => {
         let errorMessage = 'Nieudana autoryzacja';
         

@@ -10,16 +10,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { AsyncPipe } from '@angular/common';
-import { RouterLink } from "@angular/router";
+import { Route, Router, RouterLink } from "@angular/router";
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-main-page',
-  imports: [MatIcon, RecommendationsComponent, MatFormField, MatLabel, MatOption, FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatAutocompleteModule,
-    ReactiveFormsModule,
-    AsyncPipe, RouterLink],
+  imports: [ MatFormField, MatLabel, MatOption, FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule,
+RouterLink],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.css'
 })
@@ -28,11 +25,23 @@ export class MainPageComponent {
   filteredCompanies: Company[] = [];
   searchTerm = '';
 
-  constructor(private companyService: CompanyService) {
+  get currentCompany$(): Observable<Company | null> {
+    return this.companyService.currentCompany;
+  }
+  
+  constructor(
+    private companyService: CompanyService,
+    private router: Router
+  ) {
     this.companyService.getAll().subscribe((data: Company[]) => {
       this.companies = data;
       this.filteredCompanies = this.companies;
     });
+  }
+
+  setCurrentCompany(company: Company) {
+    this.companyService.setCurrentCompany(company);
+    this.router.navigate(['/massages', company.city, company.name]);
   }
 
   applyFilter() {
