@@ -1,0 +1,53 @@
+<div class="md:flex py-3 md:h-210">
+    <div class="flex-1 p-2 bg-emerald-100 flex items-center">
+        <div class="max-w-3/4 m-auto">
+            <p class="text-lg text-center mb-4">Nie wiesz czego szukasz?</p>
+            <h2 class="text-5xl text-center mb-4">Wyszukaj masaże</h2>
+            <p class="text-xl text-center mb-4"> 
+                Znajdź masaż idealnie dopasowany do Twoich potrzeb — odkryj, co naprawdę Ci służy.
+            </p>
+            <a routerLink="recommendations"><button class="w-full btn-long-gray bg-[#D0D2DC]">Szukaj</button></a>
+        </div>
+    </div>
+    <div class="flex-1 p-2 bg-sky-100 flex items-center">
+        <div class="w-3/4 mx-auto">
+            <p class="text-lg text-center mb-4">Masz już swoje ulubione miejsce?</p>
+            <h2 class="text-5xl text-center mb-4">Wybierz placówkę</h2>
+            <p class="text-xl text-center mb-4"> 
+                Sprawdź dostępne masaże i zarezerwuj swoją chwilę relaksu.
+            </p>
+            <!-- <form class="example-form"> -->
+                <mat-form-field class="w-full">
+                  <mat-label>Wyszukaj placówki</mat-label>
+                  <input type="text"
+                         aria-label="Wyszukaj placówki"
+                         matInput
+                         [matAutocomplete]="auto" 
+                         (keyup)="filterByName($event)">
+                  <mat-autocomplete #auto="matAutocomplete">
+                    @for (company of filteredCompanies; track company) {
+                      <mat-option [value]="company.city + ' ' + company.name" (click)="setCurrentCompany(company)">{{company.city}} "{{company.name}}"</mat-option>
+                    }
+                  </mat-autocomplete>
+                </mat-form-field>
+              <!-- </form> -->
+            <!-- <input type="text" id="companyInput" placeholder="Wyszukaj placówkę" formControlName="companyInput" class="w-full p-2 bg-slate-200 text-slate-700 focus:outline-none" (keyup)="filterByName($event)" /> -->
+            <!-- <h2 class="text-4xl text-center">Wybierz placówkę</h2>
+            <div class="flex items-center mt-2 p-2 border border-gray-300 rounded bg-slate-200 outline-1 focus:outline">
+                <div>
+                    <mat-icon fontIcon="search"></mat-icon>
+                </div>
+                <input type="text" id="companyInput" placeholder="Wyszukaj placówkę" formControlName="companyInput" class="w-full p-2 bg-slate-200 text-slate-700 focus:outline-none" (keyup)="filterByName($event)" />
+            </div>
+            <div>
+                <ul class="py-2 text-sm overflow-y-auto" aria-labelledby="dropdownDefaultButton">
+                    @for(company of filteredCompanies; track $index) {
+                        <li class="block px-4 py-2 hover:bg-sky-100 rounded-sm hover:cursor-pointer">
+                            <span class="font-medium">{{company.city}}</span> "{{company.name}}"
+                        </li>
+                    }
+                </ul>
+            </div> -->
+        </div>
+    </div>
+</div>

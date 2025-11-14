@@ -35,16 +35,21 @@ public class CompanyController {
     @GetMapping("/getAll")
     public ResponseEntity<List<CompanyDto>> getAllCompanies () {
         List<Company> companies = companyService.getAll();
-        List<CompanyDto> companyRequests = companies.stream().map(company -> new CompanyDto(company.getName(), company.getCity()))
-        .toList();
+        List<CompanyDto> companyRequests = companies
+            .stream()
+            .map(company -> new CompanyDto(company.getId(), company.getName(), company.getCity()))
+            .toList();
         return ResponseEntity.ok(companyRequests);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Company> getById(@PathVariable Long id) {
-        Optional<Company> foundCompany = companyService.getCompanyById(id);
-        return foundCompany.map(ResponseEntity::ok)
-                           .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<CompanyDto> getById(@PathVariable Long id) {
+        Optional<Company> company = companyService.getCompanyById(id);
+        if (company.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        CompanyDto dto = new CompanyDto(company.get().getId(), company.get().getName(), company.get().getCity());
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/remove/{id}")
@@ -53,4 +58,23 @@ public class CompanyController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/city/{cityName}")
+    public ResponseEntity<List<CompanyDto>> getCompaniesByCity(@PathVariable String cityName) {
+        List<Company> companies = companyService.getCompaniesByCity(cityName);
+        List<CompanyDto> companyRequests = companies
+            .stream()
+            .map(company -> new CompanyDto(company.getId(), company.getName(), company.getCity()))
+            .toList();
+        return ResponseEntity.ok(companyRequests);
+    }
+
+    @GetMapping("/{city}/{name}")
+    public ResponseEntity<CompanyDto> getCompaniesByNameAndCity(@PathVariable String name, @PathVariable String city) {
+        Optional<Company> company = companyService.getByNameAndCity(name, city);
+        if (company.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        CompanyDto dto = new CompanyDto(company.get().getId(), company.get().getName(), company.get().getCity());
+        return ResponseEntity.ok(dto);
+    }
 }

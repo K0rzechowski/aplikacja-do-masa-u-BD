@@ -58,7 +58,7 @@
                           [matChipInputFor]="reactiveChipGrid"
                           (matChipInputTokenEnd)="addMassage($event)"
                         /> -->
-                        <mat-select [formControl]="symptomForm" placeholder="Wybierz symptom do dodania..." required>
+                        <mat-select [formControl]="symptomForm" placeholder="Wybierz symptom do dodania...">
                             @for (symptom of getAvaiableSymptoms(); track symptom) {
                               <mat-option [value]="symptom">{{symptom.name}}</mat-option>
                             }

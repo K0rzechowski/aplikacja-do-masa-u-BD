@@ -1,0 +1,60 @@
+<div class="flex items-center">
+    <div class="m-auto">
+        <p class="text-5xl text-center my-5">Wyszukiwarka masażu</p>
+        <p class="text-xl text-center">
+            Nasz rekomendator masaży to innowacyjne narzędzie, które pomaga w wyborze idealnego zabiegu, dopasowanego do indywidualnych potrzeb i samopoczucia. Na podstawie podanych symptomów system analizuje Twoje wymagania i proponuje spersonalizowane rozwiązania, zapewniając maksymalny komfort. </p>
+        <p class="text-xl text-center warning mb-5">
+            <span class="font-medium txt">Uwaga!</span> To jedynie propozycja, a nie diagnoza. W razie wątpliwości skonsultuj się z lekarzem specjalistą.
+        </p>
+        <div class="mb-4">
+            <p for="symptom" class="text-lg font-medium text-center mb-2">Podaj swoje symptomy 
+                <mat-icon class="align-middle" fontIcon="search"></mat-icon>
+            </p>
+            <mat-form-field class="w-full">
+                <mat-chip-grid #chipGrid aria-label="Wybrane symptomy">
+                    @for (symptom of selectedSymptoms(); track symptom.id) {
+                        <mat-chip-row (removed)="removeSymptom(symptom)" [removable]="true">
+                            {{ symptom.name }}
+                            <button matChipRemove [attr.aria-label]="'Usuń' + symptom.name">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip-row>
+                    }
+                    <input type="text"
+                        aria-label="Wyszukaj symptom, np. ból karku"
+                        matInput
+                        [formControl]="searchControl"
+                        [matAutocomplete]="auto" 
+                        [matChipInputFor]="chipGrid">
+                </mat-chip-grid>
+                <mat-autocomplete 
+                    #auto="matAutocomplete"
+                    (optionSelected)="onSymptomSelected($event)"
+                    >
+                    @for (symptom of filteredSymptoms; track symptom) {
+                    <mat-option [value]="symptom">{{ symptom.name }}</mat-option>
+                    }
+                    @empty {
+                        <mat-option disabled>Brak dostępnych symptomów</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+            <div class="flex justify-between items-center">
+                <mat-form-field>
+                    <mat-label>Wybierz miasto</mat-label>
+                    <mat-select [(ngModel)]="selectedCity">
+                        @for (city of companyCities; track city) {
+                            <mat-option value="city">{{city}}</mat-option>
+                        }
+                    </mat-select>
+                  </mat-form-field>
+                  <div>
+                      <input type="submit" class="btn btn-sky" value="Wyszukaj">
+                  </div>
+            </div>
+        </div>
+        <div>
+
+        </div>
+    </div>
+</div>

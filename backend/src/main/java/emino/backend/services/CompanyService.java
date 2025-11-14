@@ -37,6 +37,10 @@ public class CompanyService {
         return companyRepository.findByCity(city);
     } 
 
+    public Optional<Company> getByNameAndCity(String name, String city) {
+        return companyRepository.findByNameAndCity(name, city);
+    } 
+
     public List<Company> getAll() {
         return companyRepository.findAll().stream()
             .sorted(Comparator

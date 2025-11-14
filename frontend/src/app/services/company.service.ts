@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Company } from '../models/company';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 
 
 @Injectable({
@@ -11,6 +11,9 @@ import { catchError, Observable, tap, throwError } from 'rxjs';
 export class CompanyService {
 
   private baseUrl = `${environment.baseUrl}/companies`;
+
+  private currentCompanySubject = new BehaviorSubject<Company | null>(null);
+  public currentCompany = this.currentCompanySubject.asObservable();
 
   constructor(private httpClient: HttpClient) { }
 
@@ -38,7 +41,19 @@ export class CompanyService {
     return this.httpClient.get<Company>(`${this.baseUrl}/${id}`);
   }
 
+  getCompanyByNameAndCity(name: string, city: string): Observable<Company> {
+    return this.httpClient.get<Company>(`${this.baseUrl}/${city}/${name}`);
+  }
+
+  getCompaniesByCity(city: string): Observable<Company[]> {
+    return this.httpClient.get<Company[]>(`${this.baseUrl}/city/${city}`);
+  }
+
   deleteCompany(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.baseUrl}/remove/${id}`);
+  }
+
+  setCurrentCompany(company: Company) {
+    this.currentCompanySubject.next(company);
   }
 }

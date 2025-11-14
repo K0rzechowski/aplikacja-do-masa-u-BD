@@ -12,6 +12,14 @@ body {
     @apply font-[500] py-2 px-4 w-full rounded;
 }
 
+.btn-long-gray {
+    @apply py-3 px-4 w-full rounded;
+}
+
+.btn-long-gray:hover {
+    @apply cursor-pointer bg-[#CCCDD7] ;
+}
+
 .btn-sky {
     @apply bg-sky-300 text-slate-800;
 }
