@@ -21,52 +21,32 @@
             </div>
             <div class="mb-4">
                 <label for="minutes">Czas trwania</label>
-                <input type="text" id="minutes" placeholder="Czas trwania" formControlName="minutes" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <input type="number" id="minutes" placeholder="Czas trwania" formControlName="minutes" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
                 <p class="warning">
-                    @if(formModel.controls['minutes'].invalid && formModel.controls['minutes'].touched ) {
-                        Czas trwania jest wymagane
+                    @if(formModel.controls['minutes'].errors?.['min']) {
+                        Czas trwania musi być większy od 0
                     }
+                    @else if(formModel.controls['minutes'].invalid && formModel.controls['minutes'].touched ) {
+                        Czas trwania jest wymagany
+                    }  
                 </p>
             </div>
             <div class="mb-4">
                 <label for="price">Cena</label>
-                <input type="text" id="price" placeholder="Cena" formControlName="price" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <input type="number" id="price" placeholder="Cena" formControlName="price" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
                 <p class="warning">
-                    @if(formModel.controls['price'].invalid && formModel.controls['price'].touched ) {
-                        Cena jest wymagana
-                    } @else if(formModel.controls['price'].errors?.['price']) {
-                        Cena musi być poprawny
+                    @if(formModel.controls['price'].errors?.['min']) {
+                        Cena musi być większa od 0
                     }
+                    @else if(formModel.controls['price'].invalid && formModel.controls['price'].touched ) {
+                        Cena jest wymagana
+                    } 
                 </p>
             </div>
             <div class="mb-4">
                 <label for="symptom">Symptomy</label>
-                <div class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
-                    <mat-chip-set>
-                            @for (symptom of selectedSymptoms(); track symptom) {
-                                <mat-chip (removed)="removeSymptom(symptom)" [removable]="true">
-                                    {{symptom.name}}
-                                    <button matChipRemove [attr.aria-label]="'Usuń' + symptom.name">
-                                        <mat-icon>cancel</mat-icon>
-                                    </button>
-                                </mat-chip>
-                            }
-                    </mat-chip-set>
-                    <mat-form-field appearance="outline" class="w-full" >
-                        <!-- <input
-                          placeholder="Wyszukaj masażu..."
-                          [matChipInputFor]="reactiveChipGrid"
-                          (matChipInputTokenEnd)="addMassage($event)"
-                        /> -->
-                        <mat-select [formControl]="symptomForm" placeholder="Wybierz symptom do dodania...">
-                            @for (symptom of getAvaiableSymptoms(); track symptom) {
-                              <mat-option [value]="symptom">{{symptom.name}}</mat-option>
-                            }
-                            @empty {
-                                <mat-option disabled>Brak dostępnych symptomów</mat-option>
-                            }
-                          </mat-select>
-                    </mat-form-field>
+                <div class="w-full">
+                    <app-search [dataType]="'symptom'" [alreadySelectedData]="existingSymptoms" (selected)="getSelectedSymptoms($event)"></app-search>
                 </div>
             </div>
             <div class="grid-cols-2">

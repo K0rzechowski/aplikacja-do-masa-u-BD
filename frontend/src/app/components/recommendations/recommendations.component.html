@@ -10,35 +10,7 @@
             <p for="symptom" class="text-lg font-medium text-center mb-2">Podaj swoje symptomy 
                 <mat-icon class="align-middle" fontIcon="search"></mat-icon>
             </p>
-            <mat-form-field class="w-full">
-                <mat-chip-grid #chipGrid aria-label="Wybrane symptomy">
-                    @for (symptom of selectedSymptoms(); track symptom.id) {
-                        <mat-chip-row (removed)="removeSymptom(symptom)" [removable]="true">
-                            {{ symptom.name }}
-                            <button matChipRemove [attr.aria-label]="'Usuń' + symptom.name">
-                                <mat-icon>cancel</mat-icon>
-                            </button>
-                        </mat-chip-row>
-                    }
-                    <input type="text"
-                        aria-label="Wyszukaj symptom, np. ból karku"
-                        matInput
-                        [formControl]="searchControl"
-                        [matAutocomplete]="auto" 
-                        [matChipInputFor]="chipGrid">
-                </mat-chip-grid>
-                <mat-autocomplete 
-                    #auto="matAutocomplete"
-                    (optionSelected)="onSymptomSelected($event)"
-                    >
-                    @for (symptom of filteredSymptoms; track symptom) {
-                    <mat-option [value]="symptom">{{ symptom.name }}</mat-option>
-                    }
-                    @empty {
-                        <mat-option disabled>Brak dostępnych symptomów</mat-option>
-                    }
-                </mat-autocomplete>
-            </mat-form-field>
+            <app-search [dataType]="dataType" (selected)="getSelectedSymptoms($event)"></app-search>
             <div class="flex justify-between items-center">
                 <mat-form-field>
                     <mat-label>Wybierz miasto</mat-label>

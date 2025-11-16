@@ -31,6 +31,10 @@ import { AlertService } from '../../../services/alert.service';
 import { MassageService } from '../../../services/massage.service';
 import { Massage } from '../../../models/massage';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { SearchComponent } from "../../search/search.component";
+import { Observable } from 'rxjs';
+import { User } from '../../../models/auth/user';
+import { AuthenticationService } from '../../../services/authentication.service';
 
 @Component({
   selector: 'app-employee-form',
@@ -47,7 +51,7 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
         monthYearA11yLabel: 'MMMM YYYY',
       }
     }, {useUtc: true}),],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel, MatButtonModule, MatDialogTitle, MatDialogClose, MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel, MatButtonModule, MatDialogTitle, MatDialogClose, MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule, SearchComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './employee-form.component.html',
   styleUrl: './employee-form.component.css'
@@ -60,19 +64,19 @@ export class EmployeeFormComponent {
   formModel: FormGroup;
   massageForm = new FormControl<Massage | null>(null);
   employeeBeforeUpdate!: Employee;
-  allMassages: Massage[] = [];
-  selectedMassages = signal<Massage[]>([]);
+  selectedMassages: Massage[] = [];
+  existingMassages: Massage[] = [];
+  companyId: string = '';
   
   @Input() employee?: Employee;
-
-  announcer = inject(LiveAnnouncer);
 
   constructor(
     private emplService: EmployeeService,
     private formBuilder: FormBuilder,
     private alertService: AlertService,
     private massageService: MassageService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthenticationService,
   ) {
     this.formModel = this.formBuilder.group({
       name:[this.employee?.name, Validators.required],
@@ -81,17 +85,16 @@ export class EmployeeFormComponent {
       email: [this.employee?.email, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberLength]],
     })
+  }
 
-    this.loadMassages();
-
-    this.massageForm.valueChanges.subscribe(massage => {
-      if (massage) {
-        this.addMassage(massage);
-        this.massageForm.setValue(null);
-    }});
+  get currentUser$(): Observable<User | null> {
+    return this.authService.currentUser;
   }
 
   ngOnInit() {
+    this.currentUser$.subscribe(user => {
+      this.companyId = user?.companyId || '';
+    });
     if (this.employee) {
       this.employeeBeforeUpdate = {...this.employee};
       this.formModel.patchValue({ 
@@ -104,48 +107,17 @@ export class EmployeeFormComponent {
     this.loadAlreadySelectedMassages();
   }
 
-  loadMassages() {
-    this.massageService.getMassagesByAdminsCompany().subscribe((data: Massage[]) => {
-      this.allMassages = data;
-      this.cdr.detectChanges(); 
-    });
+  getSelectedMassages(selected: Massage[]) {
+    this.selectedMassages = selected;
   }
 
   loadAlreadySelectedMassages() {
     if (this.employee && this.employee.massages) {
       this.massageService.getMassagesByEmployee(this.employee.id!).subscribe((data: Massage[]) => {
-        this.selectedMassages.set(data);
+        this.existingMassages = data;
         this.cdr.detectChanges(); 
       });
     }
-  }
-
-  addMassage(massage: Massage) {
-    const isAlreadySelected = this.employee?.massages?.some(m => m.id === massage.id);
-
-    if (!isAlreadySelected) {
-      this.selectedMassages.update(massages => [...massages, massage]);
-      this.announcer.announce(`Dodano masaż: ${massage.name}`);
-    } else {
-      this.announcer.announce(`Masaż: ${massage.name} jest już dodany`);
-    }
-  }
-
-  removeMassage(massage: Massage) {
-    this.selectedMassages.update(massages => {
-      const filteredMassages = massages.filter(m => m.id !== massage.id);
-      this.announcer.announce(`Usunięto masaż: ${massage.name}`);
-      return filteredMassages;
-    });
-  }
-
-  getSelectedMassagesIds(): string[] {
-    return this.selectedMassages().map(massage => massage.id!);
-  }
-
-  getAvaiableMassages(): Massage[] {
-    const selectedIds = this.getSelectedMassagesIds();
-    return this.allMassages.filter(massage => !selectedIds.includes(massage.id!));
   }
 
   edit(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate) {
@@ -158,7 +130,7 @@ export class EmployeeFormComponent {
       email,
       role: this.employee?.role!,
       company: this.employee?.company!,
-      massageIds: this.getSelectedMassagesIds(),  
+      massageIds: this.selectedMassages.map(m => m.id!),  
     } as Employee;
     this.emplService.editEmployee(updatedEmployee).subscribe({
       next: (response) => {
@@ -180,7 +152,7 @@ export class EmployeeFormComponent {
       phoneNumber,
       dateOfBirth: new Date(dateOfBirth).toISOString().split('T')[0],
       email,
-      massageIds: this.getSelectedMassagesIds()
+      massageIds: this.selectedMassages.map(m => m.id!),  
     };
     console.log(newEmployee);
     this.emplService.createEmployee(newEmployee).subscribe({
