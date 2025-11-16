@@ -21,10 +21,11 @@ import {MatIconModule} from '@angular/material/icon';
 import { AlertService } from '../../../services/alert.service';
 import { Symptom } from '../../../models/symptom';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { SearchComponent } from "../../search/search.component";
 
 @Component({
   selector: 'app-massage-form',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatButtonModule, MatDialogTitle, MatDialogClose, MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatButtonModule, MatDialogTitle, MatDialogClose, MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule, SearchComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './massage-form.component.html',
   styleUrl: './massage-form.component.css'
@@ -35,14 +36,11 @@ export class MassageFormComponent {
   readonly dialogData = inject<{massage: Massage}>(MAT_DIALOG_DATA, {optional: true});
 
   formModel: FormGroup;
-  symptomForm = new FormControl<Symptom | null>(null);
   massageBeforeUpdate!: Massage;
-  allSymptoms: Symptom[] = [];
-  selectedSymptoms = signal<Symptom[]>([]);
+  existingSymptoms: Symptom[] = [];
+  selectedSymptoms: Symptom[] = [];
   
   @Input() massage?: Massage;
-
-  announcer = inject(LiveAnnouncer);
 
   constructor(
     private msgService: MassageService,
@@ -52,17 +50,9 @@ export class MassageFormComponent {
   ) {
     this.formModel = this.formBuilder.group({
       name:[this.massage?.name, Validators.required],
-      minutes: [this.massage?.minutes, Validators.required],
-      price:[this.massage?.price, Validators.required]
+      minutes: [this.massage?.minutes, [Validators.required, Validators.min(1)]],
+      price:[this.massage?.price, [Validators.required, Validators.min(1)]]
     })
-
-    this.loadSymptoms();
-
-    this.symptomForm.valueChanges.subscribe(symptom => {
-      if (symptom) {
-        this.addSymptom(symptom);
-        this.symptomForm.setValue(null);
-    }});
   }
 
   ngOnInit() {
@@ -76,49 +66,17 @@ export class MassageFormComponent {
     this.loadAlreadySelectedSymptoms();
   }
 
-  loadSymptoms() {
-    this.msgService.getAllSymptoms().subscribe((data: Symptom[]) => {
-      this.allSymptoms = data;
-      this.cdr.detectChanges(); 
-    });
+  getSelectedSymptoms(selected: Symptom[]) {
+    this.selectedSymptoms = selected;
   }
 
   loadAlreadySelectedSymptoms() {
     if (this.massage && this.massage.symptoms) {
       this.msgService.getSymptomsByMassage(this.massage.id!).subscribe((data: Symptom[]) => {
-        this.selectedSymptoms.set(data);
+        this.existingSymptoms = data;
         this.cdr.detectChanges(); 
       });
     }
-  }
-
-  addSymptom(symptom: Symptom) {
-    const isAlreadySelected = this.massage?.symptoms?.some(s => s.id === symptom.id);
-
-    if (!isAlreadySelected) {
-      this.selectedSymptoms.update(symptoms => [...symptoms, symptom]);
-      this.announcer.announce(`Dodano symptom: ${symptom.name}`);
-    } else {
-      this.announcer.announce(`Symptom: ${symptom.name} jest już dodany`);
-    }
-  }
-
-  removeSymptom(symptom: Symptom) {
-    this.selectedSymptoms.update(symptoms => {
-      const filteredSymptoms = symptoms.filter(m => m.id !== symptom.id);
-      this.announcer.announce(`Usunięto symptom: ${symptom.name}`);
-      return filteredSymptoms;
-    });
-  }
-
-  getSelectedSymptomsIds(): string[] {
-    return this.selectedSymptoms().map(symptom => symptom.id!);
-  }
-
-  getAvaiableSymptoms(): Symptom[] {
-    const selectedIds = this.getSelectedSymptomsIds();
-    const view = this.allSymptoms.filter(symptom => !selectedIds.includes(symptom.id!));
-    return this.allSymptoms.filter(symptom => !selectedIds.includes(symptom.id!));
   }
 
   edit(name: string, minutes: number, price: number) {
@@ -129,7 +87,7 @@ export class MassageFormComponent {
       minutes,
       company: this.massage?.company!,
       companyId: this.massage?.companyId!,
-      symptomIds: this.getSelectedSymptomsIds(),  
+      symptomIds: this.selectedSymptoms.map(s => s.id!),  
     } as Massage;
     this.msgService.editMassage(updatedMassage).subscribe({
       next: (response) => {
@@ -148,7 +106,7 @@ export class MassageFormComponent {
       name: upperName,
       price,
       minutes,
-      symptomIds: this.getSelectedSymptomsIds()
+      symptomIds: this.selectedSymptoms.map(s => s.id!),
     };
     this.msgService.createMassage(newMassage).subscribe({
       next: (response) => {

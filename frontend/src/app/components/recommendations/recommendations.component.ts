@@ -16,24 +16,21 @@ import { CompanyService } from '../../services/company.service';
 import { Company } from '../../models/company';
 import { Massage } from '../../models/massage';
 import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { SearchComponent } from "../search/search.component";
 
 @Component({
   selector: 'app-recommendations',
-  imports: [MatIconModule, MatOption, ReactiveFormsModule, MatAutocompleteModule, MatLabel, MatFormField, FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, MatChipsModule, MatSelectModule],
+  imports: [MatIconModule, MatOption, ReactiveFormsModule, MatAutocompleteModule, MatLabel, MatFormField, FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, MatChipsModule, MatSelectModule, SearchComponent],
   templateUrl: './recommendations.component.html',
   styleUrl: './recommendations.component.css'
 })
 export class RecommendationsComponent {
 
-  searchControl = new FormControl('');
-  allSymptoms: Symptom[] = [];
-  selectedSymptoms = signal<Symptom[]>([]);
-  filteredSymptoms: Symptom[] = [];
+  selectedSymptoms: Symptom[] = [];
+  dataType: string = 'symptom';
   companyCities: string[] = [];
   selectedCity: string = '';
   recommendedMassages: Massage[] = [];
-
-  announcer = inject(LiveAnnouncer);
 
   constructor(
     private msgService: MassageService,
@@ -41,71 +38,17 @@ export class RecommendationsComponent {
     private alertService: AlertService,
     private cdr: ChangeDetectorRef
   ) {
-    this.loadSymptoms();
-    this.setupSearch();
-
     this.companyService.getAll().subscribe((data: Company[]) => {
       this.companyCities = Array.from(new Set(data.map(company => company.city)));
     });
   }
-
-  setupSearch() {
-    this.searchControl.valueChanges.subscribe(value => {
-      const searchTerm = typeof value === 'string' ? value : '';
-      this.filterByName(searchTerm);
-    });
-  }
-
-  filterByName(searchTerm: string) {
-    const term = searchTerm.toLowerCase();
-    this.filteredSymptoms = this.getAvaiableSymptoms().filter(s => 
-      s.name.toLowerCase().includes(term)
-    );
-  }
-
-  loadSymptoms() {
-    this.msgService.getAllSymptoms().subscribe((data: Symptom[]) => {
-      this.allSymptoms = data;
-      this.filteredSymptoms = this.getAvaiableSymptoms();
-      this.cdr.detectChanges(); 
-    });
-  }
-
-  onSymptomSelected(event: MatAutocompleteSelectedEvent) {
-    const symptom = event.option.value as Symptom;
-    this.addSymptom(symptom);
-    this.searchControl.setValue('');
-    this.filteredSymptoms = this.getAvaiableSymptoms();
-  }
-
-  addSymptom(symptom: Symptom) {
-    const isAlreadySelected = this.selectedSymptoms().some(s => s.id === symptom.id);
-    if (!isAlreadySelected) {
-      this.selectedSymptoms.update(symptoms => [...symptoms, symptom]);
-      this.announcer.announce(`Dodano symptom: ${symptom.name}`);
-    }    
-  }
-
-  removeSymptom(symptom: Symptom) {
-    this.selectedSymptoms.update(symptoms => {
-      const filteredSymptoms = symptoms.filter(m => m.id !== symptom.id);
-      this.announcer.announce(`Usunięto symptom: ${symptom.name}`);
-      return filteredSymptoms;
-    });
-    this.filteredSymptoms = this.getAvaiableSymptoms();
-  }
-
-  getSelectedSymptomsIds(): string[] {
-    return this.selectedSymptoms().map(symptom => symptom.id!);
-  }
-
-  getAvaiableSymptoms(): Symptom[] {
-    const selectedIds = this.getSelectedSymptomsIds();
-    return this.allSymptoms.filter(symptom => !selectedIds.includes(symptom.id!));
+  
+  getSelectedSymptoms(selected: Symptom[]) {
+    this.selectedSymptoms = selected;
   }
 
   // // getMassages(symptomIds: string[], city: string): Observable<Massage[]> {
-  // //   const massageRequests = symptomIds.map(id =>
+    // //   const massageRequests = symptomIds.map(id =>
   // //     this.msgService.getMassagesBySymptom(id)
   // //   )
   // //   console.log("req: ", massageRequests)

@@ -87,32 +87,8 @@
             </div>
             <div class="mb-4">
                 <label for="massage">Masaże</label>
-                <div class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
-                    <mat-chip-set>
-                            @for (massage of selectedMassages(); track massage) {
-                                <mat-chip (removed)="removeMassage(massage)" [removable]="true">
-                                    {{massage.name}}
-                                    <button matChipRemove [attr.aria-label]="'Usuń' + massage.name">
-                                        <mat-icon>cancel</mat-icon>
-                                    </button>
-                                </mat-chip>
-                            }
-                    </mat-chip-set>
-                    <mat-form-field appearance="outline" class="w-full" >
-                        <!-- <input
-                          placeholder="Wyszukaj masażu..."
-                          [matChipInputFor]="reactiveChipGrid"
-                          (matChipInputTokenEnd)="addMassage($event)"
-                        /> -->
-                        <mat-select [formControl]="massageForm" placeholder="Wybierz masaż do dodania...">
-                            @for (massage of getAvaiableMassages(); track massage) {
-                              <mat-option [value]="massage">{{massage.name}}</mat-option>
-                            }
-                            @empty {
-                                <mat-option disabled>Brak dostępnych masaży</mat-option>
-                            }
-                          </mat-select>
-                    </mat-form-field>
+                <div class="w-full">
+                    <app-search [dataType]="'massage'" [alreadySelectedData]="existingMassages" [companyId]="companyId" (selected)="getSelectedMassages($event)"></app-search>
                 </div>
             </div>
             <div class="grid-cols-2">

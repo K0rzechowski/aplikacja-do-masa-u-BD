@@ -1,0 +1,29 @@
+<mat-form-field class="w-full">
+    <mat-chip-grid #chipGrid aria-label="Wybrane">
+        @for (data of selectedData(); track data.id) {
+            <mat-chip-row (removed)="removeData(data)" [removable]="true">
+                {{ data.name }}
+                <button matChipRemove [attr.aria-label]="'Usuń' + data.name">
+                    <mat-icon>cancel</mat-icon>
+                </button>
+            </mat-chip-row>
+        }
+        <input type="text"
+            aria-label="Wyszukaj, np. ból karku"
+            matInput
+            [formControl]="searchControl"
+            [matAutocomplete]="auto" 
+            [matChipInputFor]="chipGrid">
+    </mat-chip-grid>
+    <mat-autocomplete 
+        #auto="matAutocomplete"
+        (optionSelected)="onDataSelected($event)"
+        >
+        @for (data of filteredData; track data) {
+        <mat-option [value]="data">{{ data.name }}</mat-option>
+        }
+        @empty {
+            <mat-option disabled>Brak</mat-option>
+        }
+    </mat-autocomplete>
+</mat-form-field>
