@@ -15,8 +15,26 @@ export class MassageService {
 
   constructor(private httpClient: HttpClient) { }
 
-  createMassage(request: Partial<Massage>): Observable<Massage> {
-    return this.httpClient.post<Massage>(`${this.baseUrl}/create`, request).pipe(
+  private prepareFormData(request: Partial<Massage>, file: File): FormData {
+    const formData: FormData = new FormData();
+
+    formData.append('name', request.name || '');
+    formData.append('price', request.price?.toString() || '0');
+    formData.append('minutes', request.minutes?.toString() || '0');
+    
+    if (request.symptomIds && request.symptomIds.length > 0) {
+      request.symptomIds.forEach(id => formData.append('symptomIds', id));
+    }
+    
+    formData.append('file', file);
+
+    return formData;
+  }
+
+  createMassage(request: Partial<Massage>, file: File): Observable<Massage> {
+    const formData = this.prepareFormData(request, file);
+    
+    return this.httpClient.post<Massage>(`${this.baseUrl}/create`, formData).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMessage = 'Błąd podczas tworzenia masażu';
         
@@ -31,8 +49,9 @@ export class MassageService {
     );
   }
 
-  editMassage(request: Massage): Observable<Massage> {
-    return this.httpClient.put<Massage>(`${this.baseUrl}/edit/${request.id}`, request);
+  editMassage(request: Massage, file: File): Observable<Massage> {
+    const formData = this.prepareFormData(request, file);
+    return this.httpClient.put<Massage>(`${this.baseUrl}/edit/${request.id}`, formData);
   }
 
   getMassagesByAdminsCompany(): Observable<Massage[]> {

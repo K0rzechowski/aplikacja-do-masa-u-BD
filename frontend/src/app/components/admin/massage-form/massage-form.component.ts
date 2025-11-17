@@ -39,6 +39,7 @@ export class MassageFormComponent {
   massageBeforeUpdate!: Massage;
   existingSymptoms: Symptom[] = [];
   selectedSymptoms: Symptom[] = [];
+  selectedFile: File | null = null;
   
   @Input() massage?: Massage;
 
@@ -61,7 +62,8 @@ export class MassageFormComponent {
       this.formModel.patchValue({ 
         name: this.massage.name,
         minutes: this.massage.minutes,
-        price: this.massage.price })
+        price: this.massage.price
+      });
     }
     this.loadAlreadySelectedSymptoms();
   }
@@ -79,7 +81,14 @@ export class MassageFormComponent {
     }
   }
 
-  edit(name: string, minutes: number, price: number) {
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
+  edit(name: string, minutes: number, price: number, file: File) {
     const updatedMassage: Massage = {
       id: this.massage?.id,
       name,
@@ -89,7 +98,7 @@ export class MassageFormComponent {
       companyId: this.massage?.companyId!,
       symptomIds: this.selectedSymptoms.map(s => s.id!),  
     } as Massage;
-    this.msgService.editMassage(updatedMassage).subscribe({
+    this.msgService.editMassage(updatedMassage, file).subscribe({
       next: (response) => {
         this.alertService.success("Operacja edycji powiodła się");
         this.alertService.info("Możesz zamknąć okno edycji");
@@ -100,15 +109,15 @@ export class MassageFormComponent {
     });
   }
 
-  create(name: string, minutes: number, price: number) {
+  create(name: string, minutes: number, price: number, file: File) {
     const upperName = name.charAt(0).toUpperCase() + name.slice(1)
     const newMassage = {
       name: upperName,
       price,
       minutes,
-      symptomIds: this.selectedSymptoms.map(s => s.id!),
+      symptomIds: this.selectedSymptoms.map(s => s.id!)
     };
-    this.msgService.createMassage(newMassage).subscribe({
+    this.msgService.createMassage(newMassage, file).subscribe({
       next: (response) => {
         this.alertService.success("Operacja dodania masażu powiodła się");
       },
@@ -123,17 +132,19 @@ export class MassageFormComponent {
   }
 
   submitForm(): void {
-    if (this.massage && this.formModel.valid) {
+    if (this.massage && this.formModel.valid && this.selectedFile) {
       this.edit(
         this.formModel.value.name,
         this.formModel.value.minutes,
-        this.formModel.value.price
+        this.formModel.value.price,
+        this.selectedFile
       );
-    } else if (!this.massage && this.formModel.valid) {
+    } else if (!this.massage && this.formModel.valid && this.selectedFile) {
       this.create(
         this.formModel.value.name,
         this.formModel.value.minutes,
-        this.formModel.value.price
+        this.formModel.value.price,
+        this.selectedFile
       );
     }
   }

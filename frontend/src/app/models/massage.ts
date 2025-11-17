@@ -11,5 +11,6 @@ export interface Massage {
     minutes: number,
     employees?: Employee[],
     symptoms?: Symptom[],
-    symptomIds?: string[]
+    symptomIds?: string[],
+    imageUrl?: string,
 }

@@ -9,12 +9,15 @@ import { ManageMassagesComponent } from './components/admin/manage-massages/mana
 import { MainPageComponent } from './components/main-page/main-page.component';
 import { RecommendationsComponent } from './components/recommendations/recommendations.component';
 import { MassagesComponent } from './components/massages/massages.component';
+import { authGuard } from './guards/auth-guard.guard';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'settings', component: SettingsComponent,
+  { path: 'settings', 
+    component: SettingsComponent,
+    // canActivate: [authGuard],
     children: [
       { path: 'profile', component: ProfileComponent },
       { path: 'employees', component: ManageEmployeesComponent },
