@@ -10,14 +10,15 @@ import { MainPageComponent } from './components/main-page/main-page.component';
 import { RecommendationsComponent } from './components/recommendations/recommendations.component';
 import { MassagesComponent } from './components/massages/massages.component';
 import { authGuard } from './guards/auth-guard.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'settings', 
-    component: SettingsComponent,
-    // canActivate: [authGuard],
+    loadComponent: () => import('./components/settings/settings.component').then(s => SettingsComponent),
+    canActivate: [authGuard, adminGuard],
     children: [
       { path: 'profile', component: ProfileComponent },
       { path: 'employees', component: ManageEmployeesComponent },
@@ -26,5 +27,5 @@ export const routes: Routes = [
   },
   { path: 'forCompanies', component: CompanyFormComponent },
   { path: 'recommendations', component: RecommendationsComponent },
-  { path: 'massages/:city/:name', component: MassagesComponent },
+  { path: 'massages/:city/:name',component: MassagesComponent }
 ];

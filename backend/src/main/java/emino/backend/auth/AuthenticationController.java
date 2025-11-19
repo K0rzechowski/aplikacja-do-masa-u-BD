@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import emino.backend.exception.DuplicateEmailException;
+import emino.backend.models.Admin;
+import emino.backend.models.Employee;
 import emino.backend.repositories.AdminRepository;
 import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.UserRepository;
@@ -71,7 +73,7 @@ public class AuthenticationController {
             
             response.addCookie(jwtCookie);
 
-            System.out.println("Set jwtToken cookie for user: " + authResponse.getUser().getEmail());
+            System.out.println("Ustawiono jwtToken cookie dla usera: " + authResponse.getUser().getEmail());
     
 
             return ResponseEntity.ok(authResponse);
@@ -90,7 +92,7 @@ public class AuthenticationController {
         
         response.addCookie(jwtCookie);
 
-        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+        return ResponseEntity.ok(Map.of("message", "Poprawnie wylogowano"));
     }
 
     @PutMapping("/update/{id}")
@@ -102,20 +104,46 @@ public class AuthenticationController {
             return ResponseEntity.ok(updatedUser);
         }
 
-        // If not authenticated, return 403 Forbidden
         return ResponseEntity.status(403).build(); 
     }
 
-    // Endpoint to verify jwtToken token validity
     @GetMapping("/verify")
     public ResponseEntity<Map<String, Object>> verifyToken(HttpServletRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
 
         if(auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+
+            String email = auth.getName();
+
+            var user = userRepository.findByEmail(email).orElse(null);
+
+            if (user == null) {
+                return ResponseEntity.ok(Map.of(
+                    "status", "error",
+                    "authenticated", false,
+                    "message", "Nie znaleziono użytkownika"
+                ));
+            }
+
+            var userResponse = UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .surname(user.getSurname())
+                .dateOfBirth(user.getDateOfBirth())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
+
+            if (user instanceof Admin admin) {
+                userResponse.setCompanyId(admin.getCompany().getId());
+            } else if (user instanceof Employee employee) {
+                userResponse.setCompanyId(employee.getCompany().getId());
+            }
+
             return ResponseEntity.ok(Map.of(
                 "status", "success",
                 "authenticated", true,
-                "user", auth.getName()
+                "user", userResponse
             ));
         }
 
