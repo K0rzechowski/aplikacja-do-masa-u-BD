@@ -197,8 +197,6 @@ public class MassageService {
             String withoutVersion = withoutUpload.replaceAll("^v\\d+/", "");
             String publicIdWithExtension = withoutVersion.substring(0, withoutVersion.lastIndexOf('.'));
 
-            System.out.println("Extracted public ID: " + publicIdWithExtension);
-
             return publicIdWithExtension;
         }
         return null;

@@ -8,10 +8,11 @@ import { AlertComponent } from "../alert/alert.component";
 import { AlertService } from '../../services/alert.service';
 import { MatIconModule } from "@angular/material/icon";
 import { ShowPasswordDirective } from "../../directives/show-password.directive";
+import {TooltipPosition, MatTooltipModule} from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule, MatIconModule, ShowPasswordDirective],
+  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule, MatIconModule, ShowPasswordDirective, MatTooltipModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })

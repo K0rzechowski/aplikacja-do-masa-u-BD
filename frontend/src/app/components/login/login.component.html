@@ -17,9 +17,17 @@
                 <div class="mb-4">
                     <label for="password">Hasło</label>
                     <div class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700 flex justify-between relative">
-                        <input type="password" id="password" placeholder="Hasło" formControlName="password" class="w-full outline-none" appShowPassword [appShowPasswordIcon]="passwordIcon" [appShowPasswordLabel]="passwordLabel" [appShowPasswordInput]="passwordInput" #passwordInput>
-                        <mat-icon #passwordIcon class="cursor-pointer" appShowPassword [appShowPasswordIcon]="passwordIcon" [appShowPasswordLabel]="passwordLabel" [appShowPasswordInput]="passwordInput">visibility</mat-icon>
-                        <span #passwordLabel role="tooltip" class="absolute top-0 right-0 text-xs text-slate-500" style="visibility: hidden;">Pokaż hasło</span>
+                        <input type="password" id="password" placeholder="Hasło" formControlName="password" class="w-full outline-none" #passwordInput>
+                        <mat-icon 
+                        #passwordIcon
+                        class="cursor-pointer"
+                        appShowPassword
+                        [appShowPasswordIcon]="passwordIcon"
+                        [appShowPasswordInput]="passwordInput"
+                        [appShowPasswordTooltip]="tt"
+                        [matTooltipPosition]="'above'"
+                        matTooltip="Pokaż hasło"
+                        #tt="matTooltip">visibility</mat-icon>
                     </div>
                     <p class="warning">
                         @if(formModel.controls['password'].invalid && formModel.controls['password'].touched ) {
