@@ -15,6 +15,8 @@ import 'moment/locale/pl';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { AlertService } from '../../services/alert.service';
+import { ShowPasswordDirective } from '../../directives/show-password.directive';
+import { MatIconModule } from '@angular/material/icon';
 
 registerLocaleData(localePl);
 
@@ -35,7 +37,7 @@ registerLocaleData(localePl);
     }, {useUtc: true}),
     
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel, ShowPasswordDirective, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'

@@ -4,10 +4,11 @@ import { CompanyService } from '../../services/company.service';
 import { MassageService } from '../../services/massage.service';
 import { Company } from '../../models/company';
 import { Massage } from '../../models/massage';
+import { NgOptimizedImage } from "@angular/common";
 
 @Component({
   selector: 'app-massages',
-  imports: [],
+  imports: [NgOptimizedImage],
   templateUrl: './massages.component.html',
   styleUrl: './massages.component.css'
 })
@@ -29,8 +30,8 @@ export class MassagesComponent {
         if (this.company?.id) {
           this.massageService.getMassagesByCompany(this.company.id).subscribe((data: Massage[]) =>
             this.massages = data
-          )}
+        )}
       });
-    })
+    }) 
   }
 }

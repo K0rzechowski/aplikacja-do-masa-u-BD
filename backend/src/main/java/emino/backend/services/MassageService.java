@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import emino.backend.cloudinary.CloudinaryService;
 import emino.backend.dto.MassageCreateDto;
 import emino.backend.dto.MassageDto;
 import emino.backend.dto.SymptomDto;
@@ -22,8 +23,6 @@ import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.MassageForSymptomRepository;
 import emino.backend.repositories.MassageRepository;
 import emino.backend.repositories.SymptomRepository;
-import emino.backend.cloudinary.CloudinaryService;
-import emino.backend.utils.ImageUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -178,8 +177,30 @@ public class MassageService {
             symptoms.stream()
                 .map(s -> new SymptomDto(s.getId(), s.getName()))
                 .toList());
-        dto.setImageUrl(massage.getImageUrl());
+
+        String imageUrl = massage.getImageUrl();
+        String publicId = extractPublicIdFromImageUrl(imageUrl);
+
+        dto.setImageUrl(publicId);
 
         return dto;
+    }
+
+    private String extractPublicIdFromImageUrl(String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return null;
+        }
+
+        String[] parts = imageUrl.split("/upload/");
+        if (parts.length > 1) {
+            String withoutUpload = parts[1];
+            String withoutVersion = withoutUpload.replaceAll("^v\\d+/", "");
+            String publicIdWithExtension = withoutVersion.substring(0, withoutVersion.lastIndexOf('.'));
+
+            System.out.println("Extracted public ID: " + publicIdWithExtension);
+
+            return publicIdWithExtension;
+        }
+        return null;
     }
 }

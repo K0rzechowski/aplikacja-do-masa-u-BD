@@ -3,9 +3,9 @@
     <div class="relative flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-64">
         <div class="relative h-36 m-2.5 overflow-hidden text-white rounded-md">
             @if (massage.imageUrl) {
-                <img [src]="massage.imageUrl" [alt]="massage.name" loading="lazy" />
+                <img [ngSrc]="massage.imageUrl" [width]="400" [height]="400" [alt]="massage.name" priority/>
             } @else {
-                    <img src="https://placehold.co/400" alt="card-image" />
+                <img src="https://placehold.co/400" width="400" height="400" alt="card-image" priority/>
             }
         </div>
         <div class="p-3">

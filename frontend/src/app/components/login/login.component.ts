@@ -6,10 +6,12 @@ import { AuthenticationRequest } from '../../models/auth/authenticationRequest';
 import { CommonModule } from '@angular/common';
 import { AlertComponent } from "../alert/alert.component";
 import { AlertService } from '../../services/alert.service';
+import { MatIconModule } from "@angular/material/icon";
+import { ShowPasswordDirective } from "../../directives/show-password.directive";
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, ReactiveFormsModule, MatIconModule, ShowPasswordDirective],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
