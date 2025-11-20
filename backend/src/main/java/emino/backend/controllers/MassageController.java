@@ -1,17 +1,21 @@
 package emino.backend.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import emino.backend.config.SecurityService;
 import emino.backend.dto.MassageCreateDto;
@@ -30,10 +34,12 @@ public class MassageController {
     private final SecurityService securityService;
     private final MassageService massageService;
 
-    @PostMapping("/create")
-    public ResponseEntity<MassageDto> createMassage(@RequestBody MassageCreateDto request) {
+    @PostMapping(value="/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MassageDto> createMassage(
+            @ModelAttribute MassageCreateDto request,
+            @RequestPart("file") MultipartFile file) throws IOException {
         Admin admin = securityService.getCurrentAdmin();
-        Massage msg = massageService.createMassage(request, admin);
+        Massage msg = massageService.createMassage(request, admin, file);
         MassageDto msgDto = massageService.getMassageResponse(msg);
         return ResponseEntity.ok(msgDto);
     }
@@ -90,10 +96,13 @@ public class MassageController {
     return ResponseEntity.ok(massagesAlphabetically);
     }
 
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<MassageDto> editMassage(@PathVariable Long id, @RequestBody MassageCreateDto request) {
+    @PutMapping(value = "/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MassageDto> editMassage(
+            @PathVariable Long id,
+            @ModelAttribute MassageCreateDto request,
+             @RequestPart("file") MultipartFile file) throws IOException {
         Admin admin = securityService.getCurrentAdmin();
-        Massage updatedMassage = massageService.editMassage(id, request, admin);
+        Massage updatedMassage = massageService.editMassage(id, request, file, admin);
         MassageDto msgDto = massageService.getMassageResponse(updatedMassage);
         return ResponseEntity.ok(msgDto);
     }

@@ -20,4 +20,5 @@ public class MassageDto {
     private Long companyId;
     private String companyName;
     private List<SymptomDto> symptoms;
+    private String imageUrl;
 }

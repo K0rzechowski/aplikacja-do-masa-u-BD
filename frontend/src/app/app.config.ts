@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CredentialsInterceptor } from './interceptors/credentials.interceptor';
+import { provideCloudinaryLoader } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }),
@@ -15,6 +16,7 @@ export const appConfig: ApplicationConfig = {
       provide: HTTP_INTERCEPTORS,
       useClass: CredentialsInterceptor,
       multi: true
-    }
+    },
+    provideCloudinaryLoader("https://res.cloudinary.com/dmx0gdmxh/")
   ]
 };

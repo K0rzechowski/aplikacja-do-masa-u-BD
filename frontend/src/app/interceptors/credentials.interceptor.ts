@@ -8,6 +8,13 @@ export class CredentialsInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
+    if (req.body instanceof FormData) {
+      const clonedReq = req.clone({
+        withCredentials: true,
+      })
+      return next.handle(clonedReq);
+    }
+
     const clonedReq = req.clone({
       headers: new HttpHeaders({'Content-Type': 'application/json'}),
       withCredentials: true,
