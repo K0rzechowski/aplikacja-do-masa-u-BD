@@ -65,21 +65,21 @@ export class MassageFormComponent {
         price: this.massage.price
       });
     }
-    this.loadAlreadySelectedSymptoms();
+    // this.loadAlreadySelectedSymptoms();
   }
 
-  getSelectedSymptoms(selected: Symptom[]) {
-    this.selectedSymptoms = selected;
-  }
+  // getSelectedSymptoms(selected: Symptom[]) {
+  //   this.selectedSymptoms = selected;
+  // }
 
-  loadAlreadySelectedSymptoms() {
-    if (this.massage && this.massage.symptoms) {
-      this.msgService.getSymptomsByMassage(this.massage.id!).subscribe((data: Symptom[]) => {
-        this.existingSymptoms = data;
-        this.cdr.detectChanges(); 
-      });
-    }
-  }
+  // loadAlreadySelectedSymptoms() {
+  //   if (this.massage && this.massage.symptoms) {
+  //     this.msgService.getSymptomsByMassage(this.massage.id!).subscribe((data: Symptom[]) => {
+  //       this.existingSymptoms = data;
+  //       this.cdr.detectChanges(); 
+  //     });
+  //   }
+  // }
 
   onFileSelected(event: any) {
     const file = event.target.files[0];

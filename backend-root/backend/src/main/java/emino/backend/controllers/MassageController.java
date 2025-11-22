@@ -100,7 +100,7 @@ public class MassageController {
     public ResponseEntity<MassageDto> editMassage(
             @PathVariable Long id,
             @ModelAttribute MassageCreateDto request,
-             @RequestPart("file") MultipartFile file) throws IOException {
+            @RequestPart("file") MultipartFile file) throws IOException {
         Admin admin = securityService.getCurrentAdmin();
         MassageForCompany updatedMassage = massageService.editMassage(id, request, file, admin);
         MassageDto msgDto = massageService.getMassageResponse(updatedMassage);

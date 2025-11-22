@@ -122,14 +122,14 @@ public class MassageService {
         MassageForCompany massageForCompany = massageCompanyRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego masażu"));
 
-        Massage alreadyExistingMassage = massageRepository.findByName(request.getName())
-        .orElseGet(() -> {
-            Massage massage = new Massage();
-            massage.setName(request.getName());
-            return massageRepository.save(massage);
-        });
-
+            
         if (request.getName() != null) {
+            Massage alreadyExistingMassage = massageRepository.findByName(request.getName())
+            .orElseGet(() -> {
+                Massage massage = new Massage();
+                massage.setName(request.getName());
+                return massageRepository.save(massage);
+            });
             massageForCompany.setMassage(alreadyExistingMassage);
         }
         if (request.getPrice() > 0) {
