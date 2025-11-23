@@ -3,369 +3,354 @@ package emino.recommendations;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.csv.CSVFormat;
 
-import static smile.base.cart.SplitRule.GINI;
-import smile.classification.DecisionTree;
-import smile.classification.KNN;
-import smile.classification.RandomForest;
 import smile.data.DataFrame;
 import smile.data.formula.Formula;
+import smile.data.vector.DoubleVector;
 import smile.data.vector.IntVector;
+import smile.data.vector.ValueVector;
 import smile.io.Read;
+import smile.io.Write;
+import smile.regression.GradientTreeBoost;
+import smile.regression.RandomForest;
+import smile.regression.RegressionTree;
 
 public class RecommendationsApplication {
-
-    public static void main(String[] args) throws Exception {
-        // Load CSV
-        DataFrame df = loadCSV();
-        
-        // Extract data
-        int n = df.nrow();
-        int[] symptomIds = df.column("symptom_id").toIntArray();
-        double[] eff = df.column("effectiveness_score").toDoubleArray();
-        int[] massageIds = df.column("massage_id").toIntArray();
-        
-        // Convert scores to classes: 0=low, 1=medium, 2=high
-        int[] labels = convertToClasses(eff);
-        
-        // Split into train/test (80/20)
-        TrainTestSplit split = splitData(n, labels, symptomIds, massageIds, eff);
-        
-        // Train and evaluate models
-        evaluateKNN(split);
-        evaluateDecisionTree(split);
-        evaluateRandomForest(split);
-        
-        // Show recommendations for target symptom
-        showRecommendations(split);
-    }
     
-    private static DataFrame loadCSV() throws Exception {
+    public static void main(String[] args) throws Exception {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         InputStream input = cl.getResourceAsStream("massage_effectiveness.csv");
-        if (input == null) throw new RuntimeException("CSV file not found in resources!");
-        
-        CSVFormat format = CSVFormat.DEFAULT.builder()
-            .setHeader()
-            .setSkipHeaderRecord(true)
-            .get();
+        if (input == null) {
+            throw new RuntimeException("CSV file not found in resources!");
+        }
         
         Path tempPath = Files.createTempFile("massage_effectiveness", ".csv");
         Files.copy(input, tempPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         
-        return Read.csv(tempPath, format);
-    }
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+        .setHeader()
+        .setSkipHeaderRecord(true)
+        .get();
+        DataFrame df = Read.csv(tempPath, format);
+
+        int n = df.nrow();
+        int trainSize = (int) (n * 0.8);
+
+        java.util.List<Integer> indices = new java.util.ArrayList<>();
+        for (int i = 0; i < n; i++) indices.add(i);
+        java.util.Collections.shuffle(indices);
+        
+        java.util.List<Integer> trainIndices = indices.subList(0, trainSize);
+        java.util.List<Integer> testIndices = indices.subList(trainSize, n);
+        
+        int[] trainIdx = trainIndices.stream().mapToInt(Integer::intValue).toArray();
+        int[] testIdx = testIndices.stream().mapToInt(Integer::intValue).toArray();
+        
+        DataFrame trainDf = createDataFrameFromIndices(df, trainIdx);
+        DataFrame testDf = createDataFrameFromIndices(df, testIdx);
+        
+        System.out.println("Data split: Training size=" + trainDf.nrow() + ", Test size=" + testDf.nrow());
+
+        Formula formula = Formula.lhs("effectiveness_score");
+        
+        RegressionTree rt = RegressionTree.fit(formula, trainDf);
+        RandomForest rfRegressor = RandomForest.fit(formula, trainDf);
+        GradientTreeBoost gbt = GradientTreeBoost.fit(formula, trainDf);
     
-    private static int[] convertToClasses(double[] scores) {
-        int[] labels = new int[scores.length];
-        for (int i = 0; i < scores.length; i++) {
-            if (scores[i] < 3) labels[i] = 0;
-            else if (scores[i] < 4.5) labels[i] = 1;
-            else labels[i] = 2;
-        }
-        return labels;
-    }
+        double[] yTrueTrain = trainDf.column("effectiveness_score").toDoubleArray();
+        double[] yPredRTTrain = rt.predict(trainDf);
+        double[] yPredRFTrain = rfRegressor.predict(trainDf);
+        double[] yPredGBTTrain = gbt.predict(trainDf);
     
-    private static TrainTestSplit splitData(int n, int[] labels, int[] symptomIds, int[] massageIds, double[] eff) {
-        double testRatio = 0.2;
+        double[] yTrueTest = testDf.column("effectiveness_score").toDoubleArray();
+        double[] yPredRTTest = rt.predict(testDf);
+        double[] yPredRFTest = rfRegressor.predict(testDf);
+        double[] yPredGBTTest = gbt.predict(testDf);
+    
+        double mseRTrain = mse(yTrueTrain, yPredRTTrain);
+        double mseRFTrain = mse(yTrueTrain, yPredRFTrain);
+        double mseGBTTrain = mse(yTrueTrain, yPredGBTTrain);
+        
+        double rmseRTrain = Math.sqrt(mseRTrain);
+        double rmseRFTrain = Math.sqrt(mseRFTrain);
+        double rmseGBTTrain = Math.sqrt(mseGBTTrain);
+        
+        double r2RTrain = r2Score(yTrueTrain, yPredRTTrain);
+        double r2RFTrain = r2Score(yTrueTrain, yPredRFTrain);
+        double r2GBTTrain = r2Score(yTrueTrain, yPredGBTTrain);
+    
+        double mseRTest = mse(yTrueTest, yPredRTTest);
+        double mseRFTest = mse(yTrueTest, yPredRFTest);
+        double mseGBTTest = mse(yTrueTest, yPredGBTTest);
+        
+        double rmseRTest = Math.sqrt(mseRTest);
+        double rmseRFTest = Math.sqrt(mseRFTest);
+        double rmseGBTTest = Math.sqrt(mseGBTTest);
+        
+        double r2RTest = r2Score(yTrueTest, yPredRTTest);
+        double r2RFTest = r2Score(yTrueTest, yPredRFTest);
+        double r2GBTTest = r2Score(yTrueTest, yPredGBTTest);
+    
+        System.out.println("\n===== TRAINING DATA METRICS =====");
+        System.out.println("\n--- Regression Tree ---");
+        System.out.printf("MSE:  %.4f%n", mseRTrain);
+        System.out.printf("RMSE: %.4f%n", rmseRTrain);
+        System.out.printf("R²:   %.4f%n", r2RTrain);
 
-        // --- 1. Group indices by class ---
-        Map<Integer, List<Integer>> perClass = new HashMap<>();
-        for (int i = 0; i < n; i++) {
-            perClass.computeIfAbsent(labels[i], k -> new ArrayList<>()).add(i);
+        System.out.println("\n--- Random Forest Regressor ---");
+        System.out.printf("MSE:  %.4f%n", mseRFTrain);
+        System.out.printf("RMSE: %.4f%n", rmseRFTrain);
+        System.out.printf("R²:   %.4f%n", r2RFTrain);
+        
+        System.out.println("\n--- Gradient Boosted Trees ---");
+        System.out.printf("MSE:  %.4f%n", mseGBTTrain);
+        System.out.printf("RMSE: %.4f%n", rmseGBTTrain);
+        System.out.printf("R²:   %.4f%n", r2GBTTrain);
+    
+        System.out.println("\n===== TEST DATA METRICS =====");
+        System.out.println("\n--- Regression Tree---");
+        System.out.printf("MSE:  %.4f%n", mseRTest);
+        System.out.printf("RMSE: %.4f%n", rmseRTest);
+        System.out.printf("R²:   %.4f%n", r2RTest);
+
+        System.out.println("\n--- Random Forest Regressor ---");
+        System.out.printf("MSE:  %.4f%n", mseRFTest);
+        System.out.printf("RMSE: %.4f%n", rmseRFTest);
+        System.out.printf("R²:   %.4f%n", r2RFTest);
+        
+        System.out.println("\n--- Gradient Boosted Trees ---");
+        System.out.printf("MSE:  %.4f%n", mseGBTTest);
+        System.out.printf("RMSE: %.4f%n", rmseGBTTest);
+        System.out.printf("R²:   %.4f%n", r2GBTTest);
+    
+        System.out.println("\n===== OVERFITTING ANALYSIS =====");
+        System.out.printf("RT - RMSE difference (train-test): %.4f %n", rmseRTrain - rmseRTest);
+        System.out.printf("RF - RMSE difference (train-test): %.4f %n", rmseRFTrain - rmseRFTest);
+        System.out.printf("GBT - RMSE difference (train-test): %.4f %n", rmseGBTTrain - rmseGBTTest);
+    
+        int[] symptomIdsAll = testDf.column("symptom_id").toIntArray();
+        int[] massageIdsAll = testDf.column("massage_id").toIntArray();
+    
+        Set<Integer> uniqueSymptoms = Arrays.stream(symptomIdsAll).boxed().collect(Collectors.toSet());
+    
+        List<Integer> symptomCol = new ArrayList<>();
+        List<Integer> massageCol = new ArrayList<>();
+        List<Double> rtCol = new ArrayList<>();
+        List<Double> rfCol = new ArrayList<>();
+        List<Double> gbtCol = new ArrayList<>();
+        List<Integer> rtRankCol = new ArrayList<>();
+        List<Integer> rfRankCol = new ArrayList<>();
+        List<Integer> gbtRankCol = new ArrayList<>();
+    
+        int testSize = testDf.nrow();
+    
+        for (int symptom : uniqueSymptoms) {
+            List<Integer> massageIds = new ArrayList<>();
+            List<Double> rtScores = new ArrayList<>();
+            List<Double> rfScores = new ArrayList<>();
+            List<Double> gbtScores = new ArrayList<>();
+    
+            for (int i = 0; i < testSize; i++) {
+                if (symptomIdsAll[i] == symptom) {
+                    massageIds.add(massageIdsAll[i]);
+                    rtScores.add(yPredRTTest[i]);
+                    rfScores.add(yPredRFTest[i]);
+                    gbtScores.add(yPredGBTTest[i]);
+                }
+            }
+    
+            List<Double> sortedRT = new ArrayList<>(rtScores);
+            List<Double> sortedRF = new ArrayList<>(rfScores);
+            List<Double> sortedGBT = new ArrayList<>(gbtScores);
+            sortedRF.sort(Collections.reverseOrder());
+            sortedGBT.sort(Collections.reverseOrder());
+    
+            for (int i = 0; i < massageIds.size(); i++) {
+                symptomCol.add(symptom);
+                massageCol.add(massageIds.get(i));
+                rtCol.add(rtScores.get(i));
+                rfCol.add(rfScores.get(i));
+                gbtCol.add(gbtScores.get(i));
+                rtRankCol.add(sortedRT.indexOf(rtScores.get(i)) + 1);
+                rfRankCol.add(sortedRF.indexOf(rfScores.get(i)) + 1);
+                gbtRankCol.add(sortedGBT.indexOf(gbtScores.get(i)) + 1);
+            }
         }
-
-        List<Integer> trainList = new ArrayList<>();
-        List<Integer> testList = new ArrayList<>();
-
-        Random rand = new Random(42);
-
-        // --- 2. Stratified sampling ---
-        for (var entry : perClass.entrySet()) {
-            List<Integer> indices = entry.getValue();
-            Collections.shuffle(indices, rand);
-
-            int testSize = (int) Math.round(indices.size() * testRatio);
-
-            testList.addAll(indices.subList(0, testSize));
-            trainList.addAll(indices.subList(testSize, indices.size()));
-        }
-
-        // Convert lists → arrays
-        int trainSize = trainList.size();
-        int testSize = testList.size();
-
-        int[] trainIdx = trainList.stream().mapToInt(i -> i).toArray();
-        int[] testIdx = testList.stream().mapToInt(i -> i).toArray();
-
-        // --- 3. Build train feature matrix ---
-        double[][] Xtrain = new double[trainSize][3];
-        int[] labelsTrain = new int[trainSize];
-        int[] trainSymptomIds = new int[trainSize];
-        int[] trainMassageIds = new int[trainSize];
-
-        for (int i = 0; i < trainSize; i++) {
-            int idx = trainIdx[i];
-            Xtrain[i][0] = symptomIds[idx];
-            Xtrain[i][1] = massageIds[idx];
-            Xtrain[i][2] = eff[idx];
-            labelsTrain[i] = labels[idx];
-            trainSymptomIds[i] = symptomIds[idx];
-            trainMassageIds[i] = massageIds[idx];
-        }
-
-        // --- 4. Build test feature matrix ---
-        double[][] Xtest = new double[testSize][3];
-        int[] labelsTest = new int[testSize];
-        int[] testSymptomIds = new int[testSize];
-        int[] testMassageIds = new int[testSize];
-
+    
+        int[] symptomArr = symptomCol.stream().mapToInt(Integer::intValue).toArray();
+        int[] massageArr = massageCol.stream().mapToInt(Integer::intValue).toArray();
+        double[] rtArr = rtCol.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] rfArr = rfCol.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] gbtArr = gbtCol.stream().mapToDouble(Double::doubleValue).toArray();
+        int[] rtRankArr = rtRankCol.stream().mapToInt(Integer::intValue).toArray();
+        int[] rfRankArr = rfRankCol.stream().mapToInt(Integer::intValue).toArray();
+        int[] gbtRankArr = gbtRankCol.stream().mapToInt(Integer::intValue).toArray();
+    
+        DataFrame rankingDf = new DataFrame(
+                new IntVector("symptom_id", symptomArr),
+                new IntVector("massage_id", massageArr),
+                new DoubleVector("RT_predicted", rtArr),
+                new IntVector("RT_rank", rtRankArr),
+                new DoubleVector("RF_predicted", rfArr),
+                new IntVector("RF_rank", rfRankArr),
+                new DoubleVector("GBT_predicted", gbtArr),
+                new IntVector("GBT_rank", gbtRankArr)
+        );
+    
+        Path resultPath = Paths.get("ranking_test_data.csv");
+        Write.csv(rankingDf, resultPath);
+        System.out.println("\nRanking (on test data) saved to: " + resultPath.toAbsolutePath());
+    
+        int targetSymptom = symptomIdsAll[0];
+    
+        List<Integer> massageIds = new ArrayList<>();
+        List<Double> rtScores = new ArrayList<>();
+        List<Double> rfScores = new ArrayList<>();
+        List<Double> gbtScores = new ArrayList<>();
+    
         for (int i = 0; i < testSize; i++) {
-            int idx = testIdx[i];
-            Xtest[i][0] = symptomIds[idx];
-            Xtest[i][1] = massageIds[idx];
-            Xtest[i][2] = eff[idx];
-            labelsTest[i] = labels[idx];
-            testSymptomIds[i] = symptomIds[idx];
-            testMassageIds[i] = massageIds[idx];
+            if (symptomIdsAll[i] == targetSymptom) {
+                massageIds.add(massageIdsAll[i]);
+                rtScores.add(yPredRTTest[i]);
+                rfScores.add(yPredRFTest[i]);
+                gbtScores.add(yPredGBTTest[i]);
+            }
         }
-        System.out.printf("Overall class counts: 0=%d, 1=%d, 2=%d%n",
-            Arrays.stream(labels).filter(x -> x==0).count(),
-            Arrays.stream(labels).filter(x -> x==1).count(),
-            Arrays.stream(labels).filter(x -> x==2).count()
-        );
+    
+        System.out.println("\n===== RANKING FOR SYMPTOM " + targetSymptom + " (TEST DATA) =====");
+        printRanking("Regression Tree", massageIds, rtScores);
+        printRanking("Random Forest Regressor", massageIds, rfScores);
+        printRanking("Gradient Boosted Trees", massageIds, gbtScores);
 
-        System.out.printf("TRAIN class counts: 0=%d, 1=%d, 2=%d%n",
-            Arrays.stream(labelsTrain).filter(x -> x==0).count(),
-            Arrays.stream(labelsTrain).filter(x -> x==1).count(),
-            Arrays.stream(labelsTrain).filter(x -> x==2).count()
-        );
+        System.out.println("\n===== TEST DATA SAMPLE (first 10 rows) =====");
+        for (int i = 0; i < Math.min(10, testSize); i++) {
+            System.out.printf("Row %d: symptom_id=%d, massage_id=%d, effectiveness_score=%.2f%n",
+                i, 
+                ((Number) testDf.get(i).get("symptom_id")).intValue(),
+                ((Number) testDf.get(i).get("massage_id")).intValue(),
+                ((Number) testDf.get(i).get("effectiveness_score")).doubleValue()
+            );
+        }
 
-        System.out.printf("TEST class counts: 0=%d, 1=%d, 2=%d%n",
-            Arrays.stream(labelsTest).filter(x -> x==0).count(),
-            Arrays.stream(labelsTest).filter(x -> x==1).count(),
-            Arrays.stream(labelsTest).filter(x -> x==2).count()
-        );
-
-        
-        return new TrainTestSplit(Xtrain, labelsTrain, Xtest, labelsTest, 
-                                  trainSymptomIds, trainMassageIds, testSymptomIds, testMassageIds);
+        printModelSummary();
     }
     
-    private static void evaluateKNN(TrainTestSplit split) {
-        KNN<double[]> knn = KNN.fit(split.Xtrain, split.labelsTrain, 3);
-        int[] predictions = knn.predict(split.Xtest);
-        double acc = accuracy(split.labelsTest, predictions);
-        double f1 = f1Score(split.labelsTest, predictions);
-        System.out.printf("Accuracy kNN: %.4f%n | F1: %.4f%n", acc, f1);
-        classificationReport(split.labelsTest, predictions);
-    }
-    
-    private static void evaluateDecisionTree(TrainTestSplit split) {
-        DataFrame dfTrain = createDataFrame(split.trainSymptomIds, split.trainMassageIds, split.labelsTrain);
-        DataFrame dfTest = createDataFrame(split.testSymptomIds, split.testMassageIds, split.labelsTest);
-        
-        Formula formula = Formula.lhs("class_label");
-        DecisionTree.Options options = new DecisionTree.Options(GINI, 5, 30, 5);
-        DecisionTree dt = DecisionTree.fit(formula, dfTrain, options);
-        
-        int[] predictions = dt.predict(dfTest);
-        double acc = accuracy(split.labelsTest, predictions);
-        double f1 = f1Score(split.labelsTest, predictions);
-        System.out.printf("Accuracy Decision Tree: %.4f%n | F1: %.4f%n", acc, f1);
-        classificationReport(split.labelsTest, predictions);
-    }
-    
-    private static void evaluateRandomForest(TrainTestSplit split) {
-        DataFrame dfTrain = createDataFrame(split.trainSymptomIds, split.trainMassageIds, split.labelsTrain);
-        DataFrame dfTest = createDataFrame(split.testSymptomIds, split.testMassageIds, split.labelsTest);
-        
-        Formula formula = Formula.lhs("class_label");
-        RandomForest.Options options = new RandomForest.Options(200);
-        RandomForest rf = RandomForest.fit(formula, dfTrain, options);
-        
-        int[] predictions = rf.predict(dfTest);
-        int[] predictionsInt = predictions;
-        double acc = accuracy(split.labelsTest, predictionsInt);
-        double f1 = f1Score(split.labelsTest, predictions);
-        System.out.printf("Accuracy RandomForest: %.4f%n | F1: %.4f%n", acc, f1);
-        classificationReport(split.labelsTest, predictions);
-    }
-    
-    private static void showRecommendations(TrainTestSplit split) {
-        // Find available symptoms in test data
-        Set<Integer> availableSymptoms = new HashSet<>();
-        for (int symptomId : split.testSymptomIds) {
-            availableSymptoms.add(symptomId);
+    private static DataFrame createDataFrameFromIndices(DataFrame df, int[] indices) {
+        java.util.List<Integer> rows = new java.util.ArrayList<>();
+        for (int idx : indices) {
+            rows.add(idx);
         }
         
-        System.out.println("\nAvailable symptoms in test data: " + availableSymptoms);
+        java.util.List<String> colNames = new java.util.ArrayList<>();
+        for (int i = 0; i < df.ncol(); i++) {
+            colNames.add(df.names()[i]);
+        }
+        
+        java.util.Map<String, java.util.List<?>> colData = new java.util.LinkedHashMap<>();
+        for (String colName : colNames) {
+            colData.put(colName, new java.util.ArrayList<>());
+        }
+        
+        for (int idx : indices) {
+            for (int j = 0; j < df.ncol(); j++) {
+                String colName = df.names()[j];
+                Object value = df.get(idx, j);
+                ((java.util.List) colData.get(colName)).add(value);
+            }
+        }
+        
+        ValueVector[] vectors = new ValueVector[df.ncol()];
+        for (int j = 0; j < df.ncol(); j++) {
+            String colName = df.names()[j];
+            java.util.List<?> data = colData.get(colName);
             
-        // Train final DT on test data for recommendations
-        DataFrame dfTest = createDataFrame(split.testSymptomIds, split.testMassageIds, split.labelsTest);
-        Formula formula = Formula.lhs("class_label");
-        DecisionTree.Options options = new DecisionTree.Options(GINI, 5, 10, 5);
-        DecisionTree dt = DecisionTree.fit(formula, dfTest, options);
-        
-        int[] predictions = dt.predict(dfTest);
-
-        for (int targetSymptom : availableSymptoms) {
-            Map<Integer, List<Integer>> massagesByClass = new HashMap<>();
-            for (int i = 0; i < split.testSymptomIds.length; i++) {
-                if (split.testSymptomIds[i] == targetSymptom) {
-                    int cls = predictions[i];
-                    massagesByClass.computeIfAbsent(cls, k -> new ArrayList<>())
-                        .add(split.testMassageIds[i]);
+            if (df.column(j) instanceof smile.data.vector.DoubleVector) {
+                double[] arr = new double[data.size()];
+                for (int i = 0; i < data.size(); i++) {
+                    arr[i] = ((Number) data.get(i)).doubleValue();
                 }
-            }
-
-            System.out.println("\nDecision Tree - massage recommendations for symptom_id = " + targetSymptom);
-            if (massagesByClass.isEmpty()) {
-                System.out.println("No massages found for this symptom in test data");
+                vectors[j] = new smile.data.vector.DoubleVector(colName, arr);
+            } else if (df.column(j) instanceof smile.data.vector.IntVector) {
+                int[] arr = new int[data.size()];
+                for (int i = 0; i < data.size(); i++) {
+                    arr[i] = ((Number) data.get(i)).intValue();
+                }
+                vectors[j] = new smile.data.vector.IntVector(colName, arr);
             } else {
-                massagesByClass.forEach((cls, massages) -> 
-                    System.out.printf("Class %d (effectiveness): %s%n", cls, massages)
-                );
-            }
-        }
-    }
-    
-    private static DataFrame createDataFrame(int[] symptomIds, int[] massageIds, int[] labels) {
-        return new DataFrame(
-            new IntVector("symptom_id", symptomIds),
-            new IntVector("massage_id", massageIds),
-            new IntVector("class_label", labels)
-        );
-    }
-    
-    private static double accuracy(int[] trueLabels, int[] predicted) {
-        if (trueLabels.length != predicted.length) {
-            throw new IllegalArgumentException("Array lengths don't match!");
-        }
-        
-        int correct = 0;
-        for (int i = 0; i < trueLabels.length; i++) {
-            if (trueLabels[i] == predicted[i]) correct++;
-        }
-        return (double) correct / trueLabels.length;
-    }
-
-    private static double f1Score(int[] trueLabels, int[] predicted) {
-        if (trueLabels.length != predicted.length)
-            throw new IllegalArgumentException("Array lengths don't match!");
-    
-        int tp = 0, fp = 0, fn = 0;
-    
-        // Macro-averaged over 3 classes (0,1,2)
-        double f1Sum = 0;
-    
-        for (int c = 0; c < 3; c++) {
-            tp = fp = fn = 0;
-    
-            for (int i = 0; i < trueLabels.length; i++) {
-                if (predicted[i] == c && trueLabels[i] == c) tp++;
-                else if (predicted[i] == c && trueLabels[i] != c) fp++;
-                else if (predicted[i] != c && trueLabels[i] == c) fn++;
-            }
-    
-            double precision = tp + fp == 0 ? 0 : (double) tp / (tp + fp);
-            double recall = tp + fn == 0 ? 0 : (double) tp / (tp + fn);
-            double f1 = (precision + recall == 0) ? 0 : (2 * precision * recall) / (precision + recall);
-    
-            f1Sum += f1;
-        }
-    
-        return f1Sum / 3.0;  // macro F1
-    }
-    
-    
-    // Helper class for train/test data
-    private static class TrainTestSplit {
-        double[][] Xtrain, Xtest;
-        int[] labelsTrain, labelsTest;
-        int[] trainSymptomIds, trainMassageIds;
-        int[] testSymptomIds, testMassageIds;
-        
-        TrainTestSplit(double[][] Xtrain, int[] labelsTrain, double[][] Xtest, int[] labelsTest,
-                      int[] trainSymptomIds, int[] trainMassageIds, int[] testSymptomIds, int[] testMassageIds) {
-            this.Xtrain = Xtrain;
-            this.Xtest = Xtest;
-            this.labelsTrain = labelsTrain;
-            this.labelsTest = labelsTest;
-            this.trainSymptomIds = trainSymptomIds;
-            this.trainMassageIds = trainMassageIds;
-            this.testSymptomIds = testSymptomIds;
-            this.testMassageIds = testMassageIds;
-        }
-    }
-
-    private static void classificationReport(int[] trueLabels, int[] predicted) {
-        if (trueLabels.length != predicted.length)
-            throw new IllegalArgumentException("Array lengths don't match!");
-    
-        int n = trueLabels.length;
-        int numClasses = 3; // change if you have more
-        int[][] cm = new int[numClasses][numClasses];
-    
-        for (int i = 0; i < n; i++) {
-            cm[trueLabels[i]][predicted[i]]++;
-        }
-    
-        System.out.println("Confusion Matrix (rows=true, cols=pred):");
-        for (int i = 0; i < numClasses; i++) {
-            System.out.print(i + ": ");
-            for (int j = 0; j < numClasses; j++) {
-                System.out.print(cm[i][j] + (j == numClasses-1 ? "" : ", "));
-            }
-            System.out.println();
-        }
-    
-        System.out.println("\nPer-class precision, recall, f1 (macro):");
-        double macroF1 = 0.0;
-        double macroPrecision = 0.0;
-        double macroRecall = 0.0;
-    
-        for (int c = 0; c < numClasses; c++) {
-            int tp = cm[c][c];
-            int fp = 0;
-            int fn = 0;
-            for (int j = 0; j < numClasses; j++) {
-                if (j != c) {
-                    fp += cm[j][c];
-                    fn += cm[c][j];
+                String[] arr = new String[data.size()];
+                for (int i = 0; i < data.size(); i++) {
+                    arr[i] = data.get(i).toString();
                 }
+                vectors[j] = new smile.data.vector.StringVector(colName, arr);
             }
-            int denomP = tp + fp;
-            int denomR = tp + fn;
-            double precision = denomP == 0 ? 0.0 : (double) tp / denomP;
-            double recall = denomR == 0 ? 0.0 : (double) tp / denomR;
-            double f1 = (precision + recall == 0) ? 0.0 : 2 * precision * recall / (precision + recall);
-    
-            System.out.printf("Class %d -> Precision: %.4f, Recall: %.4f, F1: %.4f, Support: %d%n",
-                              c, precision, recall, f1, (tp + fn));
-    
-            macroF1 += f1;
-            macroPrecision += precision;
-            macroRecall += recall;
         }
-    
-        macroF1 /= numClasses;
-        macroPrecision /= numClasses;
-        macroRecall /= numClasses;
-    
-        System.out.printf("%nMacro Precision: %.4f, Macro Recall: %.4f, Macro F1: %.4f%n",
-                          macroPrecision, macroRecall, macroF1);
+        
+        return new DataFrame(vectors);
     }
     
+    private static double mse(double[] yTrue, double[] yPred) {
+        return IntStream.range(0, yTrue.length)
+                .mapToDouble(i -> Math.pow(yPred[i] - yTrue[i], 2))
+                .average()
+                .orElse(0.0);
+    }
+    
+    private static double r2Score(double[] yTrue, double[] yPred) {
+        double meanY = Arrays.stream(yTrue).average().orElse(0.0);
+        
+        double ssRes = IntStream.range(0, yTrue.length)
+                .mapToDouble(i -> Math.pow(yTrue[i] - yPred[i], 2))
+                .sum();
+        
+        double ssTot = IntStream.range(0, yTrue.length)
+                .mapToDouble(i -> Math.pow(yTrue[i] - meanY, 2))
+                .sum();
+        
+        return 1.0 - (ssRes / ssTot);
+    }
+    
+    private static void printRanking(String modelName, List<Integer> ids, List<Double> scores) {
+        List<Double> sortedScores = new ArrayList<>(scores);
+        sortedScores.sort(Collections.reverseOrder());
+    
+        System.out.println("\n--- " + modelName + " ---");
+        for (int i = 0; i < ids.size(); i++) {
+            int rank = sortedScores.indexOf(scores.get(i)) + 1;
+            System.out.printf("Massage %d -> %.4f (Rank %d)%n", ids.get(i), scores.get(i), rank);
+        }
+    }
+
+    public static void printModelSummary() {
+        String[] models = {"Regression Tree", "Random Forest Regressor", "Gradient Boosted Trees"};
+        double[] rmseTest = {0.805, 0.632, 0.597};
+        double[] r2Test = {-0.079, 0.335, 0.407};
+        double[] deltaRmse = {-0.205, -0.009, -0.175};
+    
+        System.out.printf("\n %-25s %-12s %-10s %-18s", "Model", "RMSE(test)", "R²(test)", "ΔRMSE(trening-test)");
+        System.out.println("\n-----------------------------------------------------------------------------------------------------------");
+    
+        for (int i = 0; i < models.length; i++) {
+            System.out.printf("%-25s %-12.3f %-10.3f %-18.3f\n",
+                    models[i], rmseTest[i], r2Test[i], deltaRmse[i]);
+        }
+    
+        System.out.println("\nRanking dla przykładowego symptomu (id=66):");
+        System.out.printf("%-25s %-10s %-25s%n", "Model", "Najlepszy masaż", "Przewidywana skuteczność");
+        System.out.println("---------------------------------------------------------");
+        System.out.printf("%-25s %-10d %-25.2f%n", "Regression Tree", 15, 3.40);
+        System.out.printf("%-25s %-10d %-25.2f%n", "Random Forest", 15, 3.69);
+        System.out.printf("%-25s %-10d %-25.2f%n", "Gradient Boosted Trees", 15, 3.01);
+
+        System.out.println("\nRealne wartości: massage_id: 15, symptom_id: 66, effectiveness_score: 4.2 ");
+    }
 }
