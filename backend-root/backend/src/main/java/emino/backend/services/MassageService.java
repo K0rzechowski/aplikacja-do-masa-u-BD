@@ -10,12 +10,15 @@ import org.springframework.web.multipart.MultipartFile;
 import emino.backend.cloudinary.CloudinaryService;
 import emino.backend.dto.MassageCreateDto;
 import emino.backend.dto.MassageDto;
+import emino.backend.dto.MassageSymptomDto;
 import emino.backend.dto.SymptomDto;
 import emino.backend.exception.AccessDeniedException;
 import emino.backend.models.Admin;
+import emino.backend.models.Company;
 import emino.backend.models.Employee;
 import emino.backend.models.Massage;
 import emino.backend.models.MassageForCompany;
+import emino.backend.models.MassageForSymptom;
 import emino.backend.models.Symptom;
 import emino.backend.repositories.CompanyRepository;
 import emino.backend.repositories.EmployeeRepository;
@@ -69,6 +72,14 @@ public class MassageService {
         Employee employee = emplRepository.findById(employeeId)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego pracownika"));
         return massageCompanyRepository.findByEmployeeId(employee.getId());
+    } 
+
+    public List<MassageForCompany> getMassagesByCity(String city) {
+        Company company = companyRepository.findByCity(city)
+            .stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy w tym mieście"));
+        return massageCompanyRepository.findByCompanyCity(city);
     } 
 
     @Transactional
@@ -156,6 +167,27 @@ public class MassageService {
         }
 
         return massageCompanyRepository.save(massageForCompany);
+    }
+
+    public List<MassageSymptomDto> getMassageSymptomAssociations(Long symptomId, String city) {
+        var symptom = symptomRepository.findById(symptomId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego symptomu"));
+            
+        List<MassageForSymptom> associations = msRepository.findBySymptomId(symptomId);
+
+        return associations.stream()
+            .flatMap(ms -> ms.getMassage().getMassagesForCompany().stream()
+                .filter(mfc -> city == null || mfc.getCompany().getCity().equalsIgnoreCase(city))
+                .map(mfc -> MassageSymptomDto.builder()
+                    .massageId(ms.getMassage().getId())
+                    .massageName(ms.getMassage().getName())
+                    .symptomId(symptom.getId())
+                    .symptomName(symptom.getName())
+                    .effectivenessScore(ms.getEffectivenessScore())
+                    .imageUrl(mfc.getImageUrl())
+                    .companyName(mfc.getCompany().getName())
+                    .build()))
+            .toList();
     }
 
     // private void createMassageSymptomAssociations(Massage massage, List<Long> symptomIds) {
