@@ -184,7 +184,7 @@ public class MassageService {
                     .symptomId(symptom.getId())
                     .symptomName(symptom.getName())
                     .effectivenessScore(ms.getEffectivenessScore())
-                    .imageUrl(mfc.getImageUrl())
+                    .imageUrl(extractPublicIdFromImageUrl(mfc.getImageUrl()))
                     .companyName(mfc.getCompany().getName())
                     .build()))
             .toList();

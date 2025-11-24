@@ -10,17 +10,18 @@ import { AlertService } from '../../services/alert.service';
 import { MatIcon, MatIconModule } from "@angular/material/icon";
 import { MatAutocomplete, MatAutocompleteModule, MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CompanyService } from '../../services/company.service';
 import { Company } from '../../models/company';
-import { Massage } from '../../models/massage';
+import { Massage, MassageSymptom } from '../../models/massage';
 import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { SearchComponent } from "../search/search.component";
+import { MassageBoxComponent } from '../massage-box/massage-box.component';
 
 @Component({
   selector: 'app-recommendations',
-  imports: [MatIconModule, MatOption, ReactiveFormsModule, MatAutocompleteModule, MatLabel, MatFormField, FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, MatChipsModule, MatSelectModule, SearchComponent],
+  imports: [MatIconModule, MatOption, ReactiveFormsModule, MatAutocompleteModule, MatLabel, MatFormField, FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, MatChipsModule, MatSelectModule, SearchComponent, MassageBoxComponent, NgOptimizedImage],
   templateUrl: './recommendations.component.html',
   styleUrl: './recommendations.component.css'
 })
@@ -30,7 +31,9 @@ export class RecommendationsComponent {
   dataType: string = 'symptom';
   companyCities: string[] = [];
   selectedCity: string = '';
-  recommendedMassages: Massage[] = [];
+  recommendedMassages: MassageSymptom[] = [];
+  randomMassage: Massage | undefined;
+  massageEffectivenessMap: Map<string, { symptoms: string[], effectivenesses: string[]}> = new Map();
 
   constructor(
     private msgService: MassageService,
@@ -44,42 +47,70 @@ export class RecommendationsComponent {
   }
   
   getSelectedSymptoms(selected: Symptom[]) {
+    console.log(selected)
     this.selectedSymptoms = selected;
   }
 
-  // // getMassages(symptomIds: string[], city: string): Observable<Massage[]> {
-    // //   const massageRequests = symptomIds.map(id =>
-  // //     this.msgService.getMassagesBySymptom(id)
-  // //   )
-  // //   console.log("req: ", massageRequests)
-  // //   return forkJoin(massageRequests).pipe(
-  // //     map(results => {
-  // //       const allMassages = results.flat();
-  // //       const uniqueMassages = Array.from (
-  // //         new Map(allMassages.map(m => [m.id, m])).values()
-  // //       );
-  // //       console.log("Unique:", uniqueMassages)
-  // //       return uniqueMassages;
-  // //     }),
-  // //     switchMap(massagesWithSymptoms =>
-  // //       this.companyService.getCompaniesByCity(city).pipe(
-  // //         map(companiesInCity =>
-  // //           massagesWithSymptoms.filter(m => companiesInCity.some(c => c.id === m.id ))
-  // //         )
-  // //       )
-  // //     ),
-  // //     catchError(error => {
-  // //       this.alertService.error("Błąd podczas pobierania masaży", error);
-  // //       return of([]);
-  // //     })
-  // //   )
-  // // }
+  getRandomMassage(city: string) {
+    this.msgService.getMassagesByCity(city).subscribe(m => {
+      if (m && m.length > 0) {
+        const randomIndex = Math.floor(Math.random() * m.length);
+        this.randomMassage = m[randomIndex];
+      }
+    })
+  }
 
-  // seachForMassages() {
-  //   console.log("Final: ",this.getMassages(this.getSelectedSymptomsIds(), this.selectedCity));
-  //   // this.getMassages(this.getSelectedSymptomsIds(), this.selectedCity).subscribe(massages => {
-  //   //   this.recommendedMassages = massages;
-  //   //   console.log("Final: ", massages)
-  //   // });
-  // }
+  categoriseEffectiveness(score: number): string {
+    let text = '';
+    if (score < 2.5) {
+      text = "małym";
+    } else if (score >= 2.5 && score < 4 ) {
+      text = "średnim";
+    } else if (score >= 4) {
+      text = "dużym";
+    }
+    return text + " stopniu";
+  }
+
+  getMassages(symptoms: Symptom[], city: string) {
+    this.recommendedMassages = [];
+    this.massageEffectivenessMap.clear();
+
+    for(let symptom of symptoms) {
+      if (symptom.id) {
+        this.msgService.getMassagesBySymptom(symptom.id, city).subscribe(m => {
+          for(let massage of m) {
+            const exists = this.recommendedMassages.some(
+              existing => existing.massageId === massage.massageId && existing.companyName === massage.companyName
+            );
+
+            if (!exists) {
+              this.recommendedMassages.push(massage);
+            }
+
+            if (massage.massageId) {
+              if (!this.massageEffectivenessMap.has(massage.massageId)) {
+                this.massageEffectivenessMap.set(massage.massageId, {
+                  symptoms: [],
+                  effectivenesses: []
+                });
+              }
+
+              const mapEntry = this.massageEffectivenessMap.get(massage.massageId)!;
+
+              if (!mapEntry.symptoms.includes(massage.symptomName)) {
+                mapEntry.symptoms.push(massage.symptomName);
+                mapEntry.effectivenesses.push(this.categoriseEffectiveness(massage.effectivenessScore))
+              }
+            }
+          }
+        });
+      }
+    }
+  }
+
+  findMassages() {
+    this.getMassages(this.selectedSymptoms, this.selectedCity);
+    this.getRandomMassage(this.selectedCity);
+  }
 }

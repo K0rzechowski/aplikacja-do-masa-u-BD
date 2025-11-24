@@ -14,3 +14,13 @@ export interface Massage {
     symptomIds?: string[],
     imageUrl?: string,
 }
+
+export interface MassageSymptom {
+    massageId: string,
+    massageName: string,
+    symptomId: string,
+    symptomName: string,
+    effectivenessScore: number,
+    imageUrl: string,
+    companyName: string,
+}

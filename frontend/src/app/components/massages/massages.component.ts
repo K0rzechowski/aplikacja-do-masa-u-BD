@@ -5,10 +5,11 @@ import { MassageService } from '../../services/massage.service';
 import { Company } from '../../models/company';
 import { Massage } from '../../models/massage';
 import { NgOptimizedImage } from "@angular/common";
+import { MassageBoxComponent } from '../massage-box/massage-box.component';
 
 @Component({
   selector: 'app-massages',
-  imports: [NgOptimizedImage],
+  imports: [MassageBoxComponent],
   templateUrl: './massages.component.html',
   styleUrl: './massages.component.css'
 })
