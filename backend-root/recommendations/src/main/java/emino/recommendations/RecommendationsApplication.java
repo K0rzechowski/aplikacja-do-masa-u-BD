@@ -13,7 +13,7 @@ public class RecommendationsApplication {
     
     public static void main(String[] args) throws Exception {
         AlgorithmComparator comparator = new AlgorithmComparator();
-        // comparator.setUp();
+        comparator.setUp();
 
         RandomForest model = (RandomForest) Read.object(Paths.get("random_forest_model_the_best.bin"));
 
