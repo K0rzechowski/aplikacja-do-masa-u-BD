@@ -25,7 +25,7 @@ import { SearchComponent } from "../../search/search.component";
 
 @Component({
   selector: 'app-massage-form',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatButtonModule, MatDialogTitle, MatDialogClose, MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule, SearchComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatButtonModule, MatDialogTitle, MatDialogClose, MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './massage-form.component.html',
   styleUrl: './massage-form.component.css'

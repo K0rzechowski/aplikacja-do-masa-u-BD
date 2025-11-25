@@ -11,6 +11,7 @@ import { RecommendationsComponent } from './components/recommendations/recommend
 import { MassagesComponent } from './components/massages/massages.component';
 import { authGuard } from './guards/auth-guard.guard';
 import { adminGuard } from './guards/admin.guard';
+import { PriceListComponent } from './components/price-list/price-list.component';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
@@ -27,5 +28,7 @@ export const routes: Routes = [
   },
   { path: 'forCompanies', component: CompanyFormComponent },
   { path: 'recommendations', component: RecommendationsComponent },
-  { path: 'massages/:city/:name',component: MassagesComponent }
+  { path: ':city/:name/massages', component: MassagesComponent },
+  { path: ':city/:name/price', component: PriceListComponent }
+
 ];
