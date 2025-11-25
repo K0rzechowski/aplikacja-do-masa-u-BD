@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Massage } from '../models/massage';
+import { Massage, MassageSymptom } from '../models/massage';
 import { catchError, Observable, throwError } from 'rxjs';
 import { Symptom } from '../models/symptom';
 
@@ -66,8 +66,16 @@ export class MassageService {
     return this.httpClient.get<Massage[]>(`${this.baseUrl}/employee/${employeeId}`);
   }
 
-  getMassagesBySymptom(symptomId: string): Observable<Massage[]> {
-    return this.httpClient.get<Massage[]>(`${this.baseUrl}/symptom/${symptomId}`);
+  getMassagesBySymptom(symptomId: string, city: string): Observable<MassageSymptom[]> {
+    let params = {};
+    if (city) {
+      params = { city: city }
+    }
+    return this.httpClient.get<MassageSymptom[]>(`${this.baseUrl}/symptom/${symptomId}`,{params});
+  }
+
+  getMassagesByCity(city: string): Observable<Massage[]> {
+    return this.httpClient.get<Massage[]>(`${this.baseUrl}/${city}`);
   }
 
   getMassageById(id: string): Observable<Massage> {

@@ -1,0 +1,27 @@
+@if (massage) {
+    <div class="relative flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-64">
+        <div class="relative h-36 m-2.5 overflow-hidden text-white rounded-md">
+            @if (massage.imageUrl) {
+                <img [ngSrc]="massage.imageUrl" [width]="400" [height]="400" [alt]="massage.name" priority/>
+            } @else {
+                <img src="https://placehold.co/400" width="400" height="400" alt="card-image" priority/>
+            }
+        </div>
+        <div class="p-3">
+            <h6 class="mb-2 text-slate-800 text-xl font-medium">
+                {{ massage.name }}
+            </h6>
+            <p class="text-slate-600 font-light">
+                Czas trwania: {{ massage.minutes }} min
+            </p>
+            <p class="text-slate-600 font-light">
+                Cena: {{ massage.price }} zł
+            </p>
+        </div>
+        <div class="px-3 pb-3 pt-0 mt-2">
+            <button class="btn btn-sky" type="button">
+                Rezerwuj
+            </button>
+        </div>
+    </div>  
+}

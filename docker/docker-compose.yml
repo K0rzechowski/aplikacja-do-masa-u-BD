@@ -18,22 +18,22 @@ services:
     ports:
       - 8080:8080
 
-  recommendations:
-    image: 'docker-spring-boot-postgres:latest'
-    build:
-      context: ../backend-root/recommendations
-    container_name: recommendations
-    depends_on:
-      - db
-    env_file:
-      - .env
-    environment:
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-    ports:
-      - 8090:8090
+  # recommendations:
+  #   image: 'docker-spring-boot-postgres:latest'
+  #   build:
+  #     context: ../backend-root/recommendations
+  #   container_name: recommendations
+  #   depends_on:
+  #     - db
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+  #     - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+  #     - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+  #     - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+  #   ports:
+  #     - 8090:8090
 
   frontend:
     build:

@@ -41,6 +41,6 @@ export class NavbarComponent {
 
   setCurrentCompany(company: Company) {
     this.companyService.setCurrentCompany(company);
-    this.router.navigate(['/massages', company.city, company.name]);
+    this.router.navigate([company.city, company.name, 'massages']);
   }
 }

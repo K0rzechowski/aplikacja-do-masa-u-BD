@@ -7,26 +7,71 @@
             <span class="font-medium txt">Uwaga!</span> To jedynie propozycja, a nie diagnoza. W razie wątpliwości skonsultuj się z lekarzem specjalistą.
         </p>
         <div class="mb-4">
-            <p for="symptom" class="text-lg font-medium text-center mb-2">Podaj swoje symptomy 
+            <p for="symptom" class="text-lg font-medium text-center mb-2">Podaj swoje symptomy oraz miasto aby znaleźć odpowiedni masaż 
                 <mat-icon class="align-middle" fontIcon="search"></mat-icon>
             </p>
-            <app-search [dataType]="dataType" (selected)="getSelectedSymptoms($event)"></app-search>
-            <div class="flex justify-between items-center">
-                <mat-form-field>
-                    <mat-label>Wybierz miasto</mat-label>
-                    <mat-select [(ngModel)]="selectedCity">
-                        @for (city of companyCities; track city) {
-                            <mat-option value="city">{{city}}</mat-option>
-                        }
-                    </mat-select>
-                  </mat-form-field>
-                  <div>
-                      <input type="submit" class="btn btn-sky" value="Wyszukaj">
-                  </div>
+            <div class="flex justify-between gap-2">
+                <app-search class="flex-1" [dataType]="dataType" (selected)="getSelectedSymptoms($event)"></app-search>
+                <div class="flex gap-2">
+                    <mat-form-field>
+                        <mat-label>Wybierz miasto</mat-label>
+                        <mat-select [(ngModel)]="selectedCity">
+                            @for (city of companyCities; track city) {
+                                <mat-option value="{{city}}">{{city}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    <input type="submit" class="btn btn-sky place-self-center" value="Wyszukaj" (click)="findMassages()">
+                </div>
             </div>
         </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+            @for (massage of recommendedMassages; track massage) {
+            <div class="relative flex flex-col mb-6 bg-white shadow-sm border border-slate-200 rounded-lg w-64">
+                <div class="relative h-36 m-2.5 overflow-hidden text-white rounded-md">
+                    @if (massage.imageUrl) {
+                        <img [ngSrc]="massage.imageUrl" [width]="400" [height]="400" [alt]="massage.massageName" priority/>
+                    } @else {
+                        <img src="https://placehold.co/400" width="400" height="400" alt="card-image" priority/>
+                    }
+                </div>
+                <div class="p-3">
+                    <h6 class="mb-2 text-slate-800 text-xl font-medium">
+                        {{ massage.massageName }}
+                    </h6>
+                    <p class="text-slate-600 font-light">
+                        Firma: {{massage.companyName}}
+                    </p>
+                    <p class="text-slate-600 font-light">
+                        @if (massageEffectivenessMap.has(massage.massageId)) {
+                            Pomaga na:
+                            <ul>
+                                @for (symptom of massageEffectivenessMap.get(massage.massageId)?.symptoms; track $index) {
+                                    @if (massageEffectivenessMap.get(massage.massageId)?.effectivenesses) {
+                                        <li>
+                                            <span class="font-normal">{{symptom}}</span> w {{massageEffectivenessMap.get(massage.massageId)?.effectivenesses?.[$index] ?? 'brak danych'}}
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                            }
+                    </p>
+                </div>
+                <div class="px-3 pb-3 pt-0 mt-2">
+                    <button class="btn btn-sky" type="button">
+                        Rezerwuj
+                    </button>
+                </div>
+            </div>  
+        }
+        @if (randomMassage) {
+            <div class="absolute inset-y-0 right-0">
+                <p class="text-xl font-medium">Proponujemy również:</p>
+                <app-massage-box [massage]="randomMassage"></app-massage-box>
+            </div>
+        }
+        </div>
         <div>
-
         </div>
     </div>
 </div>

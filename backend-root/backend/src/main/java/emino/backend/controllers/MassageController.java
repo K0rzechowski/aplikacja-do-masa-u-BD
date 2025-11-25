@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import emino.backend.config.SecurityService;
 import emino.backend.dto.MassageCreateDto;
 import emino.backend.dto.MassageDto;
+import emino.backend.dto.MassageSymptomDto;
 import emino.backend.models.Admin;
 import emino.backend.models.MassageForCompany;
 import emino.backend.services.MassageService;
@@ -84,16 +86,26 @@ public class MassageController {
     return ResponseEntity.ok(massagesAlphabetically);
     }
 
-    @GetMapping("/symptom/{id}")
-    public ResponseEntity<List<MassageDto>> getMassagesBySymptom(@PathVariable Long id) {
-        List<MassageForCompany> msgs = massageService.getMassagesBySymptom(id);
+    @GetMapping("/symptom/{symptomId}")
+    public ResponseEntity<List<MassageSymptomDto>> getMassagesBySymptom(@PathVariable Long symptomId, @RequestParam(required = false) String city) {
+        List<MassageSymptomDto> msgs = massageService.getMassageSymptomAssociations(symptomId, city);
+        List<MassageSymptomDto> massagesInOrder = msgs.stream()
+            .sorted((m1, m2) -> Double.compare(m2.getEffectivenessScore(), m1.getEffectivenessScore()))
+            .toList();
+
+        return ResponseEntity.ok(massagesInOrder);
+    }
+
+    @GetMapping("/{city}")
+    public ResponseEntity<List<MassageDto>> getMassagesByCity(@PathVariable String city) {
+        List<MassageForCompany> msgs = massageService.getMassagesByCity(city);
         List<MassageDto> massagesAlphabetically = msgs.stream()
-        .sorted((e1, e2) -> {
-            return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
-        })
-        .map(massageService::getMassageResponse)
-        .toList();
-    return ResponseEntity.ok(massagesAlphabetically);
+            .sorted((e1, e2) -> {
+                return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
+            })
+            .map(massageService::getMassageResponse)
+            .toList();
+        return ResponseEntity.ok(massagesAlphabetically);
     }
 
     @PutMapping(value = "/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

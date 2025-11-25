@@ -1,5 +1,7 @@
 package emino.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -26,11 +28,13 @@ public class MassageForSymptom {
     @ManyToOne
     @MapsId("massageId")
     @JoinColumn(name = "massage_id")
+    @JsonIgnoreProperties({"massagesMatchesForSymptoms"})
     private Massage massage;
 
     @ManyToOne
     @MapsId("symptomId")
     @JoinColumn(name = "symptom_id")
+    @JsonIgnoreProperties({"massagesMatchesForSymptoms"})
     private Symptom symptom;
 
     @Column(nullable=false)

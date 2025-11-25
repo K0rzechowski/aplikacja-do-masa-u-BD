@@ -17,6 +17,7 @@ public interface MassageForCompanyRepository extends JpaRepository<MassageForCom
     // Optional<MassageForCompany> findByName(String name);
     Optional<MassageForCompany> findByMassage(Massage massage);
     List<MassageForCompany> findByCompany(Company company);
+    List<MassageForCompany> findByCompanyCity(String city);
     
     @Query("SELECT DISTINCT m FROM MassageForCompany m JOIN m.employees e WHERE e.id = :employeeId")
     List<MassageForCompany> findByEmployeeId(@Param("employeeId") Long employeeId);
