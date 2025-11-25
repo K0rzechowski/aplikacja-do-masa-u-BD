@@ -3,6 +3,7 @@ package emino.backend.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import emino.backend.models.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,5 @@ public class EmployeeCreateDto {
     private String email;
     private String phoneNumber;
     private List<Long> massageIds;
+    private UserRole role;
 }

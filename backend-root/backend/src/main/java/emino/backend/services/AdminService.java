@@ -6,9 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import emino.backend.dto.AdminDto;
+import emino.backend.dto.EmployeeDto;
 import emino.backend.mail.EmailService;
 import emino.backend.mail.GenerateCustomPassword;
 import emino.backend.models.Admin;
+import emino.backend.models.Employee;
 import emino.backend.models.UserRole;
 import emino.backend.repositories.AdminRepository;
 import emino.backend.repositories.CompanyRepository;
@@ -43,6 +45,19 @@ public class AdminService {
         Admin savedAdmin = adminRepository.save(admin);
         emailService.sendAdminPasswordEmail(savedAdmin, generatedPassword, company.getName());
         return savedAdmin;
+    }
+
+    public Admin createAdminFormEmployee(Employee empl) {
+        Admin admin = Admin.adminBuilder()
+            .name(empl.getName())
+            .surname(empl.getSurname())
+            .dateOfBirth(empl.getDateOfBirth())
+            .email(empl.getEmail())
+            .password(empl.getPassword())
+            .role(UserRole.ADMIN)
+            .company(empl.getCompany())
+            .build();
+        return adminRepository.save(admin);
     }
     
     public List<Admin> getAdminsByCompany(Long companyId) {

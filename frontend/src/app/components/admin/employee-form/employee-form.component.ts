@@ -33,7 +33,7 @@ import { Massage } from '../../../models/massage';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { SearchComponent } from "../../search/search.component";
 import { Observable } from 'rxjs';
-import { User } from '../../../models/auth/user';
+import { User, UserRole } from '../../../models/auth/user';
 import { AuthenticationService } from '../../../services/authentication.service';
 
 @Component({
@@ -84,6 +84,7 @@ export class EmployeeFormComponent {
       dateOfBirth: [this.employee?.dateOfBirth, Validators.required],
       email: [this.employee?.email, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberLength]],
+      role: [this.employee?.role]
     })
   }
 
@@ -102,7 +103,8 @@ export class EmployeeFormComponent {
         surname: this.employee.surname,
         email: this.employee.email,
         phoneNumber: this.employee.phoneNumber,
-        dateOfBirth: this.employee.dateOfBirth })
+        dateOfBirth: this.employee.dateOfBirth,
+        role: "EMPLOYEE"})
     }
     this.loadAlreadySelectedMassages();
   }
@@ -120,7 +122,7 @@ export class EmployeeFormComponent {
     }
   }
 
-  edit(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate) {
+  edit(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate, role: UserRole) {
     const updatedEmployee: Employee = {
       id: this.employee?.id,
       name,
@@ -128,7 +130,7 @@ export class EmployeeFormComponent {
       phoneNumber,
       dateOfBirth: new Date(dateOfBirth).toISOString().split('T')[0],
       email,
-      role: this.employee?.role!,
+      role: role,
       company: this.employee?.company!,
       massageIds: this.selectedMassages.map(m => m.id!),  
     } as Employee;
@@ -179,6 +181,7 @@ export class EmployeeFormComponent {
         this.formModel.value.email,
         this.formModel.value.phoneNumber,
         this.formModel.value.dateOfBirth,
+        this.formModel.value.role
       );
     } else if (!this.employee && this.formModel.valid) {
       this.create(

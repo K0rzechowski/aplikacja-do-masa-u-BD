@@ -94,11 +94,11 @@ public class EmployeeController {
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<EmployeeDto> editEmployee(@PathVariable Long id, @RequestBody EmployeeCreateDto request) {
+    public ResponseEntity<Void> editEmployee(@PathVariable Long id, @RequestBody EmployeeCreateDto request) {
         Admin admin = securityService.getCurrentAdmin();
-        Employee updatedEmpl = emplService.editEmployee(id, request, admin);
-        EmployeeDto emplDto = emplService.getEmployeeResponse(updatedEmpl);
-        return ResponseEntity.ok(emplDto);
+         emplService.editEmployee(id, request, admin);
+        // EmployeeDto emplDto = emplService.getEmployeeResponse(updatedEmpl);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/remove/{id}")

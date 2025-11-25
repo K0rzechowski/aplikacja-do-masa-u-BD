@@ -7,6 +7,7 @@ import java.util.Set;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import emino.backend.dto.AdminDto;
 import emino.backend.dto.EmployeeCreateDto;
 import emino.backend.dto.EmployeeDto;
 import emino.backend.dto.MassageDto;
@@ -20,6 +21,7 @@ import emino.backend.models.UserRole;
 import emino.backend.repositories.CompanyRepository;
 import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.MassageForCompanyRepository;
+import emino.backend.services.AdminService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +35,7 @@ public class EmployeeService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final GenerateCustomPassword passwordGenerator;
+    private final AdminService adminService;
     
     public List<Employee> getEmployeesByCompany(Long companyId) {
         var company = companyRepository.findById(companyId)
@@ -89,7 +92,7 @@ public class EmployeeService {
         emplRepository.deleteById(id);
     }
 
-    public Employee editEmployee(Long id, EmployeeCreateDto request, Admin admin ) {
+    public void editEmployee(Long id, EmployeeCreateDto request, Admin admin ) {
         Employee employee = emplRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego pracownika"));
 
@@ -128,7 +131,12 @@ public class EmployeeService {
             employee.setMassagesToHandle(massages);
         }
 
-        return emplRepository.save(employee);
+        if (request.getRole() != null && request.getRole() == UserRole.ADMIN) {
+            emplRepository.deleteById(employee.getId());
+            adminService.createAdminFormEmployee(employee);
+        } else {
+            emplRepository.save(employee);
+        }
     }
 
     public List<Employee> getEmployeesByMassage(Long massageId) {
