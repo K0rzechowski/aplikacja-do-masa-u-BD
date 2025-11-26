@@ -46,5 +46,8 @@ public class Company {
     private Set<MassageForCompany> massages;
 
     @OneToMany(mappedBy = "company")
+    private Set<Shift> shifts;
+
+    @OneToMany(mappedBy = "company")
     private Set<Room> rooms;
 }
