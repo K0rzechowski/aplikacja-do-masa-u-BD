@@ -8,9 +8,15 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import emino.backend.dto.CompanyDto;
+import emino.backend.dto.CompanyOpenTimeDto;
+import emino.backend.dto.RoomDto;
 import emino.backend.exception.DuplicateCompanyException;
 import emino.backend.models.Company;
+import emino.backend.models.CompanyOpenTime;
+import emino.backend.models.Room;
+import emino.backend.repositories.CompanyOpenTimeRepository;
 import emino.backend.repositories.CompanyRepository;
+import emino.backend.repositories.RoomRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 public class CompanyService {
     
     private final CompanyRepository companyRepository;
+    private final CompanyOpenTimeRepository openTimeRepository;
+    private final RoomRepository roomRepository;
 
     public Company createCompany(CompanyDto request) {
 
@@ -55,5 +63,43 @@ public class CompanyService {
 
     public void removeCompany(Long id) {
         companyRepository.deleteById(id);
+    }
+
+    public CompanyOpenTime setCompanyOpenTime(CompanyOpenTimeDto request) {
+        Company company = companyRepository.findById(request.getCompanyId())
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
+
+        CompanyOpenTime openTime = CompanyOpenTime.builder()
+            .id(request.getId())
+            .company(company)
+            .openTime(request.getOpenTime())
+            .closeTime(request.getCloseTime())
+            .build();
+
+        return openTimeRepository.save(openTime);
+    }
+
+    public Optional<CompanyOpenTime> getCompanyOpenTime(Long companyId) {
+        return openTimeRepository.findByCompanyId(companyId);
+    }
+
+    public Room createRoom(RoomDto request) {
+        Company company = companyRepository.findById(request.getCompanyId())
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
+            
+        Room room = Room.builder()
+            .id(request.getId())
+            .company(company)
+            .roomNumber(request.getRoomNumber())
+            .build();
+
+        return roomRepository.save(room);
+    }
+
+    public Optional<Room> getRoomByCompanyAndRoomNumber(Long companyId, String roomNumber) {
+        Company company = companyRepository.findById(companyId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
+        
+        return roomRepository.findByCompanyAndRoomNumber(company, roomNumber);
     }
 }

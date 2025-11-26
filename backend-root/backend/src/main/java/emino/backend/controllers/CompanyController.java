@@ -13,8 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import emino.backend.config.SecurityService;
 import emino.backend.dto.CompanyDto;
+import emino.backend.dto.CompanyOpenTimeDto;
+import emino.backend.dto.RoomDto;
+import emino.backend.models.Admin;
 import emino.backend.models.Company;
+import emino.backend.models.CompanyOpenTime;
+import emino.backend.models.Room;
 import emino.backend.services.CompanyService;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class CompanyController {
     
     private final CompanyService companyService;
+    private final SecurityService securityService;
 
     @PostMapping("/create")
     public ResponseEntity<Company> createCompany(@RequestBody CompanyDto request) {
@@ -76,5 +83,70 @@ public class CompanyController {
         }
         CompanyDto dto = new CompanyDto(company.get().getId(), company.get().getName(), company.get().getCity());
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/{companyId}/opentime")
+    public ResponseEntity<CompanyOpenTimeDto> setCompanyOpenTime(@PathVariable Long companyId, @RequestBody CompanyOpenTimeDto request) {
+        Admin admin = securityService.getCurrentAdmin();
+        if (!admin.getCompany().getId().equals(companyId)) {
+            return ResponseEntity.status(403).build();
+        }
+        CompanyOpenTime response = companyService.setCompanyOpenTime(request);
+        CompanyOpenTimeDto dto = CompanyOpenTimeDto.builder()
+            .id(response.getId())
+            .companyId(response.getCompany().getId())
+            .openTime(response.getOpenTime())
+            .closeTime(response.getCloseTime())
+            .build();
+        
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{companyId}/openTime")
+    public ResponseEntity<CompanyOpenTimeDto> setCompanyOpenTime(@PathVariable Long companyId) {
+        Optional<CompanyOpenTime> open = companyService.getCompanyOpenTime(companyId);
+        
+        if (open != null) {
+            CompanyOpenTimeDto response = CompanyOpenTimeDto.builder()
+                .id(open.get().getId())
+                .companyId(open.get().getCompany().getId())
+                .openTime(open.get().getOpenTime())
+                .closeTime(open.get().getCloseTime())
+                .build();
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{companyId}/room")
+    public ResponseEntity<RoomDto> createRoom(@PathVariable Long companyId, @RequestBody RoomDto request) {
+        Admin admin = securityService.getCurrentAdmin();
+        if (!admin.getCompany().getId().equals(companyId)) {
+            return ResponseEntity.status(403).build();
+        }
+        
+        Room room = companyService.createRoom(request);
+        RoomDto dto = RoomDto.builder()
+            .id(room.getId())
+            .companyId(companyId)
+            .roomNumber(request.getRoomNumber())
+            .build();
+        
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{companyId}/{roomNumber}")
+    public ResponseEntity<RoomDto> getRoomByCompanyAndRoomNumber(@PathVariable Long companyId, @PathVariable String roomNumber) {
+        Optional<Room> room = companyService.getRoomByCompanyAndRoomNumber(companyId, roomNumber);
+
+        if (room != null) {
+            RoomDto response =  RoomDto.builder()
+            .id(room.get().getId())
+            .companyId(companyId)
+            .roomNumber(roomNumber)
+            .build();
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.notFound().build();
     }
 }

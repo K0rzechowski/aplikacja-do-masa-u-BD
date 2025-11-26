@@ -3,6 +3,7 @@ package emino.backend.services;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,20 +20,18 @@ import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.ShiftRepository;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Value;
-
 @Service
 @RequiredArgsConstructor
 public class ScheduleOptimizationService {
     
-    private EmployeeRepository employeeRepository;
-    private CompanyRepository companyRepository;
-    private ShiftRepository shiftRepository;
-    private EmployeeAvailabilityRepository availabilityRepository;
-    private RestTemplate restTemplate;
-    private OptaPlannerMapper optaPlannerMapper;
+    private final EmployeeRepository employeeRepository;
+    private final CompanyRepository companyRepository;
+    private final ShiftRepository shiftRepository;
+    private final EmployeeAvailabilityRepository availabilityRepository;
+    private final RestTemplate restTemplate;
+    private final OptaPlannerMapper optaPlannerMapper;
 
-    @Value("${optaplanner.service.url:http://localhost:8081}")
+    @Value("${optaplanner.service.url:http://optaplanner:8081}")
     private String optaPlannerUrl;
 
     public OptaSchedule optimizeSchedule(Long companyId, LocalDateTime startTime, LocalDateTime endTime) {
@@ -45,7 +44,7 @@ public class ScheduleOptimizationService {
 
         OptaSchedule problem = optaPlannerMapper.toOptaPlannerSchedule(companyId, employees, shifts, availabilities, startTime.toLocalDate(), endTime.toLocalDate());
 
-        String solveUrl = optaPlannerUrl + "/schedules/solve";
+        String solveUrl = optaPlannerUrl + "/schedule/solve";
         OptaSchedule solution = restTemplate.postForObject(solveUrl, problem, OptaSchedule.class);
 
         if (solution != null) {

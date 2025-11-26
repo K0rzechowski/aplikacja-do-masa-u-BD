@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import emino.backend.dto.AvailabilityDto;
-import emino.backend.models.AvailabilityType;
 import emino.backend.services.AvailabilityService;
 import lombok.RequiredArgsConstructor;
 
@@ -26,12 +26,7 @@ public class AvailabilityController {
     private final AvailabilityService availabilityService;
 
     @PostMapping("/employee/{employeeId}")
-    public ResponseEntity<AvailabilityDto> setAvailability(@PathVariable Long employeeId, @RequestParam LocalDate date, @RequestParam AvailabilityType type) {
-        AvailabilityDto request = AvailabilityDto.builder()
-            .employeeId(employeeId)
-            .date(date)
-            .availabilityType(type)
-            .build();
+    public ResponseEntity<AvailabilityDto> setAvailability(@PathVariable Long employeeId, @RequestBody AvailabilityDto request) {
         AvailabilityDto response = availabilityService.setAvailability(request);
         
         return ResponseEntity.ok(response);

@@ -17,7 +17,23 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     ports:
       - 8080:8080
-
+  
+  optaplanner:
+    build:
+      context: ../../optaplanner-quickstarts/use-cases/employee-scheduling
+      dockerfile: src/main/docker/Dockerfile.jvm
+      # context: ../../optaplanner-quickstarts/use-cases/employee-rostering
+    container_name: optaplanner
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - QUARKUS_DATASOURCE_URL=${QUARKUS_DATASOURCE_URL}
+      - QUARKUS_DATASOURCE_USERNAME=${QUARKUS_DATASOURCE_USERNAME}
+      - QUARKUS_DATASOURCE_PASSWORD=${QUARKUS_DATASOURCE_PASSWORD}
+    ports:
+      - 8081:8081
   # recommendations:
   #   image: 'docker-spring-boot-postgres:latest'
   #   build:
