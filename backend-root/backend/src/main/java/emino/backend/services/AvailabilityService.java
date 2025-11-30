@@ -41,6 +41,19 @@ public class AvailabilityService {
             .collect(Collectors.toList());
     }
 
+    public AvailabilityDto editAvailability(AvailabilityDto request) {
+        EmployeeAvailability availability = availabilityRepository.findById(request.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej dostępności"));
+
+        if (request.getAvailabilityType() != null) {
+            availability.setAvailabilityType(request.getAvailabilityType());
+        }
+
+        availability = availabilityRepository.save(availability);
+
+        return mapToDto(availability);
+    }
+
     private AvailabilityDto mapToDto(EmployeeAvailability availability) {
         return AvailabilityDto.builder()
             .id(availability.getId())

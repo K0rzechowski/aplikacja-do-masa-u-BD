@@ -20,7 +20,7 @@
         (optionSelected)="onDataSelected($event)"
         >
         @for (data of filteredData; track data) {
-        <mat-option [value]="data">{{ data.name }}</mat-option>
+            <mat-option [value]="data">{{ data.name }}</mat-option>
         }
         @empty {
             <mat-option disabled>Brak</mat-option>

@@ -83,6 +83,20 @@ public class CompanyService {
         return openTimeRepository.findByCompanyId(companyId);
     }
 
+    public CompanyOpenTime editCompanyOpenTime(CompanyOpenTimeDto request) {
+        Company company = companyRepository.findById(request.getCompanyId())
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
+
+        CompanyOpenTime openTime = CompanyOpenTime.builder()
+            .id(request.getId())
+            .company(company)
+            .openTime(request.getOpenTime())
+            .closeTime(request.getCloseTime())
+            .build();
+
+        return openTimeRepository.save(openTime);
+    }
+
     public Room createRoom(RoomDto request) {
         Company company = companyRepository.findById(request.getCompanyId())
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
@@ -101,5 +115,29 @@ public class CompanyService {
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
         
         return roomRepository.findByCompanyAndRoomNumber(company, roomNumber);
+    }
+
+    public List<Room> getRoomsByCompany(Long companyId) {
+        Company company = companyRepository.findById(companyId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
+        
+        return roomRepository.findByCompany(company);
+    }
+
+    public void editRoom(Long companyId, RoomDto request) {
+        Company company = companyRepository.findById(companyId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
+            
+        Room room = Room.builder()
+            .id(request.getId())
+            .company(company)
+            .roomNumber(request.getRoomNumber())
+            .build();
+
+        roomRepository.save(room);
+    }
+
+    public void removeRoom(Long id) {
+        roomRepository.deleteById(id);
     }
 }

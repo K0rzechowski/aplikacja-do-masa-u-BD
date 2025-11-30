@@ -25,7 +25,7 @@ export class AppComponent {
     private router: Router) {
       this.currentCompany$.subscribe(company => {
         if (company && company.id !== undefined) {
-          this.router.navigate(['/massages', company.city, company.name]);
+          this.router.navigate([company.city, company.name, 'massages']);
         }
       });
   }

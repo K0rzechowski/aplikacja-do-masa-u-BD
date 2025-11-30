@@ -12,6 +12,7 @@ import { MassagesComponent } from './components/massages/massages.component';
 import { authGuard } from './guards/auth-guard.guard';
 import { adminGuard } from './guards/admin.guard';
 import { PriceListComponent } from './components/price-list/price-list.component';
+import { CompanyFormsComponent } from './components/admin/company-forms/company-forms.component';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
@@ -24,6 +25,7 @@ export const routes: Routes = [
       { path: 'profile', component: ProfileComponent },
       { path: 'employees', component: ManageEmployeesComponent },
       { path: 'massages', component: ManageMassagesComponent },
+      { path: 'companySettings', component: CompanyFormsComponent },
     ]
   },
   { path: 'forCompanies', component: CompanyFormComponent },

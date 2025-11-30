@@ -17,6 +17,10 @@ import { AlertService } from '../../services/alert.service';
 import { MatSingleDateSelectionModel } from '@angular/material/datepicker';
 import { MassageService } from '../../services/massage.service';
 import { Massage } from '../../models/massage';
+import { Room } from '../../models/room';
+import { CompanyService } from '../../services/company.service';
+import { Company } from '../../models/company';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-dialog',
@@ -36,13 +40,25 @@ export class DialogDeleteComponent {
 
   idToDelete: string | undefined = '';
   thingToDelete: String | undefined = '';
+  company: Company | undefined;
+
+  get currentCompany$(): Observable<Company | null> {
+    return this.companyService.currentCompany;
+  }
 
   constructor (
     private emplService: EmployeeService,
     private msgService: MassageService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private companyService: CompanyService
   ) {
     this.checkType();
+
+    this.currentCompany$.subscribe(c => {
+      if (c !== null) {
+        this.company = c;
+      }
+    });
   }
 
   checkType(): String {
@@ -59,6 +75,11 @@ export class DialogDeleteComponent {
         this.idToDelete = massage.id ?? '';
         this.thingToDelete = `${massage.name}`;
         return this.data.type;
+      case 'room':
+        const room = this.data.item as Room;
+        this.idToDelete = room.id ?? '';
+        this.thingToDelete = `${room.roomNumber}`;
+        return this.data.type;
       default:
         return "";
     }
@@ -67,7 +88,7 @@ export class DialogDeleteComponent {
   delete(): void {
     console.log(this.data)
     if (this.idToDelete) {
-      if(this.data.type === 'employee'){ 
+      if(this.data.type === 'employee') { 
           this.emplService.deleteEmployee(this.idToDelete).subscribe({
             next: () => {
               this.alertService.success(`Poprawnie usunięto pracownika o ID ${this.idToDelete}`);
@@ -76,7 +97,7 @@ export class DialogDeleteComponent {
               this.alertService.error(`Nieudana operacja usunięcia pracownika o ID ${this.idToDelete}`);
             }
           });
-      } else if(this.data.type === 'massage'){ 
+      } else if(this.data.type === 'massage') { 
         this.msgService.deleteMassage(this.idToDelete).subscribe({
           next: () => {
             this.alertService.success(`Poprawnie usunięto masaż o ID ${this.idToDelete}`);
@@ -85,6 +106,17 @@ export class DialogDeleteComponent {
             this.alertService.error(`Nieudana operacja usunięcia masażu o ID ${this.idToDelete}`);
           }
         });
+      } else if(this.data.type === 'room') { 
+        if (this.company?.id) {
+          this.companyService.deleteRoom(this.company?.id, this.idToDelete).subscribe({
+            next: () => {
+              this.alertService.success(`Poprawnie usunięto salę o ID ${this.idToDelete}`);
+            },
+            error: (error) => {
+              this.alertService.error(`Nieudana operacja usunięcia sali o ID ${this.idToDelete}`);
+            }
+          });  
+        }
       } 
     } 
     this.dialogRef.close(true);

@@ -72,7 +72,6 @@ export class ManageEmployeesComponent {
           setTimeout(() => {
             this.loadEmployeesInMyCompany();
           }, 300);
-          // reload employees after deletion
           this.loadEmployeesInMyCompany();
         }
       });

@@ -3,3 +3,10 @@ export interface Company {
     name: string,
     city: string
 }
+
+export interface CompanyOpenTime {
+    id?: string,
+    company: Company,
+    openTime: string,
+    endTime: string
+}

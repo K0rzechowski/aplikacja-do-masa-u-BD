@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, inject, Input, Output, signal, SimpleChange, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, Output, signal, SimpleChange, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Symptom } from '../../models/symptom';
 import { Massage } from '../../models/massage';
@@ -8,7 +8,7 @@ import { CompanyService } from '../../services/company.service';
 import { AlertService } from '../../services/alert.service';
 import { Company } from '../../models/company';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent, MatOption } from '@angular/material/autocomplete';
-import { MAT_INPUT_CONFIG, MatFormField, MatInputModule, MatLabel } from '@angular/material/input';
+import { MAT_INPUT_CONFIG, MatFormField, MatInput, MatInputModule, MatLabel } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
@@ -29,6 +29,7 @@ export class SearchComponent<T extends Symptom | Massage> {
   selectedData = signal<T[]>([]);
   @Output() selected: EventEmitter<T[]> = new EventEmitter<T[]>();
   filteredData: T[] = [];
+  @ViewChild(MatInput) input!: MatInput;
 
   announcer = inject(LiveAnnouncer);
 
@@ -99,6 +100,9 @@ export class SearchComponent<T extends Symptom | Massage> {
     }
     this.searchControl.setValue('');
     this.filteredData = this.getAvaiableData();
+    if (this.input) {
+      this.input.value='';
+    }
   }
 
   addData(chip: T) {

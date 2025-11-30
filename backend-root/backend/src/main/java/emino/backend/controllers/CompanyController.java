@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -103,7 +104,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{companyId}/openTime")
-    public ResponseEntity<CompanyOpenTimeDto> setCompanyOpenTime(@PathVariable Long companyId) {
+    public ResponseEntity<CompanyOpenTimeDto> getCompanyOpenTime(@PathVariable Long companyId) {
         Optional<CompanyOpenTime> open = companyService.getCompanyOpenTime(companyId);
         
         if (open != null) {
@@ -116,6 +117,26 @@ public class CompanyController {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{companyId}/openTime")
+    public ResponseEntity<CompanyOpenTimeDto> editCompanyOpenTime(@PathVariable Long companyId, @RequestBody CompanyOpenTimeDto request) {
+        Optional<CompanyOpenTime> open = companyService.getCompanyOpenTime(companyId);
+        
+        Admin admin = securityService.getCurrentAdmin();
+        if (!admin.getCompany().getId().equals(companyId)) {
+            return ResponseEntity.status(403).build();
+        }
+        
+        CompanyOpenTime response = companyService.editCompanyOpenTime(request);
+        CompanyOpenTimeDto dto = CompanyOpenTimeDto.builder()
+            .id(response.getId())
+            .companyId(response.getCompany().getId())
+            .openTime(response.getOpenTime())
+            .closeTime(response.getCloseTime())
+            .build();
+        
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/{companyId}/room")
@@ -135,7 +156,7 @@ public class CompanyController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{companyId}/{roomNumber}")
+    @GetMapping("/{companyId}/room{roomNumber}")
     public ResponseEntity<RoomDto> getRoomByCompanyAndRoomNumber(@PathVariable Long companyId, @PathVariable String roomNumber) {
         Optional<Room> room = companyService.getRoomByCompanyAndRoomNumber(companyId, roomNumber);
 
@@ -148,5 +169,34 @@ public class CompanyController {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{companyId}/room/edit/{roomId}")
+    public ResponseEntity<Void> editRoom(@PathVariable Long companyId, @PathVariable Long roomId, @RequestBody RoomDto request) {
+        companyService.editRoom(companyId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{companyId}/rooms")
+    public ResponseEntity<List<RoomDto>> getRoomsByCompany(@PathVariable Long companyId) {
+        List<Room> rooms = companyService.getRoomsByCompany(companyId);
+
+        List<RoomDto> roomsResponse = rooms
+            .stream()
+            .map(r -> RoomDto.builder()
+                .id(r.getId())
+                .companyId(companyId)
+                .roomNumber(r.getRoomNumber())
+                .build()
+            )
+            .toList();
+
+        return ResponseEntity.ok(roomsResponse);
+    }
+
+    @DeleteMapping("/{companyId}/room/remove/{roomId}")
+    public ResponseEntity removeEmployee(@PathVariable Long companyId, @PathVariable Long roomId) {
+        companyService.removeRoom(roomId);
+        return ResponseEntity.ok().build();
     }
 }
