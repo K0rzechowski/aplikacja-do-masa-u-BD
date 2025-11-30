@@ -41,6 +41,13 @@ public class AvailabilityService {
             .collect(Collectors.toList());
     }
 
+    public AvailabilityDto getAvailabilityByEmployeeAndStartDate(Long employeeId, LocalDate start) {
+        EmployeeAvailability availability = availabilityRepository.findByEmployeeIdAndDate(employeeId, start)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej dostępności"));
+
+        return mapToDto(availability);
+    }
+
     public AvailabilityDto editAvailability(AvailabilityDto request) {
         EmployeeAvailability availability = availabilityRepository.findById(request.getId())
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej dostępności"));

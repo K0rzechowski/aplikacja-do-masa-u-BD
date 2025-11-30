@@ -7,7 +7,6 @@ import { AsyncPipe } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { AlertService } from '../../services/alert.service';
 
-
 @Component({
   selector: 'app-settings',
   imports: [AsyncPipe, RouterLink, RouterOutlet],
@@ -22,7 +21,6 @@ export class SettingsComponent {
     { label: 'Moje konto', route: 'profile' },
     { label: 'Wizyty', route: 'appointments' }
   ];
-
 
   get isAuthenticated$(): Observable<boolean> {
     return this.authService.isAuthenticated;
@@ -47,7 +45,7 @@ export class SettingsComponent {
         this.settingsChoices.push({ label: 'Zarządzaj masażami', route: 'massages' });
         this.settingsChoices.push({ label: 'Zarządzaj swoją firmą', route: 'companySettings' });
       } else if(authService.isEmployee() == true) {
-        this.settingsChoices.push({ label: 'Coś dla zwykłego robola', route: 'employee' });
+        this.settingsChoices.push({ label: 'Zarządzaj dostępnością na dzień', route: 'availabilities' });
       }
     });
   }

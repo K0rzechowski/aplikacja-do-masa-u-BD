@@ -2,12 +2,19 @@ export interface Availability {
     id?: string,
     employeeId: string,
     date: string,
-    type: AvailabilityType
+    availabilityType: AvailabilityType
 }
 
 export enum AvailabilityType{
-    DESIRED = 'POŻĄDANY',
-    UNDESIRED = 'NIE POŻĄDANY',
-    AVAILABLE = 'DOSTĘPNY',
-    UNAVAILABLE = 'NIEDOSTĘPNY'
+    DESIRED = 'DESIRED',
+    UNDESIRED = 'UNDESIRED',
+    AVAILABLE = 'AVAILABLE',
+    UNAVAILABLE = 'UNAVAILABLE'
+}
+
+export const AvailabilityTypeLabels: Record<AvailabilityType, string> = {
+    DESIRED: 'Pożądany',
+    UNDESIRED: 'Nie pożądany',
+    AVAILABLE: 'Dostępny',
+    UNAVAILABLE: 'Nie dostępny'
 }

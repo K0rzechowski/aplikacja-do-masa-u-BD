@@ -22,7 +22,6 @@ services:
     build:
       context: ../../optaplanner-quickstarts/use-cases/employee-scheduling
       dockerfile: src/main/docker/Dockerfile.jvm
-      # context: ../../optaplanner-quickstarts/use-cases/employee-rostering
     container_name: optaplanner
     depends_on:
       - db
@@ -34,22 +33,6 @@ services:
       - QUARKUS_DATASOURCE_PASSWORD=${QUARKUS_DATASOURCE_PASSWORD}
     ports:
       - 8081:8081
-  # recommendations:
-  #   image: 'docker-spring-boot-postgres:latest'
-  #   build:
-  #     context: ../backend-root/recommendations
-  #   container_name: recommendations
-  #   depends_on:
-  #     - db
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
-  #     - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-  #     - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-  #     - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-  #   ports:
-  #     - 8090:8090
 
   frontend:
     build:

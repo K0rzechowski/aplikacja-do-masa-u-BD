@@ -13,6 +13,7 @@ import { authGuard } from './guards/auth-guard.guard';
 import { adminGuard } from './guards/admin.guard';
 import { PriceListComponent } from './components/price-list/price-list.component';
 import { CompanyFormsComponent } from './components/admin/company-forms/company-forms.component';
+import { AvailabilityCalendarComponent } from './components/employee/availability-calendar/availability-calendar.component';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
@@ -26,6 +27,7 @@ export const routes: Routes = [
       { path: 'employees', component: ManageEmployeesComponent },
       { path: 'massages', component: ManageMassagesComponent },
       { path: 'companySettings', component: CompanyFormsComponent },
+      { path: 'availabilities', component: AvailabilityCalendarComponent}
     ]
   },
   { path: 'forCompanies', component: CompanyFormComponent },

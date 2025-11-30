@@ -43,6 +43,15 @@ public class AvailabilityController {
         return ResponseEntity.ok(availabilityList);
     }
 
+    @GetMapping("/employee/{employeeId}/{start}")
+    public ResponseEntity<AvailabilityDto> getAvailabilityByEmployeeAndDate(
+        @PathVariable Long employeeId,
+        @PathVariable LocalDate start) {
+        
+        AvailabilityDto availabilityList = availabilityService.getAvailabilityByEmployeeAndStartDate(employeeId, start);
+        return ResponseEntity.ok(availabilityList);
+    }
+
     @PutMapping("/employee/{employeeId}")
     public ResponseEntity<AvailabilityDto> editAvailability(@PathVariable Long employeeId, @RequestBody AvailabilityDto request) {
         AvailabilityDto updated = availabilityService.editAvailability(request);

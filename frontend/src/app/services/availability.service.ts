@@ -16,7 +16,7 @@ export class AvailabilityService {
     return this.httpClient.post<void>(`${this.baseUrl}/employee/${request.employeeId}`, request);
   }
 
-  getAvailabilityForWeek(employeeId: string, startDate: Date):Observable<Availability[]> {
+  getAvailabilityForWeek(employeeId: string, startDate: Date): Observable<Availability[]> {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 7);
 
@@ -25,6 +25,10 @@ export class AvailabilityService {
       .set('end', endDate.toISOString().substring(0, 10));
 
     return this.httpClient.get<Availability[]>(`${this.baseUrl}/employee/${employeeId}`, {params});
+  }
+
+  getAvailabilityByEmployeeAndStartDate(employeeId: string, startDate: string): Observable<Availability> {
+    return this.httpClient.get<Availability>(`${this.baseUrl}/employee/${employeeId}/${startDate}`);
   }
 
   editAvailability(request: Availability): Observable<Availability> {
