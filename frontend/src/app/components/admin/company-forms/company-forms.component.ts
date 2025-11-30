@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { MatFormField, MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
-import {MAT_TIMEPICKER_CONFIG, MatTimepickerModule} from '@angular/material/timepicker';
+import { MatTimepickerModule} from '@angular/material/timepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
@@ -13,11 +13,22 @@ import { DialogDeleteComponent } from '../../dialog-delete/dialog-delete.compone
 import { DialogData } from '../../../models/dialog-data';
 import { Room } from '../../../models/room';
 import { RoomFormComponent } from "../room-form/room-form.component";
+import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { MAT_NATIVE_DATE_FORMATS } from '@angular/material/core';
+import { registerLocaleData } from '@angular/common';
+import localePl from '@angular/common/locales/pl';
+import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
+import { AlertService } from '../../../services/alert.service';
+import { Moment } from 'moment';
+import moment from 'moment';
+
+registerLocaleData(localePl, 'pl');
 
 @Component({
   selector: 'app-company-forms',
-  providers: [provideNativeDateAdapter(),
-    { provide: LOCALE_ID, useValue:'pl-PL'}
+  providers: [provideNativeDateAdapter(), provideMomentDateAdapter(),
+    { provide: LOCALE_ID, useValue: 'pl-PL'},
+    { provide: MAT_DATE_LOCALE, useValue: 'pl-PL' }
   ],
   imports: [ReactiveFormsModule, CommonModule, MatFormField, MatFormFieldModule, MatTimepickerModule, MatInputModule, RoomFormComponent],
   templateUrl: './company-forms.component.html',
@@ -38,33 +49,51 @@ export class CompanyFormsComponent {
   isAdmin$: Observable<boolean> | undefined;
   company: Company | undefined;
   openForm: FormGroup;
-  openTime: CompanyOpenTime | undefined;
+  companyOpenTime: CompanyOpenTime | undefined;
+  openTime: string | undefined;
+  closeTime: string | undefined;
   roomsInMyCompany: Room[] = [];
   showRoomDetails: boolean = false;
   roomToEdit: Room | undefined;
   
   constructor (
     private companyService: CompanyService,
+    private alertService: AlertService,
     private formBuilder: FormBuilder,
   ) {
     this.currentCompany$.subscribe(c => {
       if (c !== null) {
         this.company = c;
+
+        this.loadOpenTime();        
       }
     });
 
-    if (this.company?.id) {
-      this.companyService.getCompanyOpenTime(this.company?.id).subscribe(data => {
-        this.openTime = data;
-      })
-    }
-
     this.openForm = this.formBuilder.group({
-      startTime: [this.openTime?.openTime, [Validators.required]],
-      closeTime: [this.openTime?.endTime, [Validators.required]]
+      startTime: [this.companyOpenTime?.openTime, [Validators.required]],
+      closeTime: [this.companyOpenTime?.closeTime, [Validators.required]]
     })
 
     this.loadRoomsInMyCompany();
+  }
+
+
+  loadOpenTime() {
+    if (this.company?.id) {
+      this.companyService.getCompanyOpenTime(this.company?.id).subscribe(data => {
+        this.companyOpenTime = data;
+        this.openTime = this.formatTimeForView(data.openTime);
+        this.closeTime = this.formatTimeForView(data.closeTime);
+      })
+    }
+  }
+
+  formatTimeForView(time: string | undefined) {
+    if (!time) {
+      return '';
+    }
+
+    return time.substring(0, 5);
   }
 
   loadRoomsInMyCompany() {
@@ -131,6 +160,43 @@ export class CompanyFormsComponent {
     this.loadRoomsInMyCompany();
   }
 
-  //TODO
-  submitOpenTime() {}
+  createOpenTime(openTime: string, closeTime: string) {
+    if (this.company?.id) {
+      console.log(this.company.id)
+      const newTime: CompanyOpenTime = {
+        companyId: this.company.id,
+        openTime,
+        closeTime
+      };
+      this.companyService.createCompanyOpenTime(newTime).subscribe({
+        next: (response) => {
+          this.alertService.success("Operacja dodania godzin otwarcia powiodła się");
+        },
+        error: (error: Error) => {
+          this.alertService.error("Błąd podczas dodawania godzin otwarcia: " + error.message);
+        } 
+      })
+    }
+  }
+
+  momentToTimeString(m: Moment | Date): string {
+    if (!m) {
+      return "";
+    }
+
+    const mnt = moment.isMoment(m) ? m : moment(m);
+    if (!mnt.isValid()) {
+      return "";
+    }
+
+    return mnt.format("HH:mm:ss");
+  }
+
+  submitOpenTime() {
+    if (this.openForm.valid) {
+      const startTime = this.momentToTimeString(this.openForm.value.startTime);
+      const closeTime = this.momentToTimeString(this.openForm.value.closeTime);
+      this.createOpenTime(startTime, closeTime);
+    }
+  }
 }

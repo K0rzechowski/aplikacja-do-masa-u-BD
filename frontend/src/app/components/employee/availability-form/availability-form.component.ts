@@ -72,7 +72,6 @@ export class AvailabilityFormComponent {
     if (this.dialogRef) {
       this.dialogRef.close(true);
     }
-    
   }
 
   edit(type: AvailabilityType) {

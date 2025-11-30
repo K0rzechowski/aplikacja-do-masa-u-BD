@@ -58,12 +58,12 @@ export class CompanyService {
     this.currentCompanySubject.next(company);
   }
 
-  setCompanyOpenTime(openTime: CompanyOpenTime): Observable<CompanyOpenTime> {
-    return this.httpClient.post<CompanyOpenTime>(`${this.baseUrl}/${openTime.company.id}/openTime`, openTime);
+  createCompanyOpenTime(openTime: CompanyOpenTime): Observable<CompanyOpenTime> {
+    return this.httpClient.post<CompanyOpenTime>(`${this.baseUrl}/${openTime.companyId}/addOpenTime`, openTime);
   }
 
   editCompanyOpenTime(openTime: CompanyOpenTime): Observable<CompanyOpenTime> {
-    return this.httpClient.put<CompanyOpenTime>(`${this.baseUrl}/${openTime.company.id}/openTime`, openTime);
+    return this.httpClient.put<CompanyOpenTime>(`${this.baseUrl}/${openTime.companyId}/editOpenTime`, openTime);
   }
 
   getCompanyOpenTime(companyId: string): Observable<CompanyOpenTime> {

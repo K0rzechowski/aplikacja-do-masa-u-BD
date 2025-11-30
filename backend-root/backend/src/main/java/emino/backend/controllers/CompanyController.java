@@ -86,7 +86,7 @@ public class CompanyController {
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping("/{companyId}/opentime")
+    @PostMapping("/{companyId}/addOpenTime")
     public ResponseEntity<CompanyOpenTimeDto> setCompanyOpenTime(@PathVariable Long companyId, @RequestBody CompanyOpenTimeDto request) {
         Admin admin = securityService.getCurrentAdmin();
         if (!admin.getCompany().getId().equals(companyId)) {
@@ -119,7 +119,7 @@ public class CompanyController {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{companyId}/openTime")
+    @PutMapping("/{companyId}/editOpenTime")
     public ResponseEntity<CompanyOpenTimeDto> editCompanyOpenTime(@PathVariable Long companyId, @RequestBody CompanyOpenTimeDto request) {
         Optional<CompanyOpenTime> open = companyService.getCompanyOpenTime(companyId);
         

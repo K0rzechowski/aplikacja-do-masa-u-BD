@@ -6,7 +6,7 @@ export interface Company {
 
 export interface CompanyOpenTime {
     id?: string,
-    company: Company,
+    companyId: string,
     openTime: string,
-    endTime: string
+    closeTime: string
 }
