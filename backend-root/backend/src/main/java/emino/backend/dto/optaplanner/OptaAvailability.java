@@ -13,8 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class OptaAvailability {
-    
+
     private OptaEmployee employee;
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING)
     private LocalDate date;
     private AvailabilityType availabilityType;
 }

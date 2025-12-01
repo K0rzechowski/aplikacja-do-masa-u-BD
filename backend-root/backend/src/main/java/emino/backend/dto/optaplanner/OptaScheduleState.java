@@ -10,6 +10,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class OptaScheduleState {
-    
+
+    private Long tenantId;
+    private Integer publishLength;
+    private Integer draftLength;
+
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING)
+    private java.time.LocalDate firstDraftDate;
+
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING)
+    private java.time.LocalDate lastHistoricDate;
+
     private String score;
 }

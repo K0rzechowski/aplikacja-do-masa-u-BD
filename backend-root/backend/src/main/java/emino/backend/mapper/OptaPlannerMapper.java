@@ -18,66 +18,84 @@ import emino.backend.models.Shift;
 
 @Component
 public class OptaPlannerMapper {
-    
+
     public OptaEmployee toOptaPlannerEmployee(Employee employee) {
-        Set<String> skills = employee.getMassagesToHandle() != null ? employee.getMassagesToHandle() 
-            .stream()
-            .map(skill -> skill.getMassage().getName())
-            .collect(Collectors.toSet())
-        : Collections.emptySet();
+        Set<String> skills = employee.getMassagesToHandle() != null ? employee.getMassagesToHandle()
+                .stream()
+                .map(skill -> skill.getMassage().getName())
+                .collect(Collectors.toSet())
+                : Collections.emptySet();
 
         return OptaEmployee.builder()
-            .id(employee.getId())
-            .name(employee.getName() + " " + employee.getSurname())
-            .skills(skills)
-            .build();
+                .id(employee.getId())
+                .name(employee.getName() + " " + employee.getSurname())
+                .skills(skills)
+                .build();
     }
 
     public OptaShift toOptaPlannerShift(Shift shift) {
-        OptaEmployee optaEmployee = null;
-        if (shift.getAssignedEmployee() != null) {
-            optaEmployee = toOptaPlannerEmployee(shift.getAssignedEmployee());
-        }
-
         return OptaShift.builder()
-            .id(shift.getId())
-            .start(shift.getStartTime())
-            .end(shift.getEndTime())
-            .location(shift.getRoom() != null ? shift.getRoom().getRoomNumber() : null)
-            .requiredSkill(shift.getMassage().getMassage().getName())
-            .employee(optaEmployee)
-            .build();
+                .id(shift.getId())
+                .start(shift.getStartTime())
+                .end(shift.getEndTime())
+                .location(shift.getRoom().getRoomNumber())
+                .requiredSkill(shift.getMassage().getMassage().getName())
+                .employee(null)
+                .build();
     }
 
     public OptaAvailability toOptaPlannerAvailability(EmployeeAvailability availability) {
         return OptaAvailability.builder()
-            .employee(toOptaPlannerEmployee(availability.getEmployee()))
-            .date(availability.getDate())
-            .availabilityType(availability.getAvailabilityType())
-            .build();
+                .employee(toOptaPlannerEmployee(availability.getEmployee()))
+                .date(availability.getDate())
+                .availabilityType(availability.getAvailabilityType())
+                .build();
     }
 
-    // public OptaScheduleState toOptaPlannerScheduleState(Long companyId, LocalDate startDate) {
-    //     return OptaScheduleState.builder()
-    //         .tenantId(companyId)
-    //         .publishLength(7)
-    //         .draftLength(14)
-    //         .firstDraftDate(startDate.plusDays(7))
-    //         .lastHistoricDate(startDate.minusDays(1))
-    //         .build();
+    // public OptaScheduleState toOptaPlannerScheduleState(Long companyId, LocalDate
+    // startDate) {
+    // return OptaScheduleState.builder()
+    // .tenantId(companyId)
+    // .publishLength(7)
+    // .draftLength(14)
+    // .firstDraftDate(startDate.plusDays(7))
+    // .lastHistoricDate(startDate.minusDays(1))
+    // .build();
     // }
 
     public List<OptimizedShiftDto> toOptaPlannerSchedule(OptaSchedule optimizedSchedule) {
 
         return optimizedSchedule.getShifts().stream()
-            .map(optaShift -> OptimizedShiftDto.builder()
-                .id(optaShift.getId())
-                .startTime(optaShift.getStart())
-                .endTime(optaShift.getEnd())
-                .location(optaShift.getLocation())
-                .requiredSkill(optaShift.getRequiredSkill())
-                .employeeName(optaShift.getEmployee() != null ? optaShift.getEmployee().getName() : "Nieprzypisany")
-                .build())
-            .toList();
+                .map(optaShift -> OptimizedShiftDto.builder()
+                        .id(optaShift.getId())
+                        .startTime(optaShift.getStart())
+                        .endTime(optaShift.getEnd())
+                        .location(optaShift.getLocation())
+                        .requiredSkill(optaShift.getRequiredSkill())
+                        .employeeName(
+                                optaShift.getEmployee() != null ? optaShift.getEmployee().getName() : "Nieprzypisany")
+                        .build())
+                .toList();
+    }
+
+    public OptimizedShiftDto toOptimizedShiftDto(Shift shift) {
+        String employeeName = shift.getAssignedEmployee() != null
+                ? shift.getAssignedEmployee().getName() + " " + shift.getAssignedEmployee().getSurname()
+                : "Nieprzypisany";
+
+        return OptimizedShiftDto.builder()
+                .id(shift.getId())
+                .startTime(shift.getStartTime())
+                .endTime(shift.getEndTime())
+                .location(shift.getRoom().getRoomNumber())
+                .requiredSkill(shift.getMassage().getMassage().getName())
+                .employeeName(employeeName)
+                .build();
+    }
+
+    public List<OptimizedShiftDto> toOptimizedShiftDtoList(List<Shift> shifts) {
+        return shifts.stream()
+                .map(this::toOptimizedShiftDto)
+                .toList();
     }
 }

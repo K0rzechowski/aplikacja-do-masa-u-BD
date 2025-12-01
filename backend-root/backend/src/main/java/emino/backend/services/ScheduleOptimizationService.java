@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class ScheduleOptimizationService {
-    
+
     private final EmployeeRepository employeeRepository;
     private final CompanyRepository companyRepository;
     private final ShiftRepository shiftRepository;
@@ -36,13 +36,23 @@ public class ScheduleOptimizationService {
     private String optaPlannerUrl;
 
     public OptaSchedule optimizeSchedule(OptaSchedule problem) {
-        String optimizeUrl = optaPlannerUrl + "/schedule/solve";
+        String optimizeUrl = optaPlannerUrl + "/schedule/solve-sync";
 
         try {
-            log.info("Sending schedule to OptaPlanner service with {} shifts and {} employees", 
-                problem.getShifts().size(), problem.getEmployees().size());
+            log.info("Sending schedule to OptaPlanner service with {} shifts and {} employees",
+                    problem.getShifts().size(), problem.getEmployees().size());
 
-            ResponseEntity<OptaSchedule> response = restTemplate.postForEntity(optimizeUrl, problem, OptaSchedule.class);
+            try {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+                String json = mapper.writeValueAsString(problem);
+                log.info("Payload: {}", json);
+            } catch (Exception e) {
+                log.error("Failed to serialize payload for logging", e);
+            }
+
+            ResponseEntity<OptaSchedule> response = restTemplate.postForEntity(optimizeUrl, problem,
+                    OptaSchedule.class);
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 log.info("Received optimized schedule from OptaPlanner service");
@@ -60,16 +70,16 @@ public class ScheduleOptimizationService {
     private void applySolution(OptaSchedule solution, List<Shift> originalShifts, List<Employee> employees) {
         for (OptaShift optaShift : solution.getShifts()) {
             Shift shift = originalShifts.stream()
-                .filter(s -> s.getId().equals(optaShift.getId()))
-                .findFirst()
-                .orElse(null);
+                    .filter(s -> s.getId().equals(optaShift.getId()))
+                    .findFirst()
+                    .orElse(null);
 
             if (shift != null && optaShift.getEmployee() != null) {
                 String employeeName = optaShift.getEmployee().getName();
                 Employee employee = employees.stream()
-                    .filter(e -> (e.getName() + " " + e.getSurname()).equals(employeeName))
-                    .findFirst()
-                    .orElse(null);
+                        .filter(e -> (e.getName() + " " + e.getSurname()).equals(employeeName))
+                        .findFirst()
+                        .orElse(null);
 
                 if (employee != null) {
                     shift.setAssignedEmployee(employee);

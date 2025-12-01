@@ -12,8 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class OptaEmployee {
-    
+
     private Long id;
     private String name;
+    @com.fasterxml.jackson.annotation.JsonProperty("skillSet")
     private Set<String> skills;
 }
