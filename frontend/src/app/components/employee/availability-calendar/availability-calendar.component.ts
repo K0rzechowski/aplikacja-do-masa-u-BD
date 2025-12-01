@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 import { User } from '../../../models/auth/user';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-availability-calendar',
@@ -30,7 +29,7 @@ import { MatIcon } from '@angular/material/icon';
       }
     }, {useUtc: true}),
   ],
-  imports: [MatCardModule, MatDatepickerModule, CommonModule, MatFormFieldModule, MatFormFieldModule, MatIcon],
+  imports: [MatCardModule, MatDatepickerModule, CommonModule, MatFormFieldModule, MatFormFieldModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './availability-calendar.component.css'
 })

@@ -92,6 +92,12 @@
                             }
                         </p>
                     </div>
+                    <div class="mb-4">
+                        <re-captcha id="recaptcha" name="recaptcha" class="flex justify-center" formControlName="recaptcha"></re-captcha>
+                        @if (formModel.controls['recaptcha'].invalid && formModel.controls['recaptcha'].touched) {
+                            <div class="warning">Potwierdź, że nie jesteś robotem</div>
+                        }
+                    </div>
                     <div class="md:flex">
                         <button class="btn-long btn-gray mb-4 mr-2" (click)="previousPage()">Powróć</button>
                         <input type="submit" class="btn-long btn-sky mb-4 cursor-pointer" value="Zgłoś firmę"/>

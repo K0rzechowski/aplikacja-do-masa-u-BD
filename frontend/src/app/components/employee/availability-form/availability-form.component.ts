@@ -4,9 +4,8 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { Availability, AvailabilityType } from '../../../models/availability';
 import { AvailabilityService } from '../../../services/availability.service';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormField } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatOption, MatOptionModule } from "@angular/material/core";
+import { MatOptionModule } from "@angular/material/core";
 import { A11yModule } from "@angular/cdk/a11y";
 import { MatSelectModule } from '@angular/material/select';
 import { AlertService } from '../../../services/alert.service';
@@ -14,7 +13,7 @@ import { AvailabilityTypeLabels } from '../../../models/availability';
 
 @Component({
   selector: 'app-availability-form',
-  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogModule, MatDialogActions, MatDialogClose, ReactiveFormsModule,  MatFormFieldModule, MatOptionModule, A11yModule, MatSelectModule],
+  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogModule, MatDialogClose, ReactiveFormsModule,  MatFormFieldModule, MatOptionModule, A11yModule, MatSelectModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './availability-form.component.html',
   styleUrl: './availability-form.component.css'

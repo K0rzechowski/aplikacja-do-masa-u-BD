@@ -14,6 +14,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
+import { RecaptchaFormsModule, RecaptchaModule } from 'ng-recaptcha-2';
 
 @Component({
   selector: 'app-company-form',
@@ -30,7 +31,7 @@ import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
         monthYearA11yLabel: 'MMMM YYYY',
       }
     }, {useUtc: true}),],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel, MatButtonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel, MatButtonModule, RecaptchaModule, RecaptchaFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './company-form.component.html',
   styleUrl: './company-form.component.css'
@@ -54,6 +55,7 @@ export class CompanyFormComponent {
       name:['', Validators.required],
       surname:['', Validators.required],
       dateOfBirth: ['', Validators.required],
+      recaptcha: [null, Validators.required]
     });
 
     this.formModel.valueChanges.subscribe(() => {
@@ -80,7 +82,7 @@ export class CompanyFormComponent {
     });
   }
 
-  createCompanyWithAdmin(companyName: string, city: string, email: string, name: string, surname: string, dateOfBirth:  LocalDate) {
+  createCompanyWithAdmin(companyName: string, city: string, email: string, name: string, surname: string, dateOfBirth:  LocalDate, recaptchaResponse: string) {
       const upperCaseCity = city.charAt(0).toUpperCase() + city.slice(1)
       const companyRequest: Company = {name: companyName, city: upperCaseCity} as Company;
 
@@ -90,7 +92,13 @@ export class CompanyFormComponent {
           this.alertService.info("Utworzono firmę. Poczekaj na stworzenie administratora...");
 
           if (createdCompany?.id) {
-          const adminRequest: Admin = {name, surname, email, dateOfBirth: new Date(dateOfBirth).toISOString().split('T')[0], companyId: createdCompany?.id } as Admin;
+          const adminRequest: Admin = {
+            name,
+            surname,
+            email,
+            dateOfBirth: new Date(dateOfBirth).toISOString().split('T')[0],
+            companyId: createdCompany?.id,
+            recaptchaResponse } as Admin;
             this.createAdmin(adminRequest);
           } else {
             console.error("Company ID is undefined");
@@ -113,7 +121,8 @@ export class CompanyFormComponent {
         this.formModel.value.email,     
         this.formModel.value.name,     
         this.formModel.value.surname,     
-        this.formModel.value.dateOfBirth  
+        this.formModel.value.dateOfBirth,
+        this.formModel.value.recaptcha
       );
     } 
   }
