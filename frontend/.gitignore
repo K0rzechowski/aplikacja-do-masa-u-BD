@@ -43,3 +43,7 @@ Thumbs.db
 
 #Unnecessary backgrounds
 /public/background*
+
+/src/environments/*
+!/src/environments/environment.ts.dist
+

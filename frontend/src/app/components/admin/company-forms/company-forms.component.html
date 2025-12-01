@@ -7,11 +7,11 @@
     </div>
     <div class="my-5">
         <form [formGroup]="openForm" (ngSubmit)="submitOpenTime()">
-            <div class="md:flex justify-evenly space-x-4">
+            <div class="lg:flex justify-evenly space-x-4">
                 @if (openTime && closeTime) {
                     <p class="text-lg font-semibold mb-2">Godziny otwarcia: {{openTime}} - {{closeTime}}</p>
                 } @else {
-                        <div>
+                    <div>
                         <mat-form-field>
                             <mat-label for="startTime">Godzina otwarcia</mat-label>
                             <input matInput [matTimepicker]="startPicker" type="time" formControlName="startTime" />
@@ -45,7 +45,7 @@
 </div>
 <div>
     <div class="flex justify-between">
-        <h3 class="text-lg mb-2">Dodaj lub edytuj sale</h3>
+        <h3 class="text-lg place-self-center">Dodaj lub edytuj sale</h3>
         <div class="md:col-span-1 flex justify-end items-start">
             <button class="btn btn-sky" (click)="openCreateDialog('0ms', '0ms')">+ Dodaj salę</button>
         </div>
