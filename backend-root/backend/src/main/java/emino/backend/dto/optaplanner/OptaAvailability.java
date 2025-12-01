@@ -2,6 +2,8 @@ package emino.backend.dto.optaplanner;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import emino.backend.models.AvailabilityType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +17,8 @@ import lombok.NoArgsConstructor;
 public class OptaAvailability {
 
     private OptaEmployee employee;
-    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING)
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDate date;
     private AvailabilityType availabilityType;
 }

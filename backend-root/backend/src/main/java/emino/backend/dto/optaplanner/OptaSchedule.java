@@ -2,6 +2,8 @@ package emino.backend.dto.optaplanner;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,12 +17,12 @@ public class OptaSchedule {
 
     private OptaScheduleState scheduleState;
 
-    @com.fasterxml.jackson.annotation.JsonProperty("availabilityList")
+    @JsonProperty("availabilityList")
     private List<OptaAvailability> availabilities;
 
-    @com.fasterxml.jackson.annotation.JsonProperty("employeeList")
+    @JsonProperty("employeeList")
     private List<OptaEmployee> employees;
 
-    @com.fasterxml.jackson.annotation.JsonProperty("shiftList")
+    @JsonProperty("shiftList")
     private List<OptaShift> shifts;
 }

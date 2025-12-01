@@ -52,17 +52,6 @@ public class OptaPlannerMapper {
                 .build();
     }
 
-    // public OptaScheduleState toOptaPlannerScheduleState(Long companyId, LocalDate
-    // startDate) {
-    // return OptaScheduleState.builder()
-    // .tenantId(companyId)
-    // .publishLength(7)
-    // .draftLength(14)
-    // .firstDraftDate(startDate.plusDays(7))
-    // .lastHistoricDate(startDate.minusDays(1))
-    // .build();
-    // }
-
     public List<OptimizedShiftDto> toOptaPlannerSchedule(OptaSchedule optimizedSchedule) {
 
         return optimizedSchedule.getShifts().stream()
@@ -72,8 +61,7 @@ public class OptaPlannerMapper {
                         .endTime(optaShift.getEnd())
                         .location(optaShift.getLocation())
                         .requiredSkill(optaShift.getRequiredSkill())
-                        .employeeName(
-                                optaShift.getEmployee() != null ? optaShift.getEmployee().getName() : "Nieprzypisany")
+                        .employeeName(optaShift.getEmployee() != null ? optaShift.getEmployee().getName() : "Nieprzypisany")
                         .build())
                 .toList();
     }

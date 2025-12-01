@@ -2,11 +2,9 @@ package emino.backend.controllers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,13 +29,11 @@ import emino.backend.services.EmployeeService;
 import emino.backend.services.ScheduleOptimizationService;
 import emino.backend.services.ShiftService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/schedule")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
-@Slf4j
 public class ScheduleController {
 
         private final ScheduleOptimizationService scheduleOptimizationService;
@@ -56,11 +52,11 @@ public class ScheduleController {
                 List<OptimizedShiftDto> optimizedShifts = optaPlannerMapper.toOptimizedShiftDtoList(shifts);
 
                 OptimizedScheduleResponse response = OptimizedScheduleResponse.builder()
-                                .message("Pobrano harmonogram")
-                                .shiftsOptimized(optimizedShifts.size())
-                                .score("N/A")
-                                .shifts(optimizedShifts)
-                                .build();
+                        .message("Pobrano harmonogram")
+                        .shiftsOptimized(optimizedShifts.size())
+                        .score("N/A")
+                        .shifts(optimizedShifts)
+                        .build();
 
                 return ResponseEntity.ok(response);
         }
@@ -71,73 +67,60 @@ public class ScheduleController {
                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
 
-                log.info("Starting optimization for company {} from {} to {}", companyId, startTime, endTime);
+                OptaSchedule optaSchedule = prepareOptaSchedule(companyId, startTime, endTime);
 
-                try {
-                        OptaSchedule optaSchedule = prepareOptaSchedule(companyId, startTime, endTime);
+                OptaSchedule optimizedSchedule = scheduleOptimizationService.optimizeSchedule(optaSchedule);
 
-                        OptaSchedule optimizedSchedule = scheduleOptimizationService.optimizeSchedule(optaSchedule);
+                int updatedCount = updateShiftsFromOptimizedSchedule(optimizedSchedule);
 
-                        int updatedCount = updateShiftsFromOptimizedSchedule(optimizedSchedule);
+                List<OptimizedShiftDto> optimizedShifts = optaPlannerMapper
+                        .toOptaPlannerSchedule(optimizedSchedule);
 
-                        List<OptimizedShiftDto> optimizedShifts = optaPlannerMapper
-                                        .toOptaPlannerSchedule(optimizedSchedule);
+                OptimizedScheduleResponse response = OptimizedScheduleResponse.builder()
+                        .message("Poprawnie zoptymalizowano " + updatedCount + " zmian.")
+                        .shiftsOptimized(updatedCount)
+                        .score(optimizedSchedule.getScheduleState() != null
+                                ? optimizedSchedule.getScheduleState().getScore()
+                                : "N/A")
+                        .shifts(optimizedShifts)
+                        .build();
 
-                        OptimizedScheduleResponse response = OptimizedScheduleResponse.builder()
-                                        .message("Poprawnie zoptymalizowano " + updatedCount + " zmian.")
-                                        .shiftsOptimized(updatedCount)
-                                        .score(optimizedSchedule.getScheduleState() != null
-                                                        ? optimizedSchedule.getScheduleState().getScore()
-                                                        : "N/A")
-                                        .shifts(optimizedShifts)
-                                        .build();
-
-                        return ResponseEntity.ok(response);
-                } catch (Exception e) {
-                        log.error("Error during optimization", e);
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                        .body(OptimizedScheduleResponse.builder()
-                                                        .message("Błąd podczas optymalizacji: " + e.getMessage())
-                                                        .shiftsOptimized(0)
-                                                        .shifts(Collections.emptyList())
-                                                        .build());
-                }
+                return ResponseEntity.ok(response);
         }
 
         private OptaSchedule prepareOptaSchedule(Long companyId, LocalDateTime startTime, LocalDateTime endTime) {
                 List<Shift> shifts = shiftService.getShiftsByCompany(companyId, startTime, endTime);
                 List<OptaShift> optaShifts = shifts.stream()
-                                .map(optaPlannerMapper::toOptaPlannerShift)
-                                .toList();
+                        .map(optaPlannerMapper::toOptaPlannerShift)
+                        .toList();
 
                 List<Employee> employees = employeeService.getEmployeesByCompany(companyId);
                 List<OptaEmployee> optaEmployees = employees.stream()
-                                .map(optaPlannerMapper::toOptaPlannerEmployee)
-                                .toList();
+                        .map(optaPlannerMapper::toOptaPlannerEmployee)
+                        .toList();
 
                 LocalDate startDate = startTime.toLocalDate();
                 LocalDate endDate = endTime.toLocalDate();
-                List<EmployeeAvailability> availabilities = availabilityService.getAvailabilities(companyId, startDate,
-                                endDate);
+                List<EmployeeAvailability> availabilities = availabilityService.getAvailabilities(companyId, startDate, endDate);
                 List<OptaAvailability> optaAvail = availabilities.stream()
-                                .map(optaPlannerMapper::toOptaPlannerAvailability)
-                                .toList();
+                        .map(optaPlannerMapper::toOptaPlannerAvailability)
+                        .toList();
 
                 emino.backend.dto.optaplanner.OptaScheduleState scheduleState = emino.backend.dto.optaplanner.OptaScheduleState
-                                .builder()
-                                .tenantId(companyId)
-                                .publishLength(7) // Default to 1 week
-                                .draftLength(7) // Default to 1 week
-                                .firstDraftDate(startDate)
-                                .lastHistoricDate(startDate.minusDays(1))
-                                .build();
+                        .builder()
+                        .tenantId(companyId)
+                        .publishLength(7)
+                        .draftLength(7)
+                        .firstDraftDate(startDate)
+                        .lastHistoricDate(startDate.minusDays(1))
+                        .build();
 
                 return OptaSchedule.builder()
-                                .shifts(optaShifts)
-                                .employees(optaEmployees)
-                                .availabilities(optaAvail)
-                                .scheduleState(scheduleState)
-                                .build();
+                        .shifts(optaShifts)
+                        .employees(optaEmployees)
+                        .availabilities(optaAvail)
+                        .scheduleState(scheduleState)
+                        .build();
         }
 
         private int updateShiftsFromOptimizedSchedule(OptaSchedule optimizedSchedule) {
@@ -146,14 +129,9 @@ public class ScheduleController {
                 for (OptaShift optaShift : optimizedSchedule.getShifts()) {
                         if (optaShift.getEmployee() != null) {
                                 Shift shift = shiftService.getShiftById(optaShift.getId())
-                                                .orElseThrow(
-                                                                () -> new IllegalArgumentException(
-                                                                                "Nie znaleziono zmiany o id: "
-                                                                                                + optaShift.getId()));
+                                        .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zmiany o id: " + optaShift.getId()));
                                 Employee employee = employeeService.getEmployeeById(optaShift.getEmployee().getId())
-                                                .orElseThrow(() -> new IllegalArgumentException(
-                                                                "Nie znaleziono pracownika o id: "
-                                                                                + optaShift.getEmployee().getId()));
+                                        .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono pracownika o id: " + optaShift.getEmployee().getId()));
 
                                 shift.setAssignedEmployee(employee);
                                 shiftService.saveShift(shift);
@@ -161,8 +139,6 @@ public class ScheduleController {
                         }
                 }
 
-                log.info("Updated {} shifts based on optimized schedule", updatedCount);
                 return updatedCount;
         }
-
 }
