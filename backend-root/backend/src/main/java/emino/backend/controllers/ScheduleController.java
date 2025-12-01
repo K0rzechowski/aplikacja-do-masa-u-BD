@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import emino.backend.dto.optaplanner.OptaAvailability;
 import emino.backend.dto.optaplanner.OptaEmployee;
 import emino.backend.dto.optaplanner.OptaSchedule;
@@ -65,7 +67,7 @@ public class ScheduleController {
         public ResponseEntity<OptimizedScheduleResponse> optimizeSchedule(
                         @PathVariable Long companyId,
                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) throws JsonProcessingException {
 
                 OptaSchedule optaSchedule = prepareOptaSchedule(companyId, startTime, endTime);
 
