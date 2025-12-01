@@ -4,19 +4,18 @@ import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
 @Setter
 @Getter
@@ -47,8 +46,8 @@ public class MassageForCompany {
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
-    @OneToOne(mappedBy = "massage")
-    private Reservation reservation;
+    @OneToMany(mappedBy = "massage")
+    private Set<Shift> shifts;
 
     @ManyToMany(mappedBy = "massagesToHandle")
     Set<Employee> employees;

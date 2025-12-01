@@ -35,7 +35,10 @@ public class Employee extends User {
     private String phoneNumber;
 
     @OneToMany(mappedBy = "employee")
-    private List<Reservation> emplReservations;
+    private List<EmployeeAvailability> availabilities;
+
+    @OneToMany(mappedBy = "assignedEmployee")
+    private List<Shift> shifts;
 
     @ManyToMany
     @JoinTable(

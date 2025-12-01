@@ -156,7 +156,6 @@ export class EmployeeFormComponent {
       email,
       massageIds: this.selectedMassages.map(m => m.id!),  
     };
-    console.log(newEmployee);
     this.emplService.createEmployee(newEmployee).subscribe({
       next: (response) => {
         this.alertService.success("Operacja dodania pracownika powiodła się");

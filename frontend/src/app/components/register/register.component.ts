@@ -36,7 +36,6 @@ registerLocaleData(localePl);
         monthYearA11yLabel: 'MMMM YYYY',
       }
     }, {useUtc: true}),
-    
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel, ShowPasswordDirective, MatIconModule, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,

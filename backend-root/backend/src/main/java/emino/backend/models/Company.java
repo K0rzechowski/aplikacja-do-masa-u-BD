@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,5 +47,11 @@ public class Company {
     private Set<MassageForCompany> massages;
 
     @OneToMany(mappedBy = "company")
+    private Set<Shift> shifts;
+
+    @OneToMany(mappedBy = "company")
     private Set<Room> rooms;
+
+    @OneToOne(mappedBy = "company")
+    private CompanyOpenTime companyOpenTime;
 }

@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import emino.backend.exception.DuplicateEmailException;
+import emino.backend.exception.RecaptchaException;
 import emino.backend.models.Admin;
 import emino.backend.models.Employee;
 import emino.backend.repositories.AdminRepository;
 import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.UserRepository;
+import emino.backend.services.RecaptchaService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,6 +39,7 @@ public class AuthenticationController {
     private final AdminRepository adminRepository;
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
+    private final RecaptchaService recaptchaService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request, HttpServletResponse response) {
@@ -62,6 +65,10 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
+            if (!recaptchaService.verifyRecaptcha(request.getRecaptchaResponse())) {
+                throw new RecaptchaException("Weryfikacja reCAPTCHA nie powiodła się") {};
+            }
+
             AuthenticationResponse authResponse;
 
             authResponse = authService.authenticate(request);
@@ -73,10 +80,9 @@ public class AuthenticationController {
             
             response.addCookie(jwtCookie);
 
-            System.out.println("Ustawiono jwtToken cookie dla usera: " + authResponse.getUser().getEmail());
-    
-
             return ResponseEntity.ok(authResponse);
+        } catch (RecaptchaException ex) {
+            throw ex;
         } catch (AuthenticationException ex) {
             throw ex;
         }        

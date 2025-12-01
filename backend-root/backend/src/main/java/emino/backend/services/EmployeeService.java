@@ -2,12 +2,12 @@ package emino.backend.services;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import emino.backend.dto.AdminDto;
 import emino.backend.dto.EmployeeCreateDto;
 import emino.backend.dto.EmployeeDto;
 import emino.backend.dto.MassageDto;
@@ -21,7 +21,6 @@ import emino.backend.models.UserRole;
 import emino.backend.repositories.CompanyRepository;
 import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.MassageForCompanyRepository;
-import emino.backend.services.AdminService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +36,10 @@ public class EmployeeService {
     private final GenerateCustomPassword passwordGenerator;
     private final AdminService adminService;
     
+    public Optional<Employee> getEmployeeById(Long id) {
+        return emplRepository.findById(id);
+    }
+
     public List<Employee> getEmployeesByCompany(Long companyId) {
         var company = companyRepository.findById(companyId)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));

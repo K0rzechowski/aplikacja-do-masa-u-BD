@@ -18,4 +18,5 @@ public class AdminDto {
     private LocalDate dateOfBirth;
     private String email;
     private Long companyId;
+    private String recaptchaResponse;
 }

@@ -1,7 +1,5 @@
 package emino.backend.models;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,8 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,20 +30,8 @@ public class Reservation {
     private Long id; 
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "employee_id", referencedColumnName = "id")
-    private Employee employee;
-
-    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private User customer;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "massage_id", referencedColumnName = "id")
-    private MassageForCompany massage;
-
-    @Column(nullable = false)
-    @Temporal(TemporalType.DATE)
-    private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -55,4 +39,8 @@ public class Reservation {
 
     @OneToOne(mappedBy = "reservation")
     private NoteFromVisit note;
+
+    @OneToOne
+    @JoinColumn(name = "shift_id")
+    private Shift shift;
 }

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Company } from '../models/company';
-import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
+import { Company, CompanyOpenTime } from '../models/company';
+import { BehaviorSubject, catchError, Observable, ObservableInputTuple, tap, throwError } from 'rxjs';
+import { Room } from '../models/room';
 
 
 @Injectable({
@@ -55,5 +56,37 @@ export class CompanyService {
 
   setCurrentCompany(company: Company) {
     this.currentCompanySubject.next(company);
+  }
+
+  createCompanyOpenTime(openTime: CompanyOpenTime): Observable<CompanyOpenTime> {
+    return this.httpClient.post<CompanyOpenTime>(`${this.baseUrl}/${openTime.companyId}/addOpenTime`, openTime);
+  }
+
+  editCompanyOpenTime(openTime: CompanyOpenTime): Observable<CompanyOpenTime> {
+    return this.httpClient.put<CompanyOpenTime>(`${this.baseUrl}/${openTime.companyId}/editOpenTime`, openTime);
+  }
+
+  getCompanyOpenTime(companyId: string): Observable<CompanyOpenTime> {
+    return this.httpClient.get<CompanyOpenTime>(`${this.baseUrl}/${companyId}/openTime`);
+  }
+
+  createCompanyRoom(room: Room): Observable<Room> {
+    return this.httpClient.post<Room>(`${this.baseUrl}/${room.companyId}/room`, room);
+  }
+
+  getCompanyRoomByName(room: Room): Observable<Room> {
+    return this.httpClient.get<Room>(`${this.baseUrl}/${room.companyId}/room${room.id}`);
+  }
+
+  getCompanyRooms(companyId: String): Observable<Room[]> {
+    return this.httpClient.get<Room[]>(`${this.baseUrl}/${companyId}/rooms`);
+  }
+
+  editCompanyRoom(room: Room): Observable<Room> {
+    return this.httpClient.put<Room>(`${this.baseUrl}/${room.companyId}/room/edit/${room.id}`, room);
+  }
+
+  deleteRoom(companyId: string, roomId: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.baseUrl}/${companyId}/room/remove/${roomId}`);
   }
 }

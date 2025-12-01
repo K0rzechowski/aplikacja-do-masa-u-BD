@@ -35,6 +35,12 @@
                         }
                     </p>
                 </div>
+                <div class="mb-4">
+                    <re-captcha id="recaptcha" name="recaptcha" class="flex justify-center" formControlName="recaptcha"></re-captcha>
+                    @if (formModel.controls['recaptcha'].invalid && formModel.controls['recaptcha'].touched) {
+                        <div class="warning">Potwierdź, że nie jesteś robotem</div>
+                    }
+                </div>
                 <div class="lg:flex lg:justify-between mb-4">
                     <div>
                         <input type="checkbox" id="remember" formControlName="remember" class="mr-2 mb-4 lg:mb-0"/>
