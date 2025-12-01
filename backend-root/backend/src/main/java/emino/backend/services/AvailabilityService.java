@@ -34,6 +34,10 @@ public class AvailabilityService {
         return mapToDto(availability);
     }
 
+    public List<EmployeeAvailability> getAvailabilities(Long employeeId, LocalDate start, LocalDate end) {
+        return availabilityRepository.findByEmployeeIdAndDateBetween(employeeId, start, end);
+    }
+
     public List<AvailabilityDto> getAvailability(Long employeeId, LocalDate start, LocalDate end) {
         return availabilityRepository.findByEmployeeIdAndDateBetween(employeeId, start, end)
             .stream()

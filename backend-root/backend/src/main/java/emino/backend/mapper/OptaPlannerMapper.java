@@ -1,7 +1,5 @@
 package emino.backend.mapper;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -12,9 +10,8 @@ import org.springframework.stereotype.Component;
 import emino.backend.dto.optaplanner.OptaAvailability;
 import emino.backend.dto.optaplanner.OptaEmployee;
 import emino.backend.dto.optaplanner.OptaSchedule;
-import emino.backend.dto.optaplanner.OptaScheduleState;
 import emino.backend.dto.optaplanner.OptaShift;
-import emino.backend.models.AvailabilityType;
+import emino.backend.dto.optaplanner.OptimizedShiftDto;
 import emino.backend.models.Employee;
 import emino.backend.models.EmployeeAvailability;
 import emino.backend.models.Shift;
@@ -30,6 +27,7 @@ public class OptaPlannerMapper {
         : Collections.emptySet();
 
         return OptaEmployee.builder()
+            .id(employee.getId())
             .name(employee.getName() + " " + employee.getSurname())
             .skills(skills)
             .build();
@@ -59,59 +57,27 @@ public class OptaPlannerMapper {
             .build();
     }
 
-    public OptaScheduleState toOptaPlannerScheduleState(Long companyId, LocalDate startDate) {
-        return OptaScheduleState.builder()
-            .tenantId(companyId)
-            .publishLength(7)
-            .draftLength(14)
-            .firstDraftDate(startDate.plusDays(7))
-            .lastHistoricDate(startDate.minusDays(1))
-            .build();
-    }
+    // public OptaScheduleState toOptaPlannerScheduleState(Long companyId, LocalDate startDate) {
+    //     return OptaScheduleState.builder()
+    //         .tenantId(companyId)
+    //         .publishLength(7)
+    //         .draftLength(14)
+    //         .firstDraftDate(startDate.plusDays(7))
+    //         .lastHistoricDate(startDate.minusDays(1))
+    //         .build();
+    // }
 
-    public OptaSchedule toOptaPlannerSchedule(
-        Long companyId,
-        List<Employee> employees,
-        List<Shift> shifts,
-        List<EmployeeAvailability> availabilities,
-        LocalDate startDate,
-        LocalDate endDate) {
-     
-        List<OptaEmployee> optaEmployees = employees.stream()
-            .map(this::toOptaPlannerEmployee)
-            .collect(Collectors.toList());
-        
-        List<OptaShift> optaShifts = shifts.stream()
-            .map(this::toOptaPlannerShift)
-            .collect(Collectors.toList());
-        
-        List<OptaAvailability> optaAvailabilities = new ArrayList<>();
-        for (Employee employee : employees ) {
-            LocalDate currentDate = startDate;
-            while (!currentDate.isAfter(endDate)) {
-                final LocalDate date = currentDate;
+    public List<OptimizedShiftDto> toOptaPlannerSchedule(OptaSchedule optimizedSchedule) {
 
-                AvailabilityType type = availabilities.stream()
-                    .filter(avail -> avail.getEmployee().getId().equals(employee.getId()) && avail.getDate().isEqual(date))
-                    .findFirst()
-                    .map(EmployeeAvailability::getAvailabilityType)
-                    .orElse(AvailabilityType.AVAILABLE);
-
-                EmployeeAvailability availability = new EmployeeAvailability();
-                availability.setEmployee(employee);
-                availability.setDate(currentDate);
-                availability.setAvailabilityType(type);
-
-                optaAvailabilities.add(toOptaPlannerAvailability(availability));
-                currentDate = currentDate.plusDays(1);
-            }
-        }
-
-        return OptaSchedule.builder()
-            .scheduleState(toOptaPlannerScheduleState(companyId, startDate))
-            .employees(optaEmployees)
-            .shifts(optaShifts)
-            .availabilities(optaAvailabilities)
-            .build();
+        return optimizedSchedule.getShifts().stream()
+            .map(optaShift -> OptimizedShiftDto.builder()
+                .id(optaShift.getId())
+                .startTime(optaShift.getStart())
+                .endTime(optaShift.getEnd())
+                .location(optaShift.getLocation())
+                .requiredSkill(optaShift.getRequiredSkill())
+                .employeeName(optaShift.getEmployee() != null ? optaShift.getEmployee().getName() : "Nieprzypisany")
+                .build())
+            .toList();
     }
 }

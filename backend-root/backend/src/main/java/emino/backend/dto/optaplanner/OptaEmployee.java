@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OptaEmployee {
     
+    private Long id;
     private String name;
     private Set<String> skills;
 }
