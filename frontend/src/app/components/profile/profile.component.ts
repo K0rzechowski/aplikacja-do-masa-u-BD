@@ -16,6 +16,9 @@ import {MAT_DATE_LOCALE} from '@angular/material/core';
 import { UpdateProfileRequest, User } from '../../models/auth/user';
 import { AlertService } from '../../services/alert.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatIconModule } from "@angular/material/icon";
+import { ShowPasswordDirective } from '../../directives/show-password.directive';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 registerLocaleData(localePl);
 
@@ -34,26 +37,26 @@ registerLocaleData(localePl);
         monthYearA11yLabel: 'MMMM YYYY',
       }
     }, {useUtc: true}),
-    
+
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, MatHint, MatLabel, MatIconModule, ShowPasswordDirective, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
- 
+
   user: User | null | undefined;
 
   formModel: FormGroup;
   passwordForm: FormGroup
- 
+
   constructor (
     private formBuilder: FormBuilder,
     private authService: AuthenticationService,
     private router: Router,
     private alertService: AlertService
-  ) {    
+  ) {
     this.authService.currentUser.subscribe(user => {
       this.user = user;
     });
@@ -84,7 +87,7 @@ export class ProfileComponent {
           let errorMessage = error.message;
           console.log(errorMessage);
           this.alertService.error(errorMessage);
-        } 
+        }
       });
     }
   }
@@ -98,7 +101,7 @@ export class ProfileComponent {
       }
 
       this.updateProfile(request);
-    } 
+    }
   }
 
   submitPasswordForm(): void {
@@ -109,7 +112,7 @@ export class ProfileComponent {
       }
 
       this.updateProfile(passwordRequest);
-    } 
+    }
   }
 
 }

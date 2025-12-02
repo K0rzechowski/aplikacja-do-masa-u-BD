@@ -27,7 +27,7 @@
                 <label for="dateOfBirth">Data urodzenia</label>
                 <mat-datepicker-toggle matIconSuffix [for]="mobilePicker" class="md:hidden"></mat-datepicker-toggle>
             </div>
-        
+
             <!-- Mobile: only icon -->
             <div class="block md:hidden">
                 <mat-form-field appearance="outline" class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
@@ -35,7 +35,7 @@
                 </mat-form-field>
                 <mat-datepicker #mobilePicker touchUi></mat-datepicker>
             </div>
-            
+
             <!-- Desktop: full input -->
             <div class="hidden md:block">
                 <mat-form-field appearance="outline" class="date-input w-full bg-slate-300 p-2 rounded">
@@ -61,7 +61,19 @@
         <form [formGroup]="passwordForm" (ngSubmit)="submitPasswordForm()" class="w-full lg:mx-auto max-w-1/2">
             <div class="mb-4">
                 <label for="currentPassword">Aktualne hasło</label>
-                <input type="password" id="currentPassword" formControlName="currentPassword" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <div class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700 flex justify-between relative">
+                    <input type="password" id="currentPassword" formControlName="currentPassword" class="w-full outline-none" #passwordInput/>
+                    <mat-icon
+                        #passwordIcon
+                        class="cursor-pointer"
+                        appShowPassword
+                        [appShowPasswordIcon]="passwordIcon"
+                        [appShowPasswordInput]="passwordInput"
+                        [appShowPasswordTooltip]="tt"
+                        [matTooltipPosition]="'above'"
+                        matTooltip="Pokaż hasło"
+                        #tt="matTooltip">visibility</mat-icon>
+                </div>
                 <p class="warning">
                     @if (passwordForm.controls['currentPassword'].invalid && passwordForm.controls['currentPassword'].touched ) {
                         Aktualne hasło jest wymagane
@@ -70,7 +82,19 @@
             </div>
             <div class="mb-4">
                 <label for="newPassword">Nowe hasło</label>
-                <input type="password" id="newPassword" formControlName="newPassword" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <div class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700 flex justify-between relative">
+                    <input type="password" id="newPassword" formControlName="newPassword" class="w-full outline-none" #passwordSecondInput/>
+                    <mat-icon
+                        #passwordSecondIcon
+                        class="cursor-pointer"
+                        appShowPassword
+                        [appShowPasswordIcon]="passwordSecondIcon"
+                        [appShowPasswordInput]="passwordSecondInput"
+                        [appShowPasswordTooltip]="tt2"
+                        [matTooltipPosition]="'above'"
+                        matTooltip="Pokaż hasło"
+                        #tt2="matTooltip">visibility</mat-icon>
+                </div>
                 <p class="warning">
                     @if (passwordForm.controls['newPassword'].invalid && passwordForm.controls['newPassword'].touched ) {
                         Nowe hasło jest wymagane

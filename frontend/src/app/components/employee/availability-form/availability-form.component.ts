@@ -34,23 +34,19 @@ export class AvailabilityFormComponent {
     private formBuilder: FormBuilder,
     private alertService: AlertService
   ) {
+    this.formModel = this.formBuilder.group({
+      type: [null, Validators.required]
+    })
+
     this.day = this.data.day
       ? this.data.day.toISOString().split("T")[0]
       : "";
     this.availabilityService.getAvailabilityByEmployeeAndStartDate(this.data.employeeId, this.day).subscribe( data => {
       this.currentDayAvailability = data;
+      this.formModel.patchValue({
+        type: data.availabilityType
+      })
     });
-
-    this.formModel = this.formBuilder.group({
-      type: [this.currentDayAvailability?.availabilityType, Validators.required]
-    })
-  }
-
-  ngOnInit() {
-    if (this.currentDayAvailability) {
-      this.formModel.patchValue({ 
-        type: this.currentDayAvailability.availabilityType})
-    }
   }
 
   create(type: AvailabilityType) {
@@ -65,7 +61,7 @@ export class AvailabilityFormComponent {
       },
       error: (error: Error) => {
         this.alertService.error("Błąd podczas dodawania dostępności: " + error.message);
-      } 
+      }
     });
 
     if (this.dialogRef) {
@@ -87,7 +83,7 @@ export class AvailabilityFormComponent {
         },
         error: (error: Error) => {
           this.alertService.error("Błąd podczas edycji: " + error.message);
-        } 
+        }
       });
     }
   }

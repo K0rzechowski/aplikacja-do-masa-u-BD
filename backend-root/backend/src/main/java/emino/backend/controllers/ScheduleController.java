@@ -57,11 +57,11 @@ public class ScheduleController {
                 List<OptimizedShiftDto> optimizedShifts = optaPlannerMapper.toOptimizedShiftDtoList(shifts);
 
                 OptimizedScheduleResponse response = OptimizedScheduleResponse.builder()
-                                .message("Pobrano harmonogram")
-                                .shiftsOptimized(optimizedShifts.size())
-                                .score("N/A")
-                                .shifts(optimizedShifts)
-                                .build();
+                        .message("Pobrano harmonogram")
+                        .shiftsOptimized(optimizedShifts.size())
+                        .score("N/A")
+                        .shifts(optimizedShifts)
+                        .build();
 
                 return ResponseEntity.ok(response);
         }
@@ -80,16 +80,16 @@ public class ScheduleController {
                 int updatedCount = updateShiftsFromOptimizedSchedule(optimizedSchedule);
 
                 List<OptimizedShiftDto> optimizedShifts = optaPlannerMapper
-                                .toOptaPlannerSchedule(optimizedSchedule);
+                        .toOptaPlannerSchedule(optimizedSchedule);
 
                 OptimizedScheduleResponse response = OptimizedScheduleResponse.builder()
-                                .message("Poprawnie zoptymalizowano " + updatedCount + " zmian.")
-                                .shiftsOptimized(updatedCount)
-                                .score(optimizedSchedule.getScheduleState() != null
-                                                ? optimizedSchedule.getScheduleState().getScore()
-                                                : "N/A")
-                                .shifts(optimizedShifts)
-                                .build();
+                        .message("Poprawnie zoptymalizowano " + updatedCount + " zmian.")
+                        .shiftsOptimized(updatedCount)
+                        .score(optimizedSchedule.getScheduleState() != null
+                                        ? optimizedSchedule.getScheduleState().getScore()
+                                        : "N/A")
+                        .shifts(optimizedShifts)
+                        .build();
 
                 return ResponseEntity.ok(response);
         }

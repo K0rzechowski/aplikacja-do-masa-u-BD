@@ -1,0 +1,40 @@
+
+<div class="d-flex justify-content-between p-5">
+    <div class="flex justify-between items-center mb-2">
+        <h2 mat-dialog-title>Stwórz grafik</h2>
+        <button mat-dialog-close class="p-1 btn">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <p class="mb-2">Wybierz okres (7 dni)</p>
+        <form [formGroup]="formModel">
+            <div class="md:flex gap-2 mb-4">
+                <mat-form-field >
+                    <mat-label>Data rozpoczęcia</mat-label>
+                    <input matInput [matDatepicker]="startPicker" formControlName="startTime">
+                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+                </mat-form-field>
+                <mat-datepicker #startPicker></mat-datepicker>
+                
+                <mat-form-field class=>
+                    <mat-label>Data zakończenia</mat-label>
+                    <input matInput [matDatepicker]="endPicker" formControlName="endTime">
+                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+                </mat-form-field>
+                <mat-datepicker #endPicker></mat-datepicker>
+            </div>
+
+            @if (isProcessing()) {
+                <div class=" d-flex flex-column justify-items items-center">
+                    <mat-spinner diameter="24"></mat-spinner>
+                    <p>{{getStatusMessage()}}</p>
+                </div>
+            }
+            
+            <button mat-button class="btn-long btn-sky mb-4 cursor-pointer" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="createSchedule()">Stwórz</button>
+        </form>
+    </mat-dialog-content>
+</div>

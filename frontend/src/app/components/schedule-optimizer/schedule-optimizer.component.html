@@ -1,0 +1,21 @@
+<div>
+    @if (isAdmin) {
+        <div class="md:grid grid-cols-4 mb-6">
+            <div class="md:col-span-3">
+              <p class="text-4xl mb-2">Zarządzaj grafikami pracowników</p>
+              <p class="text-lg mb-2">Przeglądaj i dodawaj grafiki</p>
+            </div>
+            <div class="md:col-span-1 flex justify-end items-start">
+              <button class="btn btn-sky" (click)="openCreateScheduleDialog('0ms', '0ms')">+ Utwórz grafik</button>
+            </div>
+        </div>
+    } @else if (isEmployee) {
+        <div class="md:grid grid-cols-4 mb-6">
+            <div class="md:col-span-3">
+              <p class="text-4xl mb-2">Twój grafik</p>
+              <p class="text-lg mb-2">Przeglądaj swoje przypisane zmiany</p>
+            </div>
+        </div>
+    }
+
+</div>

@@ -14,12 +14,13 @@ import { adminGuard } from './guards/admin.guard';
 import { PriceListComponent } from './components/price-list/price-list.component';
 import { CompanyFormsComponent } from './components/admin/company-forms/company-forms.component';
 import { AvailabilityCalendarComponent } from './components/employee/availability-calendar/availability-calendar.component';
+import { ScheduleOptimizerComponent } from './components/schedule-optimizer/schedule-optimizer.component';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'settings', 
+  { path: 'settings',
     loadComponent: () => import('./components/settings/settings.component').then(s => SettingsComponent),
     canActivate: [authGuard, adminGuard],
     children: [
@@ -27,12 +28,13 @@ export const routes: Routes = [
       { path: 'employees', component: ManageEmployeesComponent },
       { path: 'massages', component: ManageMassagesComponent },
       { path: 'companySettings', component: CompanyFormsComponent },
-      { path: 'availabilities', component: AvailabilityCalendarComponent}
+      { path: 'availabilities', component: AvailabilityCalendarComponent},
+      { path: 'schedule', component: ScheduleOptimizerComponent}
     ]
   },
   { path: 'forCompanies', component: CompanyFormComponent },
   { path: 'recommendations', component: RecommendationsComponent },
   { path: ':city/:name/massages', component: MassagesComponent },
-  { path: ':city/:name/price', component: PriceListComponent }
+  { path: ':city/:name/price', component: PriceListComponent },
 
 ];
