@@ -36,7 +36,7 @@ public class ScheduleOptimizationService {
     private String optaPlannerUrl;
 
     public OptaSchedule optimizeSchedule(OptaSchedule problem) throws JsonProcessingException{
-        String optimizeUrl = optaPlannerUrl + "/schedule/solve";
+        String optimizeUrl = optaPlannerUrl + "/schedule/solve-sync";
 
         com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());

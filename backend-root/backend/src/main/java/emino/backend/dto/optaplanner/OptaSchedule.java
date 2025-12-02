@@ -23,6 +23,9 @@ public class OptaSchedule {
     @JsonProperty("employeeList")
     private List<OptaEmployee> employees;
 
+    @JsonProperty("massageList")
+    private List<String> massages;
+
     @JsonProperty("shiftList")
     private List<OptaShift> shifts;
 }
