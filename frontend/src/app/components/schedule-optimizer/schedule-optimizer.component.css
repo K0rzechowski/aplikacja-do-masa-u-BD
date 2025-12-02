@@ -1,0 +1,52 @@
+.vis-timeline {
+    border: 1px solid #e5e7eb;
+    /* gray-200 */
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    background-color: white !important;
+    color: #1f2937 !important;
+    /* gray-800 */
+}
+
+.vis-item {
+    border-color: transparent;
+    color: white;
+    font-size: 12px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.vis-item.vis-selected {
+    border-color: #3b82f6;
+    /* blue-500 */
+    background-color: #3b82f6;
+    color: white;
+}
+
+.vis-time-axis .vis-text {
+    color: #374151 !important;
+    /* gray-700 */
+}
+
+.vis-time-axis .vis-grid.vis-saturday,
+.vis-time-axis .vis-grid.vis-sunday {
+    background: #f3f4f6;
+    /* gray-100 */
+}
+
+.vis-label {
+    color: #1f2937 !important;
+    /* gray-800 */
+}
+
+/* Custom badge style inside timeline items */
+.vis-item .badge {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}

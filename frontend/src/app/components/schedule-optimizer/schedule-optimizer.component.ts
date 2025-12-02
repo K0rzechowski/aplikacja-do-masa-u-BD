@@ -1,4 +1,6 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, ElementRef, ViewChild } from '@angular/core';
+
+declare var vis: any;
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OptimizedShift } from '../../models/optaplanner/optimized-shifts';
 import { ScheduleService } from '../../services/schedule.service';
@@ -30,6 +32,20 @@ export class ScheduleOptimizerComponent {
   currentWeekStart: string = '';
   currentWeekEnd: string = '';
 
+  // Timeline
+  @ViewChild('employeeTimelineContainer') employeeTimelineContainer!: ElementRef;
+  @ViewChild('locationTimelineContainer') locationTimelineContainer!: ElementRef;
+
+  activeTab: 'employee' | 'location' = 'employee';
+
+  private employeeTimeline: any;
+  private locationTimeline: any;
+
+  private groupsEmployee: any;
+  private itemsEmployee: any;
+  private groupsLocation: any;
+  private itemsLocation: any;
+
   constructor(
     private scheduleService: ScheduleService,
     private authService: AuthenticationService
@@ -37,7 +53,13 @@ export class ScheduleOptimizerComponent {
     this.isAdmin = this.authService.isAdmin();
     this.isEmployee = this.authService.isEmployee();
     this.calculateCurrentWeek();
-    this.loadSchedule();
+  }
+
+  ngAfterViewInit() {
+    // Initialize timelines early with empty data
+    this.initTimelines();
+    // Load initial data
+    this.loadSchedule(this.currentWeekStart, this.currentWeekEnd);
   }
 
   calculateCurrentWeek() {
@@ -52,24 +74,27 @@ export class ScheduleOptimizerComponent {
     this.currentWeekEnd = end.toISOString().split('T')[0];
   }
 
-  loadSchedule() {
+  loadSchedule(startStr?: string, endStr?: string) {
     this.authService.currentUser.subscribe(user => {
       if (user && user.companyId) {
         this.isLoading = true;
 
-        const startDateTime = new Date(this.currentWeekStart);
+        const startDateTime = new Date(startStr || this.currentWeekStart);
         startDateTime.setHours(0, 0, 0, 0);
 
-        const endDateTime = new Date(this.currentWeekEnd);
+        const endDateTime = new Date(endStr || this.currentWeekEnd);
         endDateTime.setHours(23, 59, 59, 999);
 
         this.scheduleService.getOptimizedSchedule(user.companyId, startDateTime.toISOString(), endDateTime.toISOString())
           .subscribe({
             next: (response) => {
+              console.log('Loaded schedule:', response);
               this.optimizedShifts = response.shifts;
               this.optimizationScore = response.score;
               this.isLoading = false;
               this.cdr.markForCheck();
+
+              this.updateTimelineData();
             },
             error: (err) => {
               console.error('Failed to load schedule', err);
@@ -78,6 +103,134 @@ export class ScheduleOptimizerComponent {
           });
       }
     });
+  }
+
+  setActiveTab(tab: 'employee' | 'location') {
+    this.activeTab = tab;
+    setTimeout(() => {
+      if (this.employeeTimeline) this.employeeTimeline.redraw();
+      if (this.locationTimeline) this.locationTimeline.redraw();
+    }, 0);
+  }
+
+  initTimelines() {
+    if (typeof vis === 'undefined') {
+      console.error('Vis.js not loaded');
+      return;
+    }
+
+    // Initialize DataSets
+    this.groupsEmployee = new vis.DataSet();
+    this.itemsEmployee = new vis.DataSet();
+    this.groupsLocation = new vis.DataSet();
+    this.itemsLocation = new vis.DataSet();
+
+    const options = {
+      stack: false,
+      start: this.currentWeekStart,
+      end: this.currentWeekEnd,
+      editable: false,
+      margin: {
+        item: 10,
+        axis: 5
+      },
+      orientation: 'top'
+    };
+
+    if (this.employeeTimelineContainer) {
+      this.employeeTimeline = new vis.Timeline(this.employeeTimelineContainer.nativeElement, this.itemsEmployee, this.groupsEmployee, options);
+
+      // Add rangechanged listener for dynamic loading
+      this.employeeTimeline.on('rangechanged', (properties: any) => {
+        this.onRangeChanged(properties);
+      });
+    }
+
+    if (this.locationTimelineContainer) {
+      this.locationTimeline = new vis.Timeline(this.locationTimelineContainer.nativeElement, this.itemsLocation, this.groupsLocation, options);
+
+      this.locationTimeline.on('rangechanged', (properties: any) => {
+        this.onRangeChanged(properties);
+      });
+    }
+  }
+
+  onRangeChanged(properties: any) {
+    const start = new Date(properties.start);
+    const end = new Date(properties.end);
+
+    // Update current view range so reloading (e.g. after dialog close) keeps the view
+    this.currentWeekStart = start.toISOString().split('T')[0];
+    this.currentWeekEnd = end.toISOString().split('T')[0];
+
+    this.loadSchedule(start.toISOString(), end.toISOString());
+  }
+
+  updateTimelineData() {
+    if (!this.itemsEmployee || !this.itemsLocation) return;
+
+    // Clear existing items? Or merge? 
+    // Clearing is safer for now to avoid duplicates if IDs clash or logic is complex
+    this.itemsEmployee.clear();
+    this.itemsLocation.clear();
+    this.groupsEmployee.clear();
+    this.groupsLocation.clear();
+
+    const employeeSet = new Set<string>();
+    const locationSet = new Set<string>();
+
+    this.optimizedShifts.forEach((shift, index) => {
+      // Groups
+      if (shift.employeeName && !employeeSet.has(shift.employeeName)) {
+        employeeSet.add(shift.employeeName);
+        this.groupsEmployee.add({ id: shift.employeeName, content: shift.employeeName });
+      }
+      if (!locationSet.has(shift.location)) {
+        locationSet.add(shift.location);
+        this.groupsLocation.add({ id: shift.location, content: shift.location });
+      }
+
+      // Items
+      const start = new Date(shift.startTime);
+      const end = new Date(shift.endTime);
+      const content = `<div><b>${shift.requiredSkill || 'No Skill'}</b><br>${shift.location}</div>`;
+      const contentLoc = `<div><b>${shift.requiredSkill || 'No Skill'}</b><br>${shift.employeeName || 'Unassigned'}</div>`;
+
+      const color = this.getColor(shift.requiredSkill);
+      const style = `background-color: ${color}; border-color: ${color}; color: white;`;
+
+      if (shift.employeeName) {
+        this.itemsEmployee.add({
+          id: shift.id, // Use shift ID if unique
+          group: shift.employeeName,
+          content: content,
+          start: start,
+          end: end,
+          style: style
+        });
+      }
+
+      this.itemsLocation.add({
+        id: shift.id,
+        group: shift.location,
+        content: contentLoc,
+        start: start,
+        end: end,
+        style: shift.employeeName ? style : 'background-color: #EF2929; color: white;'
+      });
+    });
+  }
+
+  getColor(skill: string): string {
+    // Simple hash to color
+    if (!skill) return '#729fcf';
+
+    let hash = 0;
+    for (let i = 0; i < skill.length; i++) {
+      hash = skill.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+    return '#' + '00000'.substring(0, 6 - c.length) + c;
   }
 
   openCreateScheduleDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
