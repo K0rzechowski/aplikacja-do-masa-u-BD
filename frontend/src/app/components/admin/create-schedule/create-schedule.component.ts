@@ -44,10 +44,7 @@ export class CreateScheduleComponent {
   currentCompany: Company | undefined;
   isGenerating = false;
   isOptimizing = false;
-  currentStep: "idle" | "generating" | "optimizing" | "completed" = "idle"; 
-  optimizedShifts: OptimizedShift[] = [];
-  optimizationResult: string = '';
-  optimizationScore: string = '';
+  currentStep: "idle" | "generating" | "optimizing" | "completed" = "idle";
 
   get currentCompany$(): Observable<Company | null> {
     return this.companyService.currentCompany;
@@ -119,13 +116,9 @@ export class CreateScheduleComponent {
         next: (optimizeResponse) => {
           this.isOptimizing = false;
 
-          this.optimizedShifts = optimizeResponse.shifts;
-          this.optimizationResult = optimizeResponse.message;
-          this.optimizationScore = optimizeResponse.score;
-
           console.log("Optimization completed ", optimizeResponse.message, optimizeResponse.score);
-          this.alertService.success(`${optimizeResponse.message}. Wynik: ${optimizeResponse.score}`);
-
+          this.alertService.success(`${optimizeResponse.message}.`);
+          this.dialogRef.close();
         },
         error: (error) => {
           this.isGenerating = false;
@@ -151,6 +144,6 @@ export class CreateScheduleComponent {
     if (this.isOptimizing) {
       return "Optymalizacja w toku...";
     }
-    return "";
+    return "Stwórz grafik";
   }
 }

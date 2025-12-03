@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import emino.backend.dto.optaplanner.OptaAvailability;
 import emino.backend.dto.optaplanner.OptaEmployee;
 import emino.backend.dto.optaplanner.OptaSchedule;
+import emino.backend.dto.optaplanner.OptaScheduleState;
 import emino.backend.dto.optaplanner.OptaShift;
 import emino.backend.dto.optaplanner.OptimizedScheduleResponse;
 import emino.backend.dto.optaplanner.OptimizedShiftDto;
@@ -86,8 +87,8 @@ public class ScheduleController {
                         .message("Poprawnie zoptymalizowano " + updatedCount + " zmian.")
                         .shiftsOptimized(updatedCount)
                         .score(optimizedSchedule.getScheduleState() != null
-                                        ? optimizedSchedule.getScheduleState().getScore()
-                                        : "N/A")
+                                ? optimizedSchedule.getScheduleState().getScore()
+                                : "N/A")
                         .shifts(optimizedShifts)
                         .build();
 
@@ -97,46 +98,43 @@ public class ScheduleController {
         private OptaSchedule prepareOptaSchedule(Long companyId, LocalDateTime startTime, LocalDateTime endTime) {
                 List<Shift> shifts = shiftService.getShiftsByCompany(companyId, startTime, endTime);
                 List<OptaShift> optaShifts = shifts.stream()
-                                .map(optaPlannerMapper::toOptaPlannerShift)
-                                .toList();
+                        .map(optaPlannerMapper::toOptaPlannerShift)
+                        .toList();
 
                 List<Employee> employees = employeeService.getEmployeesByCompany(companyId);
                 List<OptaEmployee> optaEmployees = employees.stream()
-                                .map(optaPlannerMapper::toOptaPlannerEmployee)
-                                .toList();
+                        .map(optaPlannerMapper::toOptaPlannerEmployee)
+                        .toList();
 
                 LocalDate startDate = startTime.toLocalDate();
                 LocalDate endDate = endTime.toLocalDate();
-                List<EmployeeAvailability> availabilities = availabilityService.getAvailabilities(companyId, startDate,
-                                endDate);
+                List<EmployeeAvailability> availabilities = availabilityService.getAvailabilities(companyId, startDate, endDate);
                 List<OptaAvailability> optaAvail = availabilities.stream()
                                 .map(optaPlannerMapper::toOptaPlannerAvailability)
                                 .toList();
 
-                emino.backend.dto.optaplanner.OptaScheduleState scheduleState = emino.backend.dto.optaplanner.OptaScheduleState
-                                .builder()
-                                .tenantId(companyId)
-                                .publishLength(7)
-                                .draftLength(7)
-                                .firstDraftDate(startDate)
-                                .lastHistoricDate(startDate.minusDays(1))
-                                .build();
+                OptaScheduleState scheduleState = OptaScheduleState.builder()
+                        .tenantId(companyId)
+                        .publishLength(7)
+                        .draftLength(7)
+                        .firstDraftDate(startDate)
+                        .lastHistoricDate(startDate.minusDays(1))
+                        .build();
 
-                // Get available massage types from company
                 List<String> massages = companyService.getCompanyById(companyId)
-                                .map(company -> company.getMassages().stream()
-                                                .map(mfc -> mfc.getMassage().getName())
-                                                .distinct()
-                                                .toList())
-                                .orElse(new ArrayList<>());
+                        .map(company -> company.getMassages().stream()
+                                .map(mfc -> mfc.getMassage().getName())
+                                .distinct()
+                                .toList())
+                        .orElse(new ArrayList<>());
 
                 return OptaSchedule.builder()
-                                .shifts(optaShifts)
-                                .employees(optaEmployees)
-                                .massages(massages)
-                                .availabilities(optaAvail)
-                                .scheduleState(scheduleState)
-                                .build();
+                        .shifts(optaShifts)
+                        .employees(optaEmployees)
+                        .massages(massages)
+                        .availabilities(optaAvail)
+                        .scheduleState(scheduleState)
+                        .build();
         }
 
         private int updateShiftsFromOptimizedSchedule(OptaSchedule optimizedSchedule) {
@@ -144,26 +142,19 @@ public class ScheduleController {
 
                 for (OptaShift optaShift : optimizedSchedule.getShifts()) {
                         Shift shift = shiftService.getShiftById(optaShift.getId())
-                                        .orElseThrow(() -> new IllegalArgumentException(
-                                                        "Nie znaleziono zmiany o id: " + optaShift.getId()));
+                                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zmiany o id: " + optaShift.getId()));
 
-                        // Update employee if assigned
                         if (optaShift.getEmployee() != null) {
                                 Employee employee = employeeService.getEmployeeById(optaShift.getEmployee().getId())
-                                                .orElseThrow(() -> new IllegalArgumentException(
-                                                                "Nie znaleziono pracownika o id: "
-                                                                                + optaShift.getEmployee().getId()));
+                                        .orElseThrow(() -> new IllegalArgumentException( "Nie znaleziono pracownika o id: " + optaShift.getEmployee().getId()));
                                 shift.setAssignedEmployee(employee);
                                 updatedCount++;
                         }
 
-                        // Update massage type if chosen by OptaPlanner
                         if (optaShift.getRequiredSkill() != null) {
-                                // Get company with loaded massages
                                 Company company = companyService.getCompanyById(shift.getCompany().getId())
                                         .orElseThrow(() -> new IllegalArgumentException("Company not found"));
                                 
-                                // Find massage by name
                                 company.getMassages().stream()
                                         .filter(mfc -> mfc.getMassage().getName().equals(optaShift.getRequiredSkill()))
                                         .findFirst()
@@ -172,7 +163,6 @@ public class ScheduleController {
 
                         shiftService.saveShift(shift);
                 }
-
                 return updatedCount;
         }
 }

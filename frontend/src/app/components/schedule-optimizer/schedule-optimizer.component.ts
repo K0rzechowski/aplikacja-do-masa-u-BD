@@ -5,14 +5,14 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { OptimizedShift } from '../../models/optaplanner/optimized-shifts';
 import { ScheduleService } from '../../services/schedule.service';
 import { AlertService } from '../../services/alert.service';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { AuthenticationService } from '../../services/authentication.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateScheduleComponent } from '../admin/create-schedule/create-schedule.component';
 
 @Component({
   selector: 'app-schedule-optimizer',
-  imports: [CommonModule, DatePipe, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './schedule-optimizer.component.html',
   styleUrl: './schedule-optimizer.component.css'
 })
@@ -32,7 +32,6 @@ export class ScheduleOptimizerComponent {
   currentWeekStart: string = '';
   currentWeekEnd: string = '';
 
-  // Timeline
   @ViewChild('employeeTimelineContainer') employeeTimelineContainer!: ElementRef;
   @ViewChild('locationTimelineContainer') locationTimelineContainer!: ElementRef;
 
@@ -56,16 +55,14 @@ export class ScheduleOptimizerComponent {
   }
 
   ngAfterViewInit() {
-    // Initialize timelines early with empty data
     this.initTimelines();
-    // Load initial data
     this.loadSchedule(this.currentWeekStart, this.currentWeekEnd);
   }
 
   calculateCurrentWeek() {
     const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 (Sunday) - 6 (Saturday)
-    const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust when day is Sunday
+    const dayOfWeek = now.getDay();
+    const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
 
     const start = new Date(now.setDate(diff));
     const end = new Date(now.setDate(start.getDate() + 6));
@@ -88,7 +85,7 @@ export class ScheduleOptimizerComponent {
         this.scheduleService.getOptimizedSchedule(user.companyId, startDateTime.toISOString(), endDateTime.toISOString())
           .subscribe({
             next: (response) => {
-              console.log('Loaded schedule:', response);
+              // console.log('Loaded schedule:', response);
               this.optimizedShifts = response.shifts;
               this.optimizationScore = response.score;
               this.isLoading = false;
@@ -119,7 +116,6 @@ export class ScheduleOptimizerComponent {
       return;
     }
 
-    // Initialize DataSets
     this.groupsEmployee = new vis.DataSet();
     this.itemsEmployee = new vis.DataSet();
     this.groupsLocation = new vis.DataSet();
@@ -140,7 +136,6 @@ export class ScheduleOptimizerComponent {
     if (this.employeeTimelineContainer) {
       this.employeeTimeline = new vis.Timeline(this.employeeTimelineContainer.nativeElement, this.itemsEmployee, this.groupsEmployee, options);
 
-      // Add rangechanged listener for dynamic loading
       this.employeeTimeline.on('rangechanged', (properties: any) => {
         this.onRangeChanged(properties);
       });
@@ -159,7 +154,6 @@ export class ScheduleOptimizerComponent {
     const start = new Date(properties.start);
     const end = new Date(properties.end);
 
-    // Update current view range so reloading (e.g. after dialog close) keeps the view
     this.currentWeekStart = start.toISOString().split('T')[0];
     this.currentWeekEnd = end.toISOString().split('T')[0];
 
@@ -167,10 +161,10 @@ export class ScheduleOptimizerComponent {
   }
 
   updateTimelineData() {
-    if (!this.itemsEmployee || !this.itemsLocation) return;
+    if (!this.itemsEmployee || !this.itemsLocation) {
+      return;
+    }
 
-    // Clear existing items? Or merge? 
-    // Clearing is safer for now to avoid duplicates if IDs clash or logic is complex
     this.itemsEmployee.clear();
     this.itemsLocation.clear();
     this.groupsEmployee.clear();
@@ -180,7 +174,6 @@ export class ScheduleOptimizerComponent {
     const locationSet = new Set<string>();
 
     this.optimizedShifts.forEach((shift, index) => {
-      // Groups
       if (shift.employeeName && !employeeSet.has(shift.employeeName)) {
         employeeSet.add(shift.employeeName);
         this.groupsEmployee.add({ id: shift.employeeName, content: shift.employeeName });
@@ -190,18 +183,15 @@ export class ScheduleOptimizerComponent {
         this.groupsLocation.add({ id: shift.location, content: shift.location });
       }
 
-      // Items
       const start = new Date(shift.startTime);
       const end = new Date(shift.endTime);
-      const content = `<div><b>${shift.requiredSkill || 'No Skill'}</b><br>${shift.location}</div>`;
-      const contentLoc = `<div><b>${shift.requiredSkill || 'No Skill'}</b><br>${shift.employeeName || 'Unassigned'}</div>`;
-
-      const color = this.getColor(shift.requiredSkill);
-      const style = `background-color: ${color}; border-color: ${color}; color: white;`;
+      const content = `<div>${shift.location}</div>`;
+      const contentLoc = `<div>${shift.employeeName || 'Nie przypisany'}</div>`;
+      const style = `background-color: #7dd3fc; border-color: #7dd3fc; color: #1e293b;`;
 
       if (shift.employeeName) {
         this.itemsEmployee.add({
-          id: shift.id, // Use shift ID if unique
+          id: shift.id,
           group: shift.employeeName,
           content: content,
           start: start,
@@ -216,21 +206,9 @@ export class ScheduleOptimizerComponent {
         content: contentLoc,
         start: start,
         end: end,
-        style: shift.employeeName ? style : 'background-color: #EF2929; color: white;'
+        style: shift.employeeName ? style : 'background-color: #be123c; color: white;'
       });
     });
-  }
-
-  getColor(skill: string): string {
-    // Simple hash to color
-    if (!skill) return '#729fcf';
-
-    let hash = 0;
-    for (let i = 0; i < skill.length; i++) {
-      hash = skill.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-    return '#' + '00000'.substring(0, 6 - c.length) + c;
   }
 
   openCreateScheduleDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
@@ -250,7 +228,6 @@ export class ScheduleOptimizerComponent {
   getShiftsByDay(): Map<string, OptimizedShift[]> {
     const grouped = new Map<string, OptimizedShift[]>();
 
-    // Sort shifts by start time first
     const sortedShifts = [...this.optimizedShifts].sort((a, b) =>
       new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
     );

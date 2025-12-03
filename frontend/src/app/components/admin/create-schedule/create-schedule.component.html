@@ -26,15 +26,16 @@
                 </mat-form-field>
                 <mat-datepicker #endPicker></mat-datepicker>
             </div>
-
-            @if (isProcessing()) {
-                <div class=" d-flex flex-column justify-items items-center">
-                    <mat-spinner diameter="24"></mat-spinner>
-                    <p>{{getStatusMessage()}}</p>
-                </div>
-            }
             
-            <button mat-button class="btn-long btn-sky mb-4 cursor-pointer" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="createSchedule()">Stwórz</button>
+            <button 
+                mat-button 
+                class="btn-long btn-sky mb-4 cursor-pointer"
+                [class.cursor-progress]="isProcessing()"
+                [class.cursor-pointer]="!isProcessing()"
+                style="color: black; border-radius: 5px; background-color: #73D4FF;" 
+                (click)="createSchedule()">
+                {{ getStatusMessage() }}
+            </button>
         </form>
     </mat-dialog-content>
 </div>

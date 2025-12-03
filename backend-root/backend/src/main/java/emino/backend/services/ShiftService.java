@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import emino.backend.dto.ShiftResponseDto;
 import emino.backend.models.Company;
 import emino.backend.models.CompanyOpenTime;
-import emino.backend.models.MassageForCompany;
 import emino.backend.models.Room;
 import emino.backend.models.Shift;
 import emino.backend.repositories.ShiftRepository;
@@ -46,7 +45,7 @@ public class ShiftService {
                             .startTime(start)
                             .endTime(end)
                             .room(room)
-                            .massage(null) // OptaPlanner will choose massage type
+                            .massage(null)
                             .company(company)
                             .assignedEmployee(null)
                             .build();
