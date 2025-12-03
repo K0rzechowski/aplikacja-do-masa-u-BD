@@ -117,7 +117,7 @@ export class CreateScheduleComponent {
           this.isOptimizing = false;
 
           console.log("Optimization completed ", optimizeResponse.message, optimizeResponse.score);
-          this.alertService.success(`${optimizeResponse.message}.`);
+          this.alertService.success(`${optimizeResponse.message}`);
           this.dialogRef.close();
         },
         error: (error) => {

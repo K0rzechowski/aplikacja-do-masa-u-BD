@@ -81,7 +81,7 @@ public class ScheduleController {
                 int updatedCount = updateShiftsFromOptimizedSchedule(optimizedSchedule);
 
                 List<OptimizedShiftDto> optimizedShifts = optaPlannerMapper
-                        .toOptaPlannerSchedule(optimizedSchedule);
+                                .toOptaPlannerSchedule(optimizedSchedule);
 
                 OptimizedScheduleResponse response = OptimizedScheduleResponse.builder()
                         .message("Poprawnie zoptymalizowano " + updatedCount + " zmian.")
@@ -98,20 +98,20 @@ public class ScheduleController {
         private OptaSchedule prepareOptaSchedule(Long companyId, LocalDateTime startTime, LocalDateTime endTime) {
                 List<Shift> shifts = shiftService.getShiftsByCompany(companyId, startTime, endTime);
                 List<OptaShift> optaShifts = shifts.stream()
-                        .map(optaPlannerMapper::toOptaPlannerShift)
-                        .toList();
+                                .map(optaPlannerMapper::toOptaPlannerShift)
+                                .toList();
 
                 List<Employee> employees = employeeService.getEmployeesByCompany(companyId);
                 List<OptaEmployee> optaEmployees = employees.stream()
-                        .map(optaPlannerMapper::toOptaPlannerEmployee)
-                        .toList();
+                                .map(optaPlannerMapper::toOptaPlannerEmployee)
+                                .toList();
 
                 LocalDate startDate = startTime.toLocalDate();
                 LocalDate endDate = endTime.toLocalDate();
-                List<EmployeeAvailability> availabilities = availabilityService.getAvailabilities(companyId, startDate, endDate);
+                List<EmployeeAvailability> availabilities = availabilityService.getAvailabilitiesByCompany(companyId, startDate, endDate);
                 List<OptaAvailability> optaAvail = availabilities.stream()
-                                .map(optaPlannerMapper::toOptaPlannerAvailability)
-                                .toList();
+                        .map(optaPlannerMapper::toOptaPlannerAvailability)
+                        .toList();
 
                 OptaScheduleState scheduleState = OptaScheduleState.builder()
                         .tenantId(companyId)
@@ -146,17 +146,18 @@ public class ScheduleController {
 
                         if (optaShift.getEmployee() != null) {
                                 Employee employee = employeeService.getEmployeeById(optaShift.getEmployee().getId())
-                                        .orElseThrow(() -> new IllegalArgumentException( "Nie znaleziono pracownika o id: " + optaShift.getEmployee().getId()));
+                                        .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono pracownika o id: " + optaShift.getEmployee().getId()));
                                 shift.setAssignedEmployee(employee);
                                 updatedCount++;
                         }
 
                         if (optaShift.getRequiredSkill() != null) {
                                 Company company = companyService.getCompanyById(shift.getCompany().getId())
-                                        .orElseThrow(() -> new IllegalArgumentException("Company not found"));
-                                
+                                        .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono firmy o id: " + shift.getCompany().getId()));
+
                                 company.getMassages().stream()
-                                        .filter(mfc -> mfc.getMassage().getName().equals(optaShift.getRequiredSkill()))
+                                        .filter(mfc -> mfc.getMassage().getName()
+                                                .equals(optaShift.getRequiredSkill()))
                                         .findFirst()
                                         .ifPresent(shift::setMassage);
                         }

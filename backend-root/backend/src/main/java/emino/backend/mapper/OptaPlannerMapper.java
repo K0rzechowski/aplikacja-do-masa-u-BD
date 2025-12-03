@@ -40,13 +40,14 @@ public class OptaPlannerMapper {
                         .end(shift.getEndTime())
                         .location(shift.getRoom().getRoomNumber())
                         .requiredSkill(shift.getMassage() != null ? shift.getMassage().getMassage().getName()
-                                        : null)
+                                : null)
                         .employee(null)
                         .build();
         }
 
         public OptaAvailability toOptaPlannerAvailability(EmployeeAvailability availability) {
                 return OptaAvailability.builder()
+                        .id(availability.getId())
                         .employee(toOptaPlannerEmployee(availability.getEmployee()))
                         .date(availability.getDate())
                         .availabilityType(availability.getAvailabilityType())
@@ -63,8 +64,8 @@ public class OptaPlannerMapper {
                                 .location(optaShift.getLocation())
                                 .requiredSkill(optaShift.getRequiredSkill())
                                 .employeeName(optaShift.getEmployee() != null
-                                                ? optaShift.getEmployee().getName()
-                                                : "Nieprzypisany")
+                                        ? optaShift.getEmployee().getName()
+                                        : "Nieprzypisany")
                                 .build())
                         .toList();
         }

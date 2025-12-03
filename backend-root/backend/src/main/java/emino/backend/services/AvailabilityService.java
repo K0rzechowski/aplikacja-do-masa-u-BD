@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AvailabilityService {
-    
+
     private final EmployeeAvailabilityRepository availabilityRepository;
     private final EmployeeRepository employeeRepository;
 
@@ -36,6 +36,10 @@ public class AvailabilityService {
 
     public List<EmployeeAvailability> getAvailabilities(Long employeeId, LocalDate start, LocalDate end) {
         return availabilityRepository.findByEmployeeIdAndDateBetween(employeeId, start, end);
+    }
+
+    public List<EmployeeAvailability> getAvailabilitiesByCompany(Long companyId, LocalDate start, LocalDate end) {
+        return availabilityRepository.findByEmployeeCompanyIdAndDateBetween(companyId, start, end);
     }
 
     public List<AvailabilityDto> getAvailability(Long employeeId, LocalDate start, LocalDate end) {
