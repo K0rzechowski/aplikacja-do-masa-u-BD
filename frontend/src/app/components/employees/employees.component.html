@@ -1,0 +1,32 @@
+<mat-form-field class="mt-6 lg:absolute lg:right-10">
+    <mat-label>Wybierz typ masażu</mat-label>
+    <mat-select [(value)]="selectedMassageId" (selectionChange)="onMassageChange($event.value)">
+      @for (massage of massages; track massage) {
+        <mat-option [value]="massage.id">{{ massage.name }}</mat-option>
+      }
+    </mat-select>
+</mat-form-field>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 content-center gap-6">
+    @for (employee of filteredEmployees; track employee) {
+        <div class="relative flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-64">
+            <div class="p-3">
+                <h6 class="mb-2 text-slate-800 text-xl font-medium">
+                    {{ employee.name }} {{ employee.surname }}
+                </h6>
+                <p>Masaże: </p>
+                @for (massage of employee.massages; track massage) {
+                    <p class="text-slate-600 font-light">
+                    {{massage.name}}            
+                    </p>
+                }
+            </div>
+            <div class="flex-grow"></div>
+            <div class="px-3 pb-3 pt-0 mt-2">
+                <button class="btn btn-sky" type="button">
+                    Rezerwuj
+                </button>
+            </div>
+        </div>  
+    }
+</div>
+    

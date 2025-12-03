@@ -29,18 +29,6 @@
                 </p>
             </div>
             <div class="mb-4">
-                <label for="minutes">Czas trwania</label>
-                <input type="number" id="minutes" placeholder="Czas trwania" formControlName="minutes" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
-                <p class="warning">
-                    @if(formModel.controls['minutes'].errors?.['min']) {
-                        Czas trwania musi być większy od 0
-                    }
-                    @else if(formModel.controls['minutes'].invalid && formModel.controls['minutes'].touched ) {
-                        Czas trwania jest wymagany
-                    }  
-                </p>
-            </div>
-            <div class="mb-4">
                 <label for="price">Cena</label>
                 <input type="number" id="price" placeholder="Cena" formControlName="price" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
                 <p class="warning">

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import emino.backend.dto.optaplanner.OptaSchedule;
 import emino.backend.dto.optaplanner.OptaShift;
@@ -36,13 +38,12 @@ public class ScheduleOptimizationService {
     private String optaPlannerUrl;
 
     public OptaSchedule optimizeSchedule(OptaSchedule problem) throws JsonProcessingException{
-        String optimizeUrl = optaPlannerUrl + "/schedule/solve";
+        String optimizeUrl = optaPlannerUrl + "/schedule/solve-sync";
 
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         // String json = mapper.writeValueAsString(problem);
-        ResponseEntity<OptaSchedule> response = restTemplate.postForEntity(optimizeUrl, problem,
-                OptaSchedule.class);
+        ResponseEntity<OptaSchedule> response = restTemplate.postForEntity(optimizeUrl, problem, OptaSchedule.class);
 
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             return response.getBody();

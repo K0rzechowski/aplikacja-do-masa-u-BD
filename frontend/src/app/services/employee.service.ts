@@ -20,6 +20,10 @@ export class EmployeeService {
     return this.httpClient.get<Employee[]>(`${this.baseUrl}`);
   }
 
+  getEmployeesByCompany(companyId: string): Observable<Employee[]> {
+    return this.httpClient.get<Employee[]>(`${this.baseUrl}/company/${companyId}`);
+  }
+
   deleteEmployee(employeeId: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.baseUrl}/remove/${employeeId}`);
   }

@@ -16,8 +16,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OptaAvailability {
 
+    private Long id;
     private OptaEmployee employee;
-    
+
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDate date;
     private AvailabilityType availabilityType;

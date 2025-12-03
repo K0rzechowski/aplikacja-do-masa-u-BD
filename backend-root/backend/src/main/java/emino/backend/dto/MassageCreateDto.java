@@ -13,6 +13,5 @@ public class MassageCreateDto {
     
     private String name;
     private int price;
-    private int minutes;
     // private List<Long> symptomIds;
 }

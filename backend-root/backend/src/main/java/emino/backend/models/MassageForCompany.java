@@ -36,9 +36,6 @@ public class MassageForCompany {
     @Column(nullable = false)
     private int price;
 
-    @Column(nullable = false)
-    private int durationInMinutes;
-
     @Column()
     private String imageUrl;
 

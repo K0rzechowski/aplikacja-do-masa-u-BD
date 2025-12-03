@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../../models/auth/user';
 import { AuthenticationService } from '../../services/authentication.service';
-import { UserRole } from '../../models/auth/user'; 
+import { UserRole } from '../../models/auth/user';
 import { AsyncPipe } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { AlertService } from '../../services/alert.service';
@@ -44,8 +44,10 @@ export class SettingsComponent {
         this.settingsChoices.push({ label: 'Zarządzaj pracownikami', route: 'employees' });
         this.settingsChoices.push({ label: 'Zarządzaj masażami', route: 'massages' });
         this.settingsChoices.push({ label: 'Zarządzaj swoją firmą', route: 'companySettings' });
+        this.settingsChoices.push({ label: 'Zarządzaj grafikami', route: 'schedule' });
       } else if(authService.isEmployee() == true) {
         this.settingsChoices.push({ label: 'Zarządzaj dostępnością na dzień', route: 'availabilities' });
+        this.settingsChoices.push({ label: 'Grafiki', route: 'schedule' });
       }
     });
   }

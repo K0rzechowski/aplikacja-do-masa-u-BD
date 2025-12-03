@@ -51,7 +51,6 @@ export class MassageFormComponent {
   ) {
     this.formModel = this.formBuilder.group({
       name:[this.massage?.name, Validators.required],
-      minutes: [this.massage?.minutes, [Validators.required, Validators.min(1)]],
       price:[this.massage?.price, [Validators.required, Validators.min(1)]]
     })
   }
@@ -61,7 +60,6 @@ export class MassageFormComponent {
       this.massageBeforeUpdate = {...this.massage};
       this.formModel.patchValue({ 
         name: this.massage.name,
-        minutes: this.massage.minutes,
         price: this.massage.price
       });
     }
@@ -88,12 +86,11 @@ export class MassageFormComponent {
     }
   }
 
-  edit(name: string, minutes: number, price: number, file: File) {
+  edit(name: string, price: number, file: File) {
     const updatedMassage: Massage = {
       id: this.massage?.id,
       name,
       price,
-      minutes,
       company: this.massage?.company!,
       companyId: this.massage?.companyId!,
       symptomIds: this.selectedSymptoms.map(s => s.id!),  
@@ -109,12 +106,11 @@ export class MassageFormComponent {
     });
   }
 
-  create(name: string, minutes: number, price: number, file: File) {
+  create(name: string, price: number, file: File) {
     const upperName = name.charAt(0).toUpperCase() + name.slice(1)
     const newMassage = {
       name: upperName,
       price,
-      minutes,
       symptomIds: this.selectedSymptoms.map(s => s.id!)
     };
     this.msgService.createMassage(newMassage, file).subscribe({
@@ -135,14 +131,12 @@ export class MassageFormComponent {
     if (this.massage && this.formModel.valid && this.selectedFile) {
       this.edit(
         this.formModel.value.name,
-        this.formModel.value.minutes,
         this.formModel.value.price,
         this.selectedFile
       );
     } else if (!this.massage && this.formModel.valid && this.selectedFile) {
       this.create(
         this.formModel.value.name,
-        this.formModel.value.minutes,
         this.formModel.value.price,
         this.selectedFile
       );
