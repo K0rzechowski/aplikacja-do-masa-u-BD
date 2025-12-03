@@ -98,7 +98,6 @@ public class MassageService {
         MassageForCompany massageToCreate = MassageForCompany.builder()
             .massage(alreadyExistingMassage)
             .price(request.getPrice())
-            .durationInMinutes(request.getMinutes())
             .imageUrl(imageUrl)
             .company(company)
             .build();
@@ -146,9 +145,6 @@ public class MassageService {
         if (request.getPrice() > 0) {
             massageForCompany.setPrice(request.getPrice());
         }
-        if (request.getMinutes() > 0) {
-            massageForCompany.setDurationInMinutes(request.getMinutes());
-        }
 
         if (!massageForCompany.getCompany().equals(admin.getCompany())) {
             throw new AccessDeniedException("Nie można dodać masażu do nie swojej firmy");
@@ -190,24 +186,6 @@ public class MassageService {
             .toList();
     }
 
-    // private void createMassageSymptomAssociations(Massage massage, List<Long> symptomIds) {
-    //     for (Long symptomId : symptomIds) {
-    //         Symptom symptom = symptomRepository.findById(symptomId)
-    //             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego symptomu"));
-
-    //         MassageSymptom id = new MassageSymptom();
-    //         id.setMassageId(massage.getId());
-    //         id.setSymptomId(symptom.getId());
-
-    //         MassageForSymptom massageForSymptom = new MassageForSymptom();
-    //         massageForSymptom.setId(id);
-    //         massageForSymptom.setMassage(massage);
-    //         massageForSymptom.setSymptom(symptom);
-
-    //         msRepository.save(massageForSymptom);
-    //     }
-    // }
-
     public MassageDto getMassageResponse(MassageForCompany massage) {
         Massage alreadyExistingMassage = massageRepository.findByName(massage.getMassage().getName()).orElse(null);
 
@@ -218,7 +196,6 @@ public class MassageService {
             dto.setId(massage.getId());
             dto.setName(alreadyExistingMassage.getName());
             dto.setPrice(massage.getPrice());
-            dto.setMinutes(massage.getDurationInMinutes());
             dto.setCompanyId(massage.getCompany().getId());
             dto.setCompanyName(massage.getCompany().getName());
             dto.setSymptoms(

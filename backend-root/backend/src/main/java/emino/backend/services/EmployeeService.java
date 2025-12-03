@@ -166,7 +166,6 @@ public class EmployeeService {
                     MassageDto massageDto = new MassageDto();
                     massageDto.setId(massage.getId());
                     massageDto.setName(massage.getMassage().getName());
-                    massageDto.setMinutes(massage.getDurationInMinutes());
                     massageDto.setPrice(massage.getPrice());
                     massageDto.setCompanyId(massage.getCompany().getId());
                     return massageDto;

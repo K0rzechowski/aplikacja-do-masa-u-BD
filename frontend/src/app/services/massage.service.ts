@@ -20,7 +20,6 @@ export class MassageService {
 
     formData.append('name', request.name || '');
     formData.append('price', request.price?.toString() || '0');
-    formData.append('minutes', request.minutes?.toString() || '0');
     
     if (request.symptomIds && request.symptomIds.length > 0) {
       request.symptomIds.forEach(id => formData.append('symptomIds', id));
