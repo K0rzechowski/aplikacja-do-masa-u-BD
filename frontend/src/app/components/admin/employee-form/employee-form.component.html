@@ -87,13 +87,17 @@
             </div>
 
             @if (employee) {
-                <mat-form-field>
-                    <mat-label>Wybierz rolę</mat-label>
-                    <mat-select formControlName="role">
-                      <mat-option value="ADMIN">Administrator</mat-option>
-                      <mat-option value="EMPLOYEE">Masażysta</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                <div class="mb-2">
+                    <label for="role">Rola</label>
+                    <div>
+                        <mat-form-field>
+                            <mat-select formControlName="role">
+                                <mat-option value="ADMIN">Administrator</mat-option>
+                                <mat-option value="EMPLOYEE">Masażysta</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
             }
             <div class="mb-4">
                 <label for="massage">Masaże</label>

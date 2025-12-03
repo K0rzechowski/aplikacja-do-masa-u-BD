@@ -9,10 +9,11 @@ import { CommonModule } from '@angular/common';
 import { AuthenticationService } from '../../services/authentication.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateScheduleComponent } from '../admin/create-schedule/create-schedule.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-schedule-optimizer',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './schedule-optimizer.component.html',
   styleUrl: './schedule-optimizer.component.css'
 })
@@ -27,7 +28,7 @@ export class ScheduleOptimizerComponent {
   optimizedShifts: OptimizedShift[] = [];
   optimizationResult: string = '';
   optimizationScore: string = '';
-  isLoading = false;
+  currentEmployeeShifts: OptimizedShift[] = [];
 
   currentWeekStart: string = '';
   currentWeekEnd: string = '';
@@ -56,7 +57,75 @@ export class ScheduleOptimizerComponent {
 
   ngAfterViewInit() {
     this.initTimelines();
-    this.loadSchedule(this.currentWeekStart, this.currentWeekEnd);
+    
+    if (this.isEmployee) {
+      this.loadCurrentEmployeeSchedule();
+    } else {
+      this.loadSchedule(this.currentWeekStart, this.currentWeekEnd);
+    }
+  }
+
+  loadCurrentEmployeeSchedule() {
+    this.authService.currentUser.subscribe(user => {
+      if (user && user.companyId) {
+        const startDateTime = new Date(this.currentWeekStart);
+        startDateTime.setHours(0, 0, 0, 0);
+        const endDateTime = new Date(this.currentWeekEnd);
+        endDateTime.setHours(23, 59, 59, 999);
+
+        this.scheduleService.getOptimizedSchedule(user.companyId, startDateTime.toISOString(), endDateTime.toISOString()).subscribe({
+          next: (response) => {
+            this.currentEmployeeShifts = response.shifts.filter(shift => shift.employeeName === `${user.name} ${user.surname}`);
+
+            this.optimizedShifts = response.shifts;
+            this.optimizationScore = response.score;
+            this.cdr.markForCheck();
+
+            this.updateTimelineData();
+          },
+          error: (err) => {
+            console.error('Failed to load employee schedule', err);
+          }
+        });
+      }
+    });
+  }
+
+  getEmployeeShiftsByDay(): Map<string, OptimizedShift[]> {
+    const grouped = new Map<string, OptimizedShift[]>();
+
+    const sortedShifts = [...this.currentEmployeeShifts].sort((a, b) =>
+      new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+    );
+
+    sortedShifts.forEach(shift => {
+      const day = shift.startTime.split('T')[0];
+      if (!grouped.has(day)) {
+        grouped.set(day, []);
+      }
+      grouped.get(day)!.push(shift);
+    });
+
+    return grouped;
+  }
+
+  getSortedEmployeeDays(): string[] {
+    return Array.from(this.getEmployeeShiftsByDay().keys()).sort();
+  }
+
+  getDayName(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('pl-PL', { weekday: 'long' });
+  }
+
+  formatTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('pl-PL');
   }
 
   calculateCurrentWeek() {
@@ -74,7 +143,6 @@ export class ScheduleOptimizerComponent {
   loadSchedule(startStr?: string, endStr?: string) {
     this.authService.currentUser.subscribe(user => {
       if (user && user.companyId) {
-        this.isLoading = true;
 
         const startDateTime = new Date(startStr || this.currentWeekStart);
         startDateTime.setHours(0, 0, 0, 0);
@@ -88,14 +156,12 @@ export class ScheduleOptimizerComponent {
               // console.log('Loaded schedule:', response);
               this.optimizedShifts = response.shifts;
               this.optimizationScore = response.score;
-              this.isLoading = false;
               this.cdr.markForCheck();
 
               this.updateTimelineData();
             },
             error: (err) => {
               console.error('Failed to load schedule', err);
-              this.isLoading = false;
             }
           });
       }

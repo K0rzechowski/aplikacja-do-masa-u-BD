@@ -15,6 +15,7 @@ import { PriceListComponent } from './components/price-list/price-list.component
 import { CompanyFormsComponent } from './components/admin/company-forms/company-forms.component';
 import { AvailabilityCalendarComponent } from './components/employee/availability-calendar/availability-calendar.component';
 import { ScheduleOptimizerComponent } from './components/schedule-optimizer/schedule-optimizer.component';
+import { EmployeesComponent } from './components/employees/employees.component';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
@@ -35,6 +36,7 @@ export const routes: Routes = [
   { path: 'forCompanies', component: CompanyFormComponent },
   { path: 'recommendations', component: RecommendationsComponent },
   { path: ':city/:name/massages', component: MassagesComponent },
+  { path: ':city/:name/employees', component: EmployeesComponent },
   { path: ':city/:name/price', component: PriceListComponent },
 
 ];

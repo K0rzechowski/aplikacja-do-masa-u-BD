@@ -12,7 +12,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                     </svg>
                 </button>
-                <!-- Dropdown menu -->
                 <div id="dropdown" class="absolute z-10 hidden group-hover:block bg-sky-200 divide-y divide-sky-300 rounded-lg shadow-sm w-full">
                     <ul class="py-2 text-sm max-h-60 overflow-y-auto" aria-labelledby="dropdownDefaultButton">
                         @for(company of companies; track $index) {
@@ -50,6 +49,7 @@
         <div class="px-5 py-2 md:max-w-3/4 mx-auto w-full bg-slate-50">
             <div class="flex justify-end items-center space-x-3 md:space-x-4">
                 <a [routerLink]="[company.city, company.name, 'massages']">Usługi</a>
+                <a [routerLink]="[company.city, company.name, 'employees']">Masażyści</a>
                 <a [routerLink]="[company.city, company.name, 'price']">Cennik</a>
                 <a routerLink="/">Rezerwuj</a>
             </div>
