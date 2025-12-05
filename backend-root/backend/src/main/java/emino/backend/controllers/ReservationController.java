@@ -38,7 +38,7 @@ public class ReservationController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ReservationDto> createEmployee(@RequestBody ReservationDto request) throws MessagingException {
+    public ResponseEntity<ReservationDto> createReservation(@RequestBody ReservationDto request) throws MessagingException {
         Reservation reservation = reservationService.createReservation(request);
         ReservationDto dto = reservationService.getReservationResponse(reservation);
         return ResponseEntity.ok(dto);

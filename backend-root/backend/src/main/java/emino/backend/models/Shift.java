@@ -2,6 +2,8 @@ package emino.backend.models;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,10 +25,10 @@ import lombok.Setter;
 @Entity
 @Builder
 public class Shift {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; 
+    private Long id;
 
     @Column(nullable = false)
     private LocalDateTime startTime;
@@ -46,6 +48,7 @@ public class Shift {
     @JoinColumn(name = "assigned_employee_id")
     private Employee assignedEmployee;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "shift")
     private Reservation reservation;
 

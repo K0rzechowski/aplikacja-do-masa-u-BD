@@ -1,8 +1,8 @@
 <div>
     <h2 class="text-5xl text-center my-5">Zarezerwuj wizytę</h2>
     <div class="md:flex py-3">
-        <div class="p-2">
-            <form [formGroup]="formModel" (ngSubmit)="submitForm()">
+        <div class="p-2 flex-1 lg:me-10">
+            <form [formGroup]="formModel">
                 <mat-accordion class="example-headers-align">
                     <mat-expansion-panel [expanded]="step() === 0" (opened)="setStep(0)" hideToggle>
                         <mat-expansion-panel-header>
@@ -12,20 +12,21 @@
                                 <mat-icon [ngStyle]="{'color':'#008081'}">location_city</mat-icon>
                             </mat-panel-description>
                         </mat-expansion-panel-header>
-                        
+
                         <mat-form-field class="w-full">
-                            <mat-select formControlName="type">
+                            <mat-select formControlName="company">
                                 @for (company of allCompanies; track company ) {
-                                    <mat-option [value]="company"><span class="font-medium">{{ company.city }}</span> "{{ company.name }}"</mat-option>
+                                <mat-option [value]="company"><span class="font-medium">{{ company.city }}</span> "{{
+                                    company.name }}"</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
-                        
+
                         <mat-action-row>
                             <button mat-button (click)="nextStep()">Przejdź dalej</button>
                         </mat-action-row>
                     </mat-expansion-panel>
-                    
+
                     <mat-expansion-panel [expanded]="step() === 1" (opened)="setStep(1)" hideToggle>
                         <mat-expansion-panel-header>
                             <mat-panel-title> Masaż </mat-panel-title>
@@ -34,21 +35,21 @@
                                 <mat-icon [ngStyle]="{'color':'#008081'}">spa</mat-icon>
                             </mat-panel-description>
                         </mat-expansion-panel-header>
-                        
+
                         <mat-form-field class="w-full">
-                            <mat-select formControlName="type">
+                            <mat-select formControlName="massage">
                                 @for (massage of allMassages; track massage ) {
-                                    <mat-option [value]="massage">{{ massage.name }}</mat-option>
+                                <mat-option [value]="massage">{{ massage.name }}</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
-                        
+
                         <mat-action-row>
                             <button mat-button (click)="prevStep()">Cofnij</button>
                             <button mat-button (click)="nextStep()">Przejdź dalej</button>
                         </mat-action-row>
                     </mat-expansion-panel>
-                    
+
                     <mat-expansion-panel [expanded]="step() === 2" (opened)="setStep(2)" hideToggle>
                         <mat-expansion-panel-header>
                             <mat-panel-title> Masażysta </mat-panel-title>
@@ -57,61 +58,116 @@
                                 <mat-icon [ngStyle]="{'color':'#008081'}">person_apron</mat-icon>
                             </mat-panel-description>
                         </mat-expansion-panel-header>
-                        
+
                         <mat-form-field class="w-full">
-                            <mat-select formControlName="type">
+                            <mat-select formControlName="employee">
                                 @for (empl of allEmployees; track empl ) {
                                     <mat-option [value]="empl">{{ empl.name }} {{ empl.surname }}</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
-                    <mat-action-row>
-                        <button mat-button (click)="prevStep()">Cofnij</button>
-                        <button mat-button (click)="nextStep()">Przejdź dalej</button>
-                    </mat-action-row>
-                    </mat-expansion-panel>
-                    
-                    <mat-expansion-panel [expanded]="step() === 3" (opened)="setStep(3)" hideToggle>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title> Termin </mat-panel-title>
-                            <mat-panel-description>
-                                Wybierz datę oraz godzinę wizyty
-                                <mat-icon [ngStyle]="{'color':'#008081'}">date_range</mat-icon>
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
-                        
-                        <mat-form-field>
-                            <mat-label>Date</mat-label>
-                            <input matInput [matDatepicker]="picker" (focus)="picker.open()" readonly />
-                        </mat-form-field>
-                        <mat-datepicker #picker></mat-datepicker>
-                    
                         <mat-action-row>
                             <button mat-button (click)="prevStep()">Cofnij</button>
                             <button mat-button (click)="nextStep()">Przejdź dalej</button>
                         </mat-action-row>
                     </mat-expansion-panel>
-                </mat-accordion> 
+
+                    <mat-expansion-panel [expanded]="step() === 3" (opened)="setStep(3)" hideToggle>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title> Termin </mat-panel-title>
+                            <mat-panel-description>
+                                Wybierz datę oraz godzinę
+                                <mat-icon [ngStyle]="{'color':'#008081'}">date_range</mat-icon>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        @if (paginatedShiftTimes.length > 0) {
+                        <div class="mb-4">
+                            <p class="text-sm text-slate-600 mb-3">Dostępne terminy:</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                @for (time of paginatedShiftTimes; track time) {
+                                    <button type="button"
+                                        class="p-3 text-left border rounded-lg transition-all hover:bg-emerald-50"
+                                        [class.bg-emerald-50]="formModel.get('date')?.value === time"
+                                        [class.font-medium]="formModel.get('date')?.value === time"
+                                        (click)="selectTimeSlot(time)">
+                                        {{ time }}
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        @if (totalShifts > pageSize) {
+                            <mat-paginator class="minimal-paginator" [length]="totalShifts" [pageSize]="pageSize" [pageIndex]="pageIndex" [hidePageSize]="true" (page)="onPageChange($event)">
+                            </mat-paginator>
+                        }
+                        } @else {
+                            <p class="text-center text-slate-600">Brak dostępnych terminów dla wybranego masażysty</p>
+                        }
+
+                        <mat-action-row>
+                            <button mat-button (click)="prevStep()">Cofnij</button>
+                        </mat-action-row>
+                    </mat-expansion-panel>
+                </mat-accordion>
             </form>
         </div>
-        <div class="inline-block h-[700px] min-h-[1em] w-0.5 self-stretch bg-slate-200"></div>
-        <div class="p-2">
-            <div class="splash container p-5 ">
+        <div class="self-auto md:inline-block md:h-[700px] md:min-h-[1em] md:w-0.5 md:self-stretch md:bg-slate-200">
+        </div>
+        <div class="p-2 flex-1 lg:ms-10">
+            <div class="bg-[#C0F3E4] bg-cover rounded-xl shadow-lg mx-auto w-full container p-5 ">
                 <p class="text-4xl mb-2">Podsumowanie</p>
-                <div>
-                    <p class="text-lg font-medium">Placówka:</p>
+                <div class="lg:flex lg:justify-between">
+                    <div>
+                        <div class="mb-3">
+                            <p class="text-lg font-medium">Placówka:</p>
+                            @if (formModel.get('company')?.value) {
+                                <p class="text-base ml-2">{{ formModel.get('company')?.value?.city }} "{{ formModel.get('company')?.value?.name }}"</p>
+                            } @else {
+                                <p class="text-base text-slate-600 ml-2">Nie wybrano</p>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-lg font-medium">Masaż:</p>
+                            @if (formModel.get('massage')?.value) {
+                                <p class="text-base ml-2">{{ formModel.get('massage')?.value?.name }}</p>
+                            } @else {
+                                <p class="text-base text-slate-600 ml-2">Nie wybrano</p>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-lg font-medium">Masażysta:</p>
+                            @if (formModel.get('employee')?.value) {
+                                <p class="text-base ml-2">{{ formModel.get('employee')?.value?.name }} {{ formModel.get('employee')?.value?.surname }}</p>
+                            } @else {
+                                <p class="text-base text-slate-600 ml-2">Nie wybrano</p>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-lg font-medium">Data i godzina:</p>
+                            @if (formModel.get('date')?.value) {
+                                <p class="text-base ml-2">{{ formModel.get('date')?.value }}</p>
+                            } @else {
+                                <p class="text-base text-slate-600 ml-2">Nie wybrano</p>
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        @if(currentUser$ | async; as currentUser) {
+                            <p class="text-lg font-medium">Dane kontaktowe:</p>
+                            <p class="ml-2"><span class="font-medium">Imię i nazwisko:</span> {{currentUser.name}} {{currentUser.surname}}</p>
+                            <p class="ml-2"><span class="font-medium">Data urodzenia:</span> {{currentUser.dateOfBirth}}</p>
+                            <p class="ml-2"><span class="font-medium">E-mail:</span> {{currentUser.email}}</p>
+                        }
+                    </div>
                 </div>
-                <div>
-                    <p class="text-lg font-medium">Masaż:</p>
-                </div>
-                <div>
-                    <p class="text-lg font-medium">Masażysta:</p>
-                </div>
-                <div>
-                    <p class="text-lg font-medium">Data i godzina:</p>
+                <div class="flex-grow"></div>
+                <div class="pt-0 mt-2 flex justify-end">
+                    <button class="btn btn-sky" type="submit" (click)="submitForm()">
+                        Rezerwuj
+                    </button>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

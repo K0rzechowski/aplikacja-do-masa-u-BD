@@ -1,5 +1,7 @@
 package emino.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,13 +22,14 @@ import lombok.Setter;
 @Entity
 @Builder
 public class Room {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; 
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = false)
+    @JsonBackReference
     private Company company;
 
     @Column(nullable = false)

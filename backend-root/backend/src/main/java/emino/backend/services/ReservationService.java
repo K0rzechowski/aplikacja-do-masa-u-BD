@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
-    
+
     private final ReservationRepository reservationRepository;
     private final EmployeeRepository emplRepository;
     private final CompanyRepository companyRepository;
@@ -33,7 +33,7 @@ public class ReservationService {
     private final ShiftRepository shiftRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
-    
+
     public Optional<Reservation> getReservationById(Long id) {
         return reservationRepository.findById(id);
     }
@@ -42,23 +42,31 @@ public class ReservationService {
         var company = companyRepository.findById(companyId)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
         return reservationRepository.findByShiftCompanyId(companyId);
-    } 
+    }
 
     public List<Reservation> getAllReservations() {
         return reservationRepository.findAll();
     }
 
     public Reservation createReservation(ReservationDto request) throws MessagingException {
+        User customer = userRepository.findById(request.getCustomer().getId())
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
+
+        Shift shift = shiftRepository.findById(request.getShift().getId())
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zmiany"));
+
+        MassageForCompany massage = massageRepository.findById(request.getMassageForCompany().getId())
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono masażu"));
+
         Reservation reservation = Reservation.builder()
-            .customer(request.getCustomer())
-            .shift(request.getShift())
-            .massage(request.getMassageForCompany())
+            .customer(customer)
+            .shift(shift)
+            .massage(massage)
             .status(Status.RESERVED)
             .build();
 
-        
         Reservation savedReservation = reservationRepository.save(reservation);
-        emailService.sendReservationConfirmationEmail(request.getCustomer(), request.getShift().getCompany(), request.getMassageForCompany().getMassage().getName(), request.getShift());
+        emailService.sendReservationConfirmationEmail(customer, shift.getCompany(), massage.getMassage().getName(), shift);
         return savedReservation;
     }
 
@@ -68,7 +76,7 @@ public class ReservationService {
 
     public void cancelReservation(Long reservationId, Long userId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej rezerwacji"));
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej rezerwacji"));
 
         if (!reservation.getCustomer().getId().equals(userId)) {
             throw new IllegalArgumentException("Użytkownik nie ma uprawnień do anulowania tej rezerwacji");
@@ -93,21 +101,21 @@ public class ReservationService {
     public List<Reservation> getReservationsByMassage(Long massageId) {
         MassageForCompany massage = massageRepository.findById(massageId)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego masażu"));
-        
+
         return reservationRepository.findByMassageId(massageId);
     }
 
     public List<Reservation> getReservationsByCustomer(Long customerId) {
         User customer = userRepository.findById(customerId)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego klienta"));
-        
+
         return reservationRepository.findByCustomerId(customerId);
     }
 
     public List<Reservation> getReservationsByEmployee(Long employeeId) {
         Employee employee = emplRepository.findById(employeeId)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego masażu"));
-        
+
         return reservationRepository.findByShiftAssignedEmployeeId(employeeId);
     }
 
