@@ -66,13 +66,12 @@
     </div>
 
     <div id="myTabContent">
-        <div [class.hidden]="activeTab !== 'employee'" class="p-2 rounded-lg bg-slate-50"
-            role="tabpanel">
-            <div #employeeTimelineContainer></div>
+        <div [class.hidden]="activeTab !== 'employee'" role="tabpanel">    
+            <div #employeeTimelineContainer id="employeeTimelineContainer"></div>
         </div>
         <div [class.hidden]="activeTab !== 'location'" class="p-2 rounded-lg bg-slate-50"
             role="tabpanel">
-            <div #locationTimelineContainer></div>
+            <div #locationTimelineContainer id="locationTimelineContainer"></div>
         </div>
     </div>
 </div>

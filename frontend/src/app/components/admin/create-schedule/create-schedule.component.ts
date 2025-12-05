@@ -57,8 +57,7 @@ export class CreateScheduleComponent {
     private formBuilder: FormBuilder
   ) {
     this.formModel = this.formBuilder.group({
-      startTime: [null, Validators.required],
-      endTime: [null, Validators.required]
+      startTime: [null, Validators.required]
     })
 
     this.currentCompany$.subscribe(c => {
@@ -91,14 +90,13 @@ export class CreateScheduleComponent {
     if (this.currentCompany != null && this.currentCompany?.id && this.formModel.valid) {
       this.isGenerating = true;
       const startDate = this.formModel.value.startTime;
-      const endDate = this.formModel.value.endTime;
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 6);
 
       const startDateStr = this.formatDate(startDate);
 
       const startDateTime = this.formatToISOStartDateTime(startDate);
       const endDateTime = this.formatToISOEndDateTime(endDate);
-
-      console.log("Generating shifts from ", startDateStr, " to ", endDateTime);
 
       this.scheduleService.generateShifts(this.currentCompany.id, startDateStr).pipe(
         switchMap(response => {
@@ -116,7 +114,6 @@ export class CreateScheduleComponent {
         next: (optimizeResponse) => {
           this.isOptimizing = false;
 
-          console.log("Optimization completed ", optimizeResponse.message, optimizeResponse.score);
           this.alertService.success(`${optimizeResponse.message}`);
           this.dialogRef.close();
         },

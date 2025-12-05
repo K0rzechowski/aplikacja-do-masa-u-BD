@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "vis-timeline/styles/vis-timeline-graph2d.css";
 
 body {
     @apply bg-slate-50 text-gray-900 font-sans;
@@ -17,7 +18,7 @@ body {
 }
 
 .btn-long-gray:hover {
-    @apply cursor-pointer bg-[#CCCDD7] ;
+    @apply cursor-pointer bg-[#CCCDD7];
 }
 
 .btn-sky {
@@ -45,9 +46,60 @@ body {
 }
 
 .splash {
-    @apply bg-[url(/bg-white.png)] bg-cover rounded-xl shadow-lg mx-auto w-full;    
+    @apply bg-[url(/bg-white.png)] bg-cover rounded-xl shadow-lg mx-auto w-full;
 }
 
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.vis-timeline {
+    border: 1px solid #e2e8f0 !important;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    border-radius: 8px;
+    background-color: #F8FAFC !important;
+    color: #1f2937 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+.vis-item {
+    border-color: transparent;
+    color: white;
+    font-size: 12px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.vis-item.vis-selected {
+    border-color: #3b82f6;
+    background-color: #3b82f6;
+    color: white;
+}
+
+.vis-time-axis .vis-text {
+    color: #374151 !important;
+}
+
+.vis-label {
+    color: #1f2937 !important;
+}
+
+.vis-item .badge {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}

@@ -7,24 +7,16 @@
         </button>
     </div>
     <mat-dialog-content>
-        <p class="mb-2">Wybierz okres (7 dni)</p>
         <form [formGroup]="formModel">
-            <div class="md:flex gap-2 mb-4">
-                <mat-form-field >
+            <label for="startTime" class="flex justify-center items-center">Wybierz datę rozpoczęcia tygodnia</label>
+            <div class="flex justify-center items-center mb-4">
+                <mat-form-field>
                     <mat-label>Data rozpoczęcia</mat-label>
                     <input matInput [matDatepicker]="startPicker" formControlName="startTime">
                     <mat-hint>DD/MM/YYYY</mat-hint>
                     <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
                 </mat-form-field>
-                <mat-datepicker #startPicker></mat-datepicker>
-                
-                <mat-form-field class=>
-                    <mat-label>Data zakończenia</mat-label>
-                    <input matInput [matDatepicker]="endPicker" formControlName="endTime">
-                    <mat-hint>DD/MM/YYYY</mat-hint>
-                    <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
-                </mat-form-field>
-                <mat-datepicker #endPicker></mat-datepicker>
+                <mat-datepicker #startPicker></mat-datepicker>      
             </div>
             
             <button 
