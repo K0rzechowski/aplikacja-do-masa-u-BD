@@ -43,4 +43,8 @@ public class Reservation {
     @OneToOne
     @JoinColumn(name = "shift_id")
     private Shift shift;
+
+    @ManyToOne()
+    @JoinColumn(name = "massage_id")
+    private MassageForCompany massage;
 }

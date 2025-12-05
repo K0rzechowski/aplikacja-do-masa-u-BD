@@ -9,7 +9,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import emino.backend.models.Admin;
+import emino.backend.models.Company;
 import emino.backend.models.Employee;
+import emino.backend.models.Shift;
+import emino.backend.models.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
@@ -43,7 +46,6 @@ public class EmailService {
     }
 
     public void sendHtmlPasswordEmail(Employee to, String password, String companyName) throws MessagingException {
-        
         String htmlTemplate = readTemplate("templates/passwordTemplate.html");
 
         MimeMessage message = emailSender.createMimeMessage();
@@ -62,8 +64,8 @@ public class EmailService {
 
         emailSender.send(message);
     }
+
     public void sendAdminPasswordEmail(Admin to, String password, String companyName) throws MessagingException {
-        
         String htmlTemplate = readTemplate("templates/adminTemplate.html");
 
         MimeMessage message = emailSender.createMimeMessage();
@@ -77,6 +79,27 @@ public class EmailService {
             .replace("${company}", companyName)
             .replace("${email}", to.getEmail())
             .replace("${password}", password);
+
+        message.setContent(htmlContent, "text/html; charset=utf-8");
+
+        emailSender.send(message);
+    }
+
+    public void sendReservationConfirmationEmail(User to, Company company, String massageName, Shift shift) throws MessagingException {
+        String htmlTemplate = readTemplate("templates/reservationTemplate.html");
+
+        MimeMessage message = emailSender.createMimeMessage();
+
+        message.setFrom("rekomendacjemasazy@gmail.com");
+        message.setRecipients(MimeMessage.RecipientType.TO, to.getEmail());
+        message.setSubject("Potwierdzenie utworzenia firmy");
+
+        String htmlContent = htmlTemplate
+            .replace("${name}", to.getName())
+            .replace("${massageName}", massageName)
+            .replace("${time}", shift.getStartTime().toString())
+            .replace("${location}", company.getName())
+            .replace("${city}", company.getCity());
 
         message.setContent(htmlContent, "text/html; charset=utf-8");
 

@@ -46,6 +46,9 @@ public class MassageForCompany {
     @OneToMany(mappedBy = "massage")
     private Set<Shift> shifts;
 
+    @OneToMany(mappedBy = "massage")
+    private Set<Reservation> reservations;
+
     @ManyToMany(mappedBy = "massagesToHandle")
     Set<Employee> employees;
 }
