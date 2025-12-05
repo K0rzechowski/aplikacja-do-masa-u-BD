@@ -1,0 +1,117 @@
+<div>
+    <h2 class="text-5xl text-center my-5">Zarezerwuj wizytę</h2>
+    <div class="md:flex py-3">
+        <div class="p-2">
+            <form [formGroup]="formModel" (ngSubmit)="submitForm()">
+                <mat-accordion class="example-headers-align">
+                    <mat-expansion-panel [expanded]="step() === 0" (opened)="setStep(0)" hideToggle>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title> Placówka </mat-panel-title>
+                            <mat-panel-description>
+                                Wybierz placówkę
+                                <mat-icon [ngStyle]="{'color':'#008081'}">location_city</mat-icon>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        
+                        <mat-form-field class="w-full">
+                            <mat-select formControlName="type">
+                                @for (company of allCompanies; track company ) {
+                                    <mat-option [value]="company"><span class="font-medium">{{ company.city }}</span> "{{ company.name }}"</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                        
+                        <mat-action-row>
+                            <button mat-button (click)="nextStep()">Przejdź dalej</button>
+                        </mat-action-row>
+                    </mat-expansion-panel>
+                    
+                    <mat-expansion-panel [expanded]="step() === 1" (opened)="setStep(1)" hideToggle>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title> Masaż </mat-panel-title>
+                            <mat-panel-description>
+                                Wybierz masaż
+                                <mat-icon [ngStyle]="{'color':'#008081'}">spa</mat-icon>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        
+                        <mat-form-field class="w-full">
+                            <mat-select formControlName="type">
+                                @for (massage of allMassages; track massage ) {
+                                    <mat-option [value]="massage">{{ massage.name }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                        
+                        <mat-action-row>
+                            <button mat-button (click)="prevStep()">Cofnij</button>
+                            <button mat-button (click)="nextStep()">Przejdź dalej</button>
+                        </mat-action-row>
+                    </mat-expansion-panel>
+                    
+                    <mat-expansion-panel [expanded]="step() === 2" (opened)="setStep(2)" hideToggle>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title> Masażysta </mat-panel-title>
+                            <mat-panel-description>
+                                Wybierz masażystę
+                                <mat-icon [ngStyle]="{'color':'#008081'}">person_apron</mat-icon>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        
+                        <mat-form-field class="w-full">
+                            <mat-select formControlName="type">
+                                @for (empl of allEmployees; track empl ) {
+                                    <mat-option [value]="empl">{{ empl.name }} {{ empl.surname }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    <mat-action-row>
+                        <button mat-button (click)="prevStep()">Cofnij</button>
+                        <button mat-button (click)="nextStep()">Przejdź dalej</button>
+                    </mat-action-row>
+                    </mat-expansion-panel>
+                    
+                    <mat-expansion-panel [expanded]="step() === 3" (opened)="setStep(3)" hideToggle>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title> Termin </mat-panel-title>
+                            <mat-panel-description>
+                                Wybierz datę oraz godzinę wizyty
+                                <mat-icon [ngStyle]="{'color':'#008081'}">date_range</mat-icon>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        
+                        <mat-form-field>
+                            <mat-label>Date</mat-label>
+                            <input matInput [matDatepicker]="picker" (focus)="picker.open()" readonly />
+                        </mat-form-field>
+                        <mat-datepicker #picker></mat-datepicker>
+                    
+                        <mat-action-row>
+                            <button mat-button (click)="prevStep()">Cofnij</button>
+                            <button mat-button (click)="nextStep()">Przejdź dalej</button>
+                        </mat-action-row>
+                    </mat-expansion-panel>
+                </mat-accordion> 
+            </form>
+        </div>
+        <div class="inline-block h-[700px] min-h-[1em] w-0.5 self-stretch bg-slate-200"></div>
+        <div class="p-2">
+            <div class="splash container p-5 ">
+                <p class="text-4xl mb-2">Podsumowanie</p>
+                <div>
+                    <p class="text-lg font-medium">Placówka:</p>
+                </div>
+                <div>
+                    <p class="text-lg font-medium">Masaż:</p>
+                </div>
+                <div>
+                    <p class="text-lg font-medium">Masażysta:</p>
+                </div>
+                <div>
+                    <p class="text-lg font-medium">Data i godzina:</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

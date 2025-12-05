@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import emino.backend.config.SecurityService;
 import emino.backend.dto.ReservationDto;
 import emino.backend.models.Reservation;
 import emino.backend.services.ReservationService;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class ReservationController {
     
     private final ReservationService reservationService;
+    private final SecurityService securityService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<ReservationDto>> getReservationsById(@PathVariable Long id) {
@@ -59,13 +61,15 @@ public class ReservationController {
     }
 
     @PutMapping("/cancel/{id}")
-    public ResponseEntity<Void> cancelReservation(@PathVariable Long id, Long userId) {
+    public ResponseEntity<Void> cancelReservation(@PathVariable Long id) {
+        Long userId = securityService.getCurrentUserId();
         reservationService.cancelReservation(id, userId);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/complete/{id}")
-    public ResponseEntity<Void> setReservationAsCompleted(@PathVariable Long id, Long employeeId) {
+    public ResponseEntity<Void> setReservationAsCompleted(@PathVariable Long id) {
+        Long employeeId = securityService.getCurrentUserId();
         reservationService.setReservationAsCompleted(id, employeeId);
         return ResponseEntity.ok().build();
     }
@@ -90,7 +94,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservationDtos);
     }
 
-    @GetMapping("/customer/{id}")
+    @GetMapping("/employee/{id}")
     public ResponseEntity<List<ReservationDto>> getReservationsByEmployee(@PathVariable Long id) {
         List<Reservation> reservations = reservationService.getReservationsByEmployee(id);
         List<ReservationDto> reservationDtos = reservations.stream()

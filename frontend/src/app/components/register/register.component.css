@@ -13,25 +13,21 @@
   border: none !important;
 }
 
-/* Calendar popup background */
 ::ng-deep .mat-datepicker-content {
     background-color: #e2e8f0 !important;
     color: #334155 !important;
   }
   
-  /* Selected date */
   ::ng-deep .mat-calendar-body-selected {
-    background-color: #0284c7 !important; /* blue-500 */
+    background-color: #0284c7 !important;
     color: white !important;
   }
   
-  /* Today’s date highlight */
   ::ng-deep .mat-calendar-body-today:not(.mat-calendar-body-selected) {
     border-color: #0284c7 !important;
     color: #0284c7 !important;
   }
   
-  /* Hovered dates */
   ::ng-deep .mat-calendar-body-cell:hover {
     background-color: #e2e8f0 !important;
   }

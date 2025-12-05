@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import emino.backend.exception.AccessDeniedException;
 import emino.backend.models.Admin;
+import emino.backend.models.User;
 import emino.backend.repositories.AdminRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -17,13 +18,30 @@ public class SecurityService {
     public Admin getCurrentAdmin() {
         Authentication authentication;
         authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new AccessDeniedException("Brak uwierzytelnienia");
         }
 
         String email = authentication.getName();
         return adminRepository.findByEmail(email).stream()
-                .findFirst()
-                .orElseThrow(() -> new AccessDeniedException("Nie znaleziono danego administratora"));
+            .findFirst()
+            .orElseThrow(() -> new AccessDeniedException("Nie znaleziono danego administratora"));
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication;
+        authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Brak uwierzytelnienia");
+        }
+
+        String email = authentication.getName();
+        return adminRepository.findByEmail(email).stream()
+            .findFirst()
+            .orElseThrow(() -> new AccessDeniedException("Nie znaleziono danego administratora"));
+    }
+
+    public Long getCurrentUserId() {
+        return getCurrentUser().getId();
     }
 }
