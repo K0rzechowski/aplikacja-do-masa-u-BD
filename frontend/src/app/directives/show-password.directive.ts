@@ -36,18 +36,4 @@ export class ShowPasswordDirective {
       this.appShowPasswordTooltip.show();
     }
   }
-
-  // @HostListener("mouseenter")
-  // onMouseEnter() {
-  //   if (this.labelEl && !this.isShown) {
-  //     this.renderer.setStyle(this.labelEl, 'visibility', 'visible');
-  //   }
-  // }
-
-  // @HostListener("mouseleave")
-  // onMouseLeave() {
-  //   if (this.labelEl && !this.isShown) {
-  //     this.renderer.setStyle(this.labelEl, 'visibility', 'hidden');
-  //   }
-  // }
 }

@@ -17,6 +17,7 @@ import { AvailabilityCalendarComponent } from './components/employee/availabilit
 import { ScheduleOptimizerComponent } from './components/schedule-optimizer/schedule-optimizer.component';
 import { EmployeesComponent } from './components/employees/employees.component';
 import { ReserveFormComponent } from './components/reserve-form/reserve-form.component';
+import { ReservationHistoryComponent } from './components/reservation-history/reservation-history.component';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
@@ -31,7 +32,8 @@ export const routes: Routes = [
       { path: 'massages', component: ManageMassagesComponent },
       { path: 'companySettings', component: CompanyFormsComponent },
       { path: 'availabilities', component: AvailabilityCalendarComponent},
-      { path: 'schedule', component: ScheduleOptimizerComponent}
+      { path: 'schedule', component: ScheduleOptimizerComponent},
+      { path: 'reservations', component: ReservationHistoryComponent }
     ]
   },
   { path: 'forCompanies', component: CompanyFormComponent },
@@ -39,6 +41,6 @@ export const routes: Routes = [
   { path: ':city/:name/massages', component: MassagesComponent },
   { path: ':city/:name/employees', component: EmployeesComponent },
   { path: ':city/:name/price', component: PriceListComponent },
-  { path: 'reservation', component: ReserveFormComponent },
+  { path: 'reservation', component: ReserveFormComponent, canActivate: [authGuard] },
 
 ];

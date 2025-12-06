@@ -8,12 +8,14 @@ import emino.backend.exception.AccessDeniedException;
 import emino.backend.models.Admin;
 import emino.backend.models.User;
 import emino.backend.repositories.AdminRepository;
+import emino.backend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class SecurityService {
     private final AdminRepository adminRepository;
+    private final UserRepository userRepository;
 
     public Admin getCurrentAdmin() {
         Authentication authentication;
@@ -24,8 +26,8 @@ public class SecurityService {
 
         String email = authentication.getName();
         return adminRepository.findByEmail(email).stream()
-            .findFirst()
-            .orElseThrow(() -> new AccessDeniedException("Nie znaleziono danego administratora"));
+                .findFirst()
+                .orElseThrow(() -> new AccessDeniedException("Nie znaleziono danego administratora"));
     }
 
     public User getCurrentUser() {
@@ -36,9 +38,8 @@ public class SecurityService {
         }
 
         String email = authentication.getName();
-        return adminRepository.findByEmail(email).stream()
-            .findFirst()
-            .orElseThrow(() -> new AccessDeniedException("Nie znaleziono danego administratora"));
+        return userRepository.findByEmail(email)
+            .orElseThrow(() -> new AccessDeniedException("Nie znaleziono danego użytkownika"));
     }
 
     public Long getCurrentUserId() {

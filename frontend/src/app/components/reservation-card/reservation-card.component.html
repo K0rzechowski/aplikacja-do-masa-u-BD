@@ -1,0 +1,29 @@
+@if (reservation) {
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden lg:max-w-2xl m-2">
+        <div class="p-4 md:flex md:items-start md:justify-between md:relative">
+            <div class="md:flex md:items-center">
+                <div class="mb-2 flex flex-col md:my-auto">
+                    <p [appStatusColor]="reservation.status" class="inline-block rounded-md px-2 py-1 text-sm font-semibold ring-1 text-center mb-2">{{ ReservationStatusLabels[reservation.status] }}</p>
+                    <div class="pr-4 bg-sky-200 p-2 rounded-lg text-center">
+                        <p class="text-4xl">{{ reservation.shift.startTime | date:'dd' }}</p>
+                        <p class="text-sm text-center">{{ formatDate(reservation.shift.startTime) }}</p>
+                    </div>
+                </div>
+                <div class="mb-2 md:ml-4 md:mb-0">
+                    <div class="uppercase tracking-wide text-sm text-slate-600 font-semibold">{{
+                        reservationData.massageForCompany.massage.name}}</div>
+                    <p class="mt-2 font-light">{{formatTime(reservation.shift.startTime)}} - {{
+                        formatTime(reservation.shift.endTime) }} </p>
+                    <p class="mt-2 font-light">{{ reservationData.shift.assignedEmployee.name }} {{
+                        reservationData.shift.assignedEmployee.surname }}</p>
+                    <p class="mt-2 font-light">{{ reservationData.shift.company.city }}, "{{
+                        reservationData.shift.company.name }}"</p>
+                    <p class="mt-2 font-light">{{ reservationData.shift.room.roomNumber }}</p>
+                </div>
+            </div>
+            <div class="lg:absolute lg:bottom-5 lg:right-5">
+                <button class="btn btn-sky" (click)="cancelReservation()">Anuluj rezerwację</button>
+            </div>
+        </div>
+    </div>
+}

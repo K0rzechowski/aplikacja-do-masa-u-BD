@@ -10,7 +10,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { AsyncPipe, NgStyle } from '@angular/common';
+import { AsyncPipe, DatePipe, NgStyle } from '@angular/common';
 import { MatDialogTitle } from '@angular/material/dialog';
 import { A11yModule } from '@angular/cdk/a11y';
 import { MatSelectModule } from '@angular/material/select';
@@ -30,7 +30,7 @@ import { Reservation, ReservationStatus } from '../../models/reservation';
 
 @Component({
   selector: 'app-reserve-form',
-  imports: [ReactiveFormsModule, MatExpansionModule, MatIconModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatDatepickerModule, NgStyle, MatButtonModule, ReactiveFormsModule, MatFormFieldModule, MatOptionModule, A11yModule, MatSelectModule, AsyncPipe, MatPaginatorModule],
+  imports: [ReactiveFormsModule, MatExpansionModule, MatIconModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatDatepickerModule, NgStyle, MatButtonModule, ReactiveFormsModule, MatFormFieldModule, MatOptionModule, A11yModule, MatSelectModule, AsyncPipe, MatPaginatorModule, DatePipe],
   templateUrl: './reserve-form.component.html',
   styleUrl: './reserve-form.component.css',
   providers: [provideNativeDateAdapter()],
@@ -45,19 +45,16 @@ export class ReserveFormComponent {
   allEmployees: Employee[] = [];
   shiftTimes: string[] = [];
 
-  // Pagination properties
   pageSize: number = 10;
   pageIndex: number = 0;
   totalShifts: number = 0;
   paginatedShiftTimes: string[] = [];
 
-  // Week grouping properties
   currentWeekShifts: OptimizedShift[] = [];
   nextWeekShifts: OptimizedShift[] = [];
   showNextWeek: boolean = false;
   allShifts: OptimizedShift[] = [];
 
-  // Map to store shift objects by their display string
   shiftMap: Map<string, OptimizedShift> = new Map();
 
   get currentUser$(): Observable<User | null> {
@@ -93,7 +90,7 @@ export class ReserveFormComponent {
 
     this.getCompanyChange();
     this.getMassageChange();
-    this.getEmployeeChange();      
+    this.getEmployeeChange();
   }
 
   getCompanyChange() {
@@ -146,7 +143,8 @@ export class ReserveFormComponent {
           const employeeName = `${employee.name} ${employee.surname}`;
 
           this.currentWeekShifts = result.currentWeekShifts.filter(shift => {
-            return shift.employeeName === employeeName;
+            const currentTime = new Date(Date.now()).getTime();
+            return new Date(shift.startTime).getTime() > currentTime && shift.employeeName === employeeName;
           });
 
           this.nextWeekShifts = result.nextWeekShifts.filter(shift => {
@@ -166,8 +164,8 @@ export class ReserveFormComponent {
           });
 
           this.updatePaginatedShifts();
-      });
-    } else {
+        });
+      } else {
         this.shiftTimes = [];
         this.paginatedShiftTimes = [];
         this.currentWeekShifts = [];
@@ -241,28 +239,28 @@ export class ReserveFormComponent {
   }
 
   submitForm() {
-      const selectedShift = this.getSelectedShift();
-      const selectedMassage = this.formModel.get('massage')?.value;
+    const selectedShift = this.getSelectedShift();
+    const selectedMassage = this.formModel.get('massage')?.value;
 
-      if (selectedShift && selectedMassage) {
-        const reservation: Partial<Reservation> = {
-          customer: this.currentUserValue!,
-          status: ReservationStatus.RESERVED,
-          shift: selectedShift,
-          massageForCompany: selectedMassage
-        };
+    if (selectedShift && selectedMassage) {
+      const reservation: Partial<Reservation> = {
+        customer: this.currentUserValue!,
+        status: ReservationStatus.RESERVED,
+        shift: selectedShift,
+        massageForCompany: selectedMassage
+      };
 
 
-        this.reservationService.createReservation(reservation).subscribe({
-          next: (response) => {
-            this.alertService.success('Rezerwacja utworzona pomyślnie');
-            this.formModel.reset();
-          },
-          error: (error) => {
-            console.error('Error creating reservation:', error);
-            this.alertService.error('Błąd podczas tworzenia rezerwacji');
-          }
-        });
+      this.reservationService.createReservation(reservation).subscribe({
+        next: (response) => {
+          this.alertService.success('Rezerwacja utworzona pomyślnie');
+          this.formModel.reset();
+        },
+        error: (error) => {
+          console.error('Error creating reservation:', error);
+          this.alertService.error('Błąd podczas tworzenia rezerwacji');
+        }
+      });
     } else {
       this.alertService.error('Wypełnij wszystkie pola formularza');
     }

@@ -38,7 +38,7 @@ export class SettingsComponent {
       this.currentUser = user;
       this.settingsChoices = [
         { label: 'Moje konto', route: 'profile' },
-        { label: 'Wizyty', route: 'appointments' }
+        { label: 'Wizyty', route: 'reservations' }
       ];
       if (authService.isAdmin() == true) {
         this.settingsChoices.push({ label: 'Zarządzaj pracownikami', route: 'employees' });

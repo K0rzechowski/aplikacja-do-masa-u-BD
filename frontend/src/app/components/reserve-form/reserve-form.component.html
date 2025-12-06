@@ -87,8 +87,8 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 @for (time of paginatedShiftTimes; track time) {
                                     <button type="button"
-                                        class="p-3 text-left border rounded-lg transition-all hover:bg-emerald-50"
-                                        [class.bg-emerald-50]="formModel.get('date')?.value === time"
+                                        class="p-3 text-left border rounded-lg transition-all hover:bg-slate-50"
+                                        [class.bg-slate-50]="formModel.get('date')?.value === time"
                                         [class.font-medium]="formModel.get('date')?.value === time"
                                         (click)="selectTimeSlot(time)">
                                         {{ time }}
@@ -112,7 +112,7 @@
                 </mat-accordion>
             </form>
         </div>
-        <div class="self-auto md:inline-block md:h-[700px] md:min-h-[1em] md:w-0.5 md:self-stretch md:bg-slate-200">
+        <div class="self-auto md:inline-block md:h-[690px] md:min-h-[1em] md:w-0.5 md:self-stretch md:bg-slate-200">
         </div>
         <div class="p-2 flex-1 lg:ms-10">
             <div class="bg-[#C0F3E4] bg-cover rounded-xl shadow-lg mx-auto w-full container p-5 ">
@@ -155,9 +155,9 @@
                     <div>
                         @if(currentUser$ | async; as currentUser) {
                             <p class="text-lg font-medium">Dane kontaktowe:</p>
-                            <p class="ml-2"><span class="font-medium">Imię i nazwisko:</span> {{currentUser.name}} {{currentUser.surname}}</p>
-                            <p class="ml-2"><span class="font-medium">Data urodzenia:</span> {{currentUser.dateOfBirth}}</p>
-                            <p class="ml-2"><span class="font-medium">E-mail:</span> {{currentUser.email}}</p>
+                            <p class="ml-2"><span class="font-medium">Imię i nazwisko:</span> {{ currentUser.name }} {{ currentUser.surname }}</p>
+                            <p class="ml-2"><span class="font-medium">Data urodzenia:</span> {{ currentUser.dateOfBirth | date:'dd/MM/yyyy' }}</p>
+                            <p class="ml-2"><span class="font-medium">E-mail:</span> {{ currentUser.email }}</p>
                         }
                     </div>
                 </div>

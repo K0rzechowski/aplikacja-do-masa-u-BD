@@ -92,7 +92,7 @@ public class EmailService {
 
         message.setFrom("rekomendacjemasazy@gmail.com");
         message.setRecipients(MimeMessage.RecipientType.TO, to.getEmail());
-        message.setSubject("Potwierdzenie utworzenia firmy");
+        message.setSubject("Potwierdzenie rezerwacji masażu");
 
         String htmlContent = htmlTemplate
             .replace("${name}", to.getName())
