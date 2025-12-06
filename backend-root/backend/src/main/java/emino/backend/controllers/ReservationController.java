@@ -61,7 +61,7 @@ public class ReservationController {
     }
 
     @PutMapping("/cancel/{id}")
-    public ResponseEntity<Void> cancelReservation(@PathVariable Long id) {
+    public ResponseEntity<Void> cancelReservation(@PathVariable Long id) throws MessagingException {
         Long userId = securityService.getCurrentUserId();
         reservationService.cancelReservation(id, userId);
         return ResponseEntity.ok().build();

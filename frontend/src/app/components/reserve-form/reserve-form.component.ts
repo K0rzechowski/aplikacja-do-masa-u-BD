@@ -158,7 +158,7 @@ export class ReserveFormComponent {
 
           this.shiftMap.clear();
           this.shiftTimes = this.allShifts.map(shift => {
-            const displayString = this.formatShiftTime(shift);
+            const displayString = this.formatDateTime(shift);
             this.shiftMap.set(displayString, shift);
             return displayString;
           });
@@ -203,30 +203,14 @@ export class ReserveFormComponent {
     this.paginatedShiftTimes = this.shiftTimes.slice(startIndex, endIndex);
   }
 
-  formatShiftTime(shift: OptimizedShift): string {
-    const startDate = new Date(shift.startTime);
-    const endDate = new Date(shift.endTime);
-
-    const dayNames = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
-    const dayName = dayNames[startDate.getDay()];
-
-    const dateStr = startDate.toLocaleDateString('pl-PL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-
-    const startTime = startDate.toLocaleTimeString('pl-PL', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
-    const endTime = endDate.toLocaleTimeString('pl-PL', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
-    return `${dayName}, ${dateStr} ${startTime} - ${endTime}`;
+  formatDateTime(shift: OptimizedShift): string {
+    const startTime = new Date(shift.startTime);
+    const endTime = new Date(shift.endTime);
+    
+    const formattedDate = new DatePipe('pl-PL').transform(startTime, 'fullDate');
+    const formattedStartTime = new DatePipe('pl-PL').transform(startTime, 'shortTime');
+    const formattedEndTime = new DatePipe('pl-PL').transform(endTime, 'shortTime');
+    return `${formattedDate} ${formattedStartTime} - ${formattedEndTime}`;
   }
 
   selectTimeSlot(time: string) {

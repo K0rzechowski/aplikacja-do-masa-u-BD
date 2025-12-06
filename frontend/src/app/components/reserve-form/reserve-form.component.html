@@ -82,20 +82,20 @@
                         </mat-expansion-panel-header>
 
                         @if (paginatedShiftTimes.length > 0) {
-                        <div class="mb-4">
-                            <p class="text-sm text-slate-600 mb-3">Dostępne terminy:</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                @for (time of paginatedShiftTimes; track time) {
-                                    <button type="button"
-                                        class="p-3 text-left border rounded-lg transition-all hover:bg-slate-50"
-                                        [class.bg-slate-50]="formModel.get('date')?.value === time"
-                                        [class.font-medium]="formModel.get('date')?.value === time"
-                                        (click)="selectTimeSlot(time)">
-                                        {{ time }}
-                                    </button>
-                                }
+                            <div class="mb-4">
+                                <p class="text-sm text-slate-600 mb-3">Dostępne terminy:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    @for (time of paginatedShiftTimes; track time) {
+                                        <button type="button"
+                                            class="p-3 text-left border rounded-lg transition-all hover:bg-slate-50"
+                                            [class.bg-slate-50]="formModel.get('date')?.value === time"
+                                            [class.font-medium]="formModel.get('date')?.value === time"
+                                            (click)="selectTimeSlot(time)">
+                                            {{ time }}
+                                        </button>
+                                    }
+                                </div>
                             </div>
-                        </div>
 
                         @if (totalShifts > pageSize) {
                             <mat-paginator class="minimal-paginator" [length]="totalShifts" [pageSize]="pageSize" [pageIndex]="pageIndex" [hidePageSize]="true" (page)="onPageChange($event)">

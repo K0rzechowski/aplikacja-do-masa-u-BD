@@ -74,9 +74,12 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
-    public void cancelReservation(Long reservationId, Long userId) {
+    public void cancelReservation(Long reservationId, Long userId) throws MessagingException {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej rezerwacji"));
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej rezerwacji"));
+
+        User customer = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego użytkownika"));
 
         if (!reservation.getCustomer().getId().equals(userId)) {
             throw new IllegalArgumentException("Użytkownik nie ma uprawnień do anulowania tej rezerwacji");
@@ -84,6 +87,7 @@ public class ReservationService {
 
         reservation.setStatus(Status.CANCELLED);
         reservationRepository.save(reservation);
+        emailService.sendCancelReservationEmail(customer, reservation.getShift().getCompany(), reservation.getMassage().getMassage().getName(), reservation.getShift());
     }
 
     public void setReservationAsCompleted(Long reservationId, Long employeeId) {

@@ -105,4 +105,25 @@ public class EmailService {
 
         emailSender.send(message);
     }
+
+    public void sendCancelReservationEmail(User to, Company company, String massageName, Shift shift) throws MessagingException {
+        String htmlTemplate = readTemplate("templates/cancelReservationTemplate.html");
+
+        MimeMessage message = emailSender.createMimeMessage();
+
+        message.setFrom("rekomendacjemasazy@gmail.com");
+        message.setRecipients(MimeMessage.RecipientType.TO, to.getEmail());
+        message.setSubject("Potwierdzenie anulowania rezerwacji masażu");
+
+        String htmlContent = htmlTemplate
+            .replace("${name}", to.getName())
+            .replace("${massageName}", massageName)
+            .replace("${time}", shift.getStartTime().toString())
+            .replace("${location}", company.getName())
+            .replace("${city}", company.getCity());
+
+        message.setContent(htmlContent, "text/html; charset=utf-8");
+
+        emailSender.send(message);
+    }
 }
