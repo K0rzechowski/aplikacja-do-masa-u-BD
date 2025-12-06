@@ -10,10 +10,11 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateScheduleComponent } from '../admin/create-schedule/create-schedule.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-schedule-optimizer',
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatTabsModule],
   templateUrl: './schedule-optimizer.component.html',
   styleUrl: './schedule-optimizer.component.css'
 })
@@ -37,6 +38,7 @@ export class ScheduleOptimizerComponent {
   @ViewChild('locationTimelineContainer') locationTimelineContainer!: ElementRef;
 
   activeTab: 'employee' | 'location' = 'employee';
+  selectedTabIndex: number = 0;
 
   private employeeTimeline: any;
   private locationTimeline: any;
@@ -64,11 +66,13 @@ export class ScheduleOptimizerComponent {
       } else {
         this.loadSchedule(this.currentWeekStart, this.currentWeekEnd);
       }
-      
-      setTimeout(() => {
-        if (this.employeeTimeline) this.employeeTimeline.redraw();
-        if (this.locationTimeline) this.locationTimeline.redraw();
-      }, 100);
+
+      if (this.employeeTimeline) {
+        this.employeeTimeline.redraw();
+      }
+      if (this.locationTimeline) {  
+        this.locationTimeline.redraw();
+      }
     });
   }
 
@@ -312,11 +316,16 @@ export class ScheduleOptimizerComponent {
     return this.optimizedShifts.length > 0;
   }
 
-  setActiveTab(tab: 'employee' | 'location') {
-    this.activeTab = tab;
+  onTabChange(index: number) {
+    this.selectedTabIndex = index;
+    this.activeTab = index === 0 ? 'employee' : 'location';
     setTimeout(() => {
-      if (this.employeeTimeline) this.employeeTimeline.redraw();
-      if (this.locationTimeline) this.locationTimeline.redraw();
-    });
+      if (this.employeeTimeline) {
+        this.employeeTimeline.redraw();
+      }
+      if (this.locationTimeline) {  
+        this.locationTimeline.redraw();
+      }
+    }, 100);
   }
 }

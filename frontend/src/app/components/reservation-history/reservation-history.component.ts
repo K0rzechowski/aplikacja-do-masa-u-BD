@@ -50,7 +50,6 @@ export class ReservationHistoryComponent {
       if (reservation.status === 'CANCELLED') {
         this.cancelledReservations.push(reservation);
       }
-      console.log('Cancelled Reservations:', this.cancelledReservations);
     });
   }
 
@@ -61,7 +60,6 @@ export class ReservationHistoryComponent {
       if (reservationDate < currentDate && reservation.status !== 'CANCELLED') {
         this.pastReservations.push(reservation);
       }
-      console.log('Past Reservations:', this.pastReservations);
     });
   }
 
@@ -72,16 +70,12 @@ export class ReservationHistoryComponent {
       if (reservationDate >= currentDate && reservation.status !== 'CANCELLED') {
         this.upcomingReservations.push(reservation);
       }
-      console.log('Upcoming Reservations:', this.upcomingReservations);
     });
   }
 
   loadReservations() {
-    console.log('Loading reservations for user:', this.currentUserValue);
     if (this.currentUserValue?.id) {
-
       this.reservationService.getReservationsByCustomer(this.currentUserValue?.id!).subscribe(data => {
-        console.log('All Reservations:', data);
         this.loadCancelledReservations(data);
         this.loadPastReservations(data);
         this.loadUpcomingReservations(data);
@@ -91,7 +85,6 @@ export class ReservationHistoryComponent {
   }
 
   onReservationCancelled(reservationId: string) {
-    // Remove from upcoming reservations
     const upcomingIndex = this.upcomingReservations.findIndex(r => r.id === reservationId);
     if (upcomingIndex !== -1) {
       const cancelledReservation = this.upcomingReservations.splice(upcomingIndex, 1)[0];
@@ -99,11 +92,19 @@ export class ReservationHistoryComponent {
       return;
     }
 
-    // Remove from past reservations
     const pastIndex = this.pastReservations.findIndex(r => r.id === reservationId);
     if (pastIndex !== -1) {
       const cancelledReservation = this.pastReservations.splice(pastIndex, 1)[0];
       this.cancelledReservations.push(cancelledReservation);
+    }
+  }
+
+  onReservationCompleted(reservationId: string) {
+    const upcomingIndex = this.pastReservations.findIndex(r => r.id === reservationId);
+    if (upcomingIndex !== -1) {
+      const completedReservation = this.pastReservations.splice(upcomingIndex, 1)[0];
+      this.pastReservations.push(completedReservation);
+      return;
     }
   }
 }

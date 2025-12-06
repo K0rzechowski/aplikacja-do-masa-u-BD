@@ -18,6 +18,7 @@ import { ScheduleOptimizerComponent } from './components/schedule-optimizer/sche
 import { EmployeesComponent } from './components/employees/employees.component';
 import { ReserveFormComponent } from './components/reserve-form/reserve-form.component';
 import { ReservationHistoryComponent } from './components/reservation-history/reservation-history.component';
+import { ManageReservationsComponent } from './components/employee/manage-reservations/manage-reservations.component';
 
 export const routes: Routes = [
   { path: '', component:MainPageComponent },
@@ -31,9 +32,10 @@ export const routes: Routes = [
       { path: 'employees', component: ManageEmployeesComponent },
       { path: 'massages', component: ManageMassagesComponent },
       { path: 'companySettings', component: CompanyFormsComponent },
-      { path: 'availabilities', component: AvailabilityCalendarComponent},
-      { path: 'schedule', component: ScheduleOptimizerComponent},
-      { path: 'reservations', component: ReservationHistoryComponent }
+      { path: 'availabilities', component: AvailabilityCalendarComponent },
+      { path: 'schedule', component: ScheduleOptimizerComponent },
+      { path: 'reservations', component: ReservationHistoryComponent },
+      { path: 'manageReservations', component: ManageReservationsComponent }
     ]
   },
   { path: 'forCompanies', component: CompanyFormComponent },

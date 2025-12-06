@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { Reservation } from '../models/reservation';
+import { NoteFromVisit } from '../models/note-from-visit';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ import { Reservation } from '../models/reservation';
 export class ReservationService {
 
   private baseUrl = `${environment.baseUrl}/reservations`;
+  private notesUrl = `${environment.baseUrl}/notes`;
 
   constructor(
     private httpClient: HttpClient
@@ -54,4 +56,33 @@ export class ReservationService {
   getReservationByShift(shiftId: string): Observable<Reservation> {
     return this.httpClient.get<Reservation>(`${this.baseUrl}/shift/${shiftId}`);
   }
+
+  createNote(note: Partial<NoteFromVisit>): Observable<NoteFromVisit> {
+    return this.httpClient.post<NoteFromVisit>(`${this.notesUrl}/create`, note);
+  }
+
+  getNoteById(id: string): Observable<NoteFromVisit> {
+    return this.httpClient.get<NoteFromVisit>(`${this.notesUrl}/${id}`);
+  }
+
+  removeNote(id: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.notesUrl}/remove/${id}`);
+  }
+
+  updateNote(id: string, note: Partial<NoteFromVisit>): Observable<NoteFromVisit> {
+    return this.httpClient.put<NoteFromVisit>(`${this.notesUrl}/update/${id}`, note);
+  }
+
+  getNoteByReservation(reservationId: string): Observable<NoteFromVisit> {
+    return this.httpClient.get<NoteFromVisit>(`${this.notesUrl}/reservation/${reservationId}`);
+  }
+
+  getNotesByDate(dateOfCreation: string): Observable<NoteFromVisit[]> {
+    return this.httpClient.get<NoteFromVisit[]>(`${this.notesUrl}/date?dateOfCreation=${dateOfCreation}`);
+  }
+
+  getNotesByCustomer(customerId: string): Observable<NoteFromVisit[]> {
+    return this.httpClient.get<NoteFromVisit[]>(`${this.notesUrl}/customer/${customerId}`);
+  }
 }
+

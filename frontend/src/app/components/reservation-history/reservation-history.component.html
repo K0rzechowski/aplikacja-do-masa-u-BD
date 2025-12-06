@@ -2,7 +2,7 @@
 <mat-tab-group>
     <mat-tab label="Nadchodzące wizyty">
         @for (res of upcomingReservations; track res) {
-            <app-reservation-card [reservation]="res" (reservationCancelled)="onReservationCancelled($event)"></app-reservation-card>
+            <app-reservation-card [reservation]="res" (reservationCancelled)="onReservationCancelled($event)" (reservationCancelled)="onReservationCompleted($event)"></app-reservation-card>
         } @empty {
             <p class="text-center text-slate-600 col-span-4 p-2">Brak nadchodzących wizyt.</p>
         }

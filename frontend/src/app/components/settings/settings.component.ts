@@ -48,6 +48,7 @@ export class SettingsComponent {
       } else if(authService.isEmployee() == true) {
         this.settingsChoices.push({ label: 'Zarządzaj dostępnością na dzień', route: 'availabilities' });
         this.settingsChoices.push({ label: 'Grafiki', route: 'schedule' });
+        this.settingsChoices.push({ label: 'Zarządzaj rezerwacjami użytkowników', route: 'manageReservations' });
       }
     });
   }

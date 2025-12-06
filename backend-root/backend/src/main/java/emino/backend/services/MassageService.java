@@ -55,7 +55,6 @@ public class MassageService {
         return Optional.empty();
     } 
 
-    // tu ma zwrócić MassageForCompany
     public List<MassageForCompany> getMassagesBySymptom(Long symptomId) {
         var symptom = symptomRepository.findById(symptomId)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego symptomu"));
