@@ -1,6 +1,7 @@
 package emino.backend.models;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -11,7 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,8 +50,8 @@ public class Shift {
     private Employee assignedEmployee;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "shift")
-    private Reservation reservation;
+    @OneToMany(mappedBy = "shift")
+    private Set<Reservation> reservation;
 
     @ManyToOne
     @JoinColumn(name = "company_id")

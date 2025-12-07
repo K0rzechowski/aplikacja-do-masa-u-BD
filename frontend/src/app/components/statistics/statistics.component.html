@@ -1,0 +1,43 @@
+
+<p class="text-4xl mb-2">Statystki</p>
+<p class="text-lg">Przeglądaj statystyki twojej firmy</p>
+<div class="my-5">
+    <!-- <div class="flex"> -->
+        <div>
+            <div class="flex justify-between">
+                <p class="text-medium mb-2">Rezerwacje według pracowników</p>
+                <div class="flex items-center gap-4">
+                    <mat-icon (click)="prev()" class="px-2 cursor-pointer" [ngStyle]="{'color':'#008081'}">arrow_back_ios</mat-icon>
+                    <span class="text-center text-emerald-900 justify-self-auto">{{ formatDate(current) }}</span>
+                    <mat-icon (click)="next()" class="cursor-pointer" [ngStyle]="{'color':'#008081'}">arrow_forward_ios</mat-icon>
+                </div>
+            </div>
+            <div class="2xl:flex 2xl:justify-between" >
+                <div class="md:w-xl">
+                    <canvas
+                        baseChart
+                        [data]="barChartEmployeeData"
+                        [options]="barChartOptions"
+                        [type]="barChartType"
+                        (chartClick)="chartEmployeeClicked($event)"
+                    >
+                    </canvas>
+                </div>
+                <div class="max-w-3xs justify-self-auto">
+                    @if (showPieChartEmployee) {
+                        <canvas
+                            baseChart
+                            [data]="pieChartEmployeeData"
+                            [type]="pieChartEmployeeType"
+                            [options]="pieChartOptions"
+                        >
+                        </canvas>
+                    }
+                </div>
+            </div>
+        </div>
+        <div>
+
+        </div>
+    </div>
+<!-- </div> -->

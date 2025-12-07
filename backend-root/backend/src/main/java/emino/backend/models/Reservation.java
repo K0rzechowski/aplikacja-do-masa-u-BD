@@ -40,7 +40,7 @@ public class Reservation {
     @OneToOne(mappedBy = "reservation")
     private NoteFromVisit note;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "shift_id")
     private Shift shift;
 

@@ -31,9 +31,10 @@ export class StatusColorDirective implements OnChanges {
       case ReservationStatus.RESERVED:
       case 'RESERVED':
         newClasses = [
-          'bg-green-400/10',
-          'text-green-600',
-          'ring-green-400/20'
+          'bg-blue-400/10',
+          'text-blue-400',
+          'ring-blue-400/20'
+          
         ];
         break;
       case ReservationStatus.CANCELLED:
@@ -47,9 +48,9 @@ export class StatusColorDirective implements OnChanges {
       case ReservationStatus.COMPLETED:
       case 'COMPLETED':
         newClasses = [
-          'bg-blue-400/10',
-          'text-blue-400',
-          'ring-blue-400/20'
+          'bg-green-400/10',
+          'text-green-600',
+          'ring-green-400/20'
         ];
         break;
       default:

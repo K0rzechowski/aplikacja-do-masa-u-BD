@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import emino.backend.dto.ReservationDto;
+import emino.backend.exception.DuplicateReservationException;
 import emino.backend.mail.EmailService;
 import emino.backend.models.Employee;
 import emino.backend.models.MassageForCompany;
@@ -49,6 +50,10 @@ public class ReservationService {
     }
 
     public Reservation createReservation(ReservationDto request) throws MessagingException {
+        if (reservationRepository.findByStatusAndShiftId(request.getStatus(), request.getShift().getId()).isPresent()) {
+            throw new DuplicateReservationException("Dana wizyta już została zarezerwowana");
+        }
+
         User customer = userRepository.findById(request.getCustomer().getId())
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
 

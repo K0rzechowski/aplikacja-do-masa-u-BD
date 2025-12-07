@@ -8,6 +8,8 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.sun.jdi.request.DuplicateRequestException;
+
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,6 +33,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateCompanyException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateCompanyException(DuplicateCompanyException ex) {
         ErrorResponse errorResponse = ErrorResponse.builder(ex, HttpStatus.CONFLICT, ex.getMessage())
+            .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(DuplicateRequestException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateReservationException(DuplicateRequestException ex) {
+        ErrorResponse errorResponse = ErrorResponse.builder(ex, HttpStatus.CONFLICT, "Dana wizyta już została zarezerwowana")
             .build();
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);

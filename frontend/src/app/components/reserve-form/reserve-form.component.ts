@@ -233,16 +233,14 @@ export class ReserveFormComponent {
         shift: selectedShift,
         massageForCompany: selectedMassage
       };
-
-
+      
       this.reservationService.createReservation(reservation).subscribe({
         next: (response) => {
           this.alertService.success('Rezerwacja utworzona pomyślnie');
           this.formModel.reset();
         },
-        error: (error) => {
-          console.error('Error creating reservation:', error);
-          this.alertService.error('Błąd podczas tworzenia rezerwacji');
+        error: (error: Error) => {
+          this.alertService.error(error.message);
         }
       });
     } else {

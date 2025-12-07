@@ -1,3 +1,3 @@
 export const AUTH_ROUTES =  ['/settings', '/settings/profile', '/reservation'];
 export const EMPLOYEE_ROUTES =  ['/settings/manageReservations', '/settings/schedule', '/settings/availabilities'];
-export const ADMIN_ROUTES = ['/settings/employees', '/settings/massages', '/settings/companySettings', '/settings/schedule'];
+export const ADMIN_ROUTES = ['/settings/employees', '/settings/massages', '/settings/companySettings', '/settings/schedule', '/settings/statistics'];

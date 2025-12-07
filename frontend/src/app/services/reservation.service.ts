@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { Reservation } from '../models/reservation';
 import { NoteFromVisit } from '../models/note-from-visit';
 
@@ -22,7 +22,21 @@ export class ReservationService {
   }
 
   createReservation(reservation: Partial<Reservation>): Observable<Reservation> {
-    return this.httpClient.post<Reservation>(`${this.baseUrl}/create`, reservation);
+    return this.httpClient.post<Reservation>(`${this.baseUrl}/create`, reservation).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Nie utworzono rezerwacji';
+        
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.status === 409 ) {
+          errorMessage = 'Dana wizyta już została zarezerwowana';
+        } else if (error.status >= 500) {
+          errorMessage = 'Wystąpił błąd serwera';
+        }
+        
+        return throwError(() => new Error(errorMessage));
+      })
+    );
   }
 
   getReservationsByCompany(companyId: string): Observable<Reservation[]> {
