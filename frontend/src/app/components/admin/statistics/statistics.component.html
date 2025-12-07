@@ -1,0 +1,63 @@
+
+<p class="text-4xl mb-2">Statystki</p>
+<p class="text-lg">Przeglądaj statystyki twojej firmy</p>
+<div class="my-5">
+    <div class="flex justify-between">
+        <p class="text-medium font-semibold mb-2">Rezerwacje według pracowników</p>
+        <div class="flex items-center gap-4 justify-end">
+            <mat-icon (click)="prev()" class="px-2 cursor-pointer" [ngStyle]="{'color':'#008081'}">arrow_back_ios</mat-icon>
+            <span class="text-center justify-self-auto">{{ formatDate(current) }}</span>
+            <mat-icon (click)="next()" class="cursor-pointer" [ngStyle]="{'color':'#008081'}">arrow_forward_ios</mat-icon>
+        </div>
+    </div>
+    <div class="bg-slate-100 rounded my-2 p-2 2xl:flex 2xl:justify-between">
+        <div class="md:w-lg">
+            <canvas
+                baseChart
+                [data]="barChartEmployeeData"
+                [options]="barChartOptions"
+                [type]="barChartType"
+                (chartClick)="chartEmployeeClicked($event)"
+            >
+            </canvas>
+        </div>
+        <div class="max-w-3xs justify-self-auto">
+            @if (showPieChartEmployee) {
+                <canvas
+                    baseChart
+                    [data]="pieChartEmployeeData"
+                    [type]="pieChartType"
+                    [options]="pieChartOptions"
+                >
+                </canvas>
+            }
+        </div>
+    </div>
+    <div class="py-2">
+        <p class="text-medium text-right font-semibold mb-3">Rezerwacje według typów masaży</p>
+        <div class="bg-slate-100 rounded my-2 p-2 2xl:flex 2xl:justify-between">
+            <div class="max-w-3xs justify-self-auto">
+                @if (showPieChartMassage) {
+                    <canvas
+                    baseChart
+                    [data]="pieChartMassageData"
+                    [type]="pieChartType"
+                    [options]="pieChartOptions"
+                    >
+                </canvas>
+            }
+            </div>
+            <div class="md:w-lg">
+                <canvas
+                baseChart
+                [data]="barChartMassageData"
+                [options]="barChartOptions"
+                [type]="barChartType"
+                (chartClick)="chartMassageClicked($event)"
+                >
+            </canvas>
+        </div>
+    </div>
+</div>
+<app-finance-chart [currentCompanyId]="currentUserValue?.companyId"></app-finance-chart>
+</div>

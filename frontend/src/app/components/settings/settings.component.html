@@ -1,8 +1,8 @@
 
-<div class=" mx-auto w-full flex justify-center items-center py-10 lg:max-w-3/4">
+<div class="mx-auto w-full flex justify-center items-center py-10 2xl:max-w-3/4">
     <div class="container bg-[#fff] rounded-xl shadow-lg">
-        <div class="w-full md:grid grid-cols-4 min-h-[500px]">
-            <div class="my-5 mx-5 md:ml-5 col-span-1 flex flex-col">
+        <div class="w-full md:grid md:grid-cols-4 2xl:grid-cols-5 min-h-[500px]">
+            <div class="my-5 md:ml-5 col-span-1 flex flex-col">
                 <p class="text-2xl mb-2">{{(currentUser$ | async)?.name}} {{(currentUser$ | async)?.surname}} </p>
                 <ul class="bg-[#C8F2EA] rounded-md flex-1 flex flex-col">
                     @for(choice of settingsChoices; track $index) {
@@ -11,7 +11,7 @@
                     <li class="p-2 top-0 hover:bg-emerald-300 rounded-md mt-auto" (click)="logout()">Wyloguj się</li>
                 </ul>
             </div>
-            <div class="col-span-3 p-5">
+            <div class="md:col-span-3 2xl:col-span-4 p-5">
                 <router-outlet></router-outlet>
             </div>
         </div>

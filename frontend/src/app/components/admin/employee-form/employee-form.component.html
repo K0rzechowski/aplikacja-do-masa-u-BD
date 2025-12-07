@@ -60,7 +60,6 @@
                     <mat-datepicker-toggle matIconSuffix [for]="mobilePicker" class="md:hidden"></mat-datepicker-toggle>
                 </div>
         
-                <!-- Mobile: only icon -->
                 <div class="block md:hidden">
                     <mat-form-field appearance="outline" class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
                         <input matInput [matDatepicker]="mobilePicker" formControlName="dateOfBirth" placeholder="DD/MM/YYYY">
@@ -68,7 +67,6 @@
                     <mat-datepicker #mobilePicker touchUi></mat-datepicker>
                 </div>
                 
-                <!-- Desktop: full input -->
                 <div class="hidden md:block">
                     <mat-form-field appearance="outline" class="date-input w-full bg-slate-300 p-2 rounded">
                         <mat-label>Data urodzenia</mat-label>

@@ -38,16 +38,18 @@ export class SettingsComponent {
       this.currentUser = user;
       this.settingsChoices = [
         { label: 'Moje konto', route: 'profile' },
-        { label: 'Wizyty', route: 'appointments' }
+        { label: 'Wizyty', route: 'reservations' }
       ];
       if (authService.isAdmin() == true) {
         this.settingsChoices.push({ label: 'Zarządzaj pracownikami', route: 'employees' });
         this.settingsChoices.push({ label: 'Zarządzaj masażami', route: 'massages' });
         this.settingsChoices.push({ label: 'Zarządzaj swoją firmą', route: 'companySettings' });
         this.settingsChoices.push({ label: 'Zarządzaj grafikami', route: 'schedule' });
+        this.settingsChoices.push({ label: 'Statystyki', route: 'statistics' });
       } else if(authService.isEmployee() == true) {
         this.settingsChoices.push({ label: 'Zarządzaj dostępnością na dzień', route: 'availabilities' });
         this.settingsChoices.push({ label: 'Grafiki', route: 'schedule' });
+        this.settingsChoices.push({ label: 'Zarządzaj rezerwacjami klientów', route: 'manageReservations' });
       }
     });
   }

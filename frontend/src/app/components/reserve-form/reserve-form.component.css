@@ -1,0 +1,36 @@
+.example-headers-align .mat-expansion-panel {
+    background-color: #E2E8F0;
+}
+
+.example-headers-align .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+}
+  
+.example-headers-align .mat-mdc-form-field + .mat-mdc-form-field {
+    margin-left: 8px;
+}
+
+::ng-deep .mat-mdc-select-panel {
+    background-color: #F8FAFC !important;
+}
+
+::ng-deep .mdc-text-field--filled {
+    background-color: #F8FAFC !important;
+}
+
+::ng-deep .minimal-paginator {
+    background-color: #E2E8F0 !important;
+    font-size: 0.875rem;
+}
+
+::ng-deep .minimal-paginator .mat-mdc-paginator-container {
+    min-height: auto;
+    justify-content: center;
+}
+
+::ng-deep .minimal-paginator .mat-mdc-icon-button {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+}

@@ -1,8 +1,7 @@
 package emino.backend.models;
 
 public enum Status {
-    PENDING,
-    CONFIRMED,
+    RESERVED,
     CANCELLED,
     COMPLETED
 }

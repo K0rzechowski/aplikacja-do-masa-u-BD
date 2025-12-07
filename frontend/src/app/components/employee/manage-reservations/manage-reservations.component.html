@@ -1,0 +1,25 @@
+<p class="text-4xl mb-4">Zarządzaj rezerwacjami klientów</p>
+<p class="text-lg mb-4">Przeglądaj, edytuj i dodaj notatki do rezerwacji klientów</p>
+<mat-tab-group>
+    <mat-tab label="Nadchodzące wizyty">
+        @for (res of upcomingReservations; track res) {
+            <app-reservation-card [reservation]="res" [isEmployee]="true" (reservationCancelled)="onReservationCancelled($event)" (reservationCompleted)="onReservationCompleted($event)"></app-reservation-card>
+        } @empty {
+            <p class="text-center text-slate-600 col-span-4 p-2">Brak nadchodzących wizyt.</p>
+        }
+    </mat-tab>
+    <mat-tab label="Wykonane wizyty">
+        @for (res of pastReservations; track res) {
+            <app-reservation-card [reservation]="res" [isEmployee]="true" (reservationCancelled)="onReservationCancelled($event)" (reservationCompleted)="onReservationCompleted($event)"></app-reservation-card>
+        } @empty {
+            <p class="text-center text-slate-600 col-span-4 p-2">Brak przeszłych wizyt.</p>
+        }
+    </mat-tab>
+    <mat-tab label="Anulowane wizyty">
+        @for (res of cancelledReservations; track res) {
+            <app-reservation-card [reservation]="res" [isEmployee]="true"></app-reservation-card>
+        } @empty {
+            <p class="text-center text-slate-600 col-span-4 p-2">Brak anulowanych wizyt.</p>
+        }
+    </mat-tab>
+</mat-tab-group>

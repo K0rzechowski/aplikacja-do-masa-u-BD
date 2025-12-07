@@ -2,6 +2,9 @@ package emino.backend.models;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,7 +35,7 @@ public class MassageForCompany {
     @ManyToOne
     @JoinColumn(name = "massage_id", nullable = false)
     private Massage massage;
-    
+
     @Column(nullable = false)
     private int price;
 
@@ -41,11 +44,18 @@ public class MassageForCompany {
 
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = false)
+    @JsonBackReference
     private Company company;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "massage")
     private Set<Shift> shifts;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "massage")
+    private Set<Reservation> reservations;
+
+    @JsonIgnore
     @ManyToMany(mappedBy = "massagesToHandle")
     Set<Employee> employees;
 }

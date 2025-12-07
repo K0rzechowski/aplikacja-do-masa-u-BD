@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject, ElementRef, ViewChild } from '@angular/core';
-
-declare var vis: any;
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Timeline } from 'vis-timeline/peer';
+import { DataSet } from 'vis-data/peer';
 import { OptimizedShift } from '../../models/optaplanner/optimized-shifts';
 import { ScheduleService } from '../../services/schedule.service';
 import { AlertService } from '../../services/alert.service';
@@ -10,10 +10,11 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateScheduleComponent } from '../admin/create-schedule/create-schedule.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-schedule-optimizer',
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatTabsModule],
   templateUrl: './schedule-optimizer.component.html',
   styleUrl: './schedule-optimizer.component.css'
 })
@@ -37,6 +38,7 @@ export class ScheduleOptimizerComponent {
   @ViewChild('locationTimelineContainer') locationTimelineContainer!: ElementRef;
 
   activeTab: 'employee' | 'location' = 'employee';
+  selectedTabIndex: number = 0;
 
   private employeeTimeline: any;
   private locationTimeline: any;
@@ -56,13 +58,22 @@ export class ScheduleOptimizerComponent {
   }
 
   ngAfterViewInit() {
-    this.initTimelines();
-    
-    if (this.isEmployee) {
-      this.loadCurrentEmployeeSchedule();
-    } else {
-      this.loadSchedule(this.currentWeekStart, this.currentWeekEnd);
-    }
+    setTimeout(() => {
+      this.initTimelines();
+
+      if (this.isEmployee) {
+        this.loadCurrentEmployeeSchedule();
+      } else {
+        this.loadSchedule(this.currentWeekStart, this.currentWeekEnd);
+      }
+
+      if (this.employeeTimeline) {
+        this.employeeTimeline.redraw();
+      }
+      if (this.locationTimeline) {  
+        this.locationTimeline.redraw();
+      }
+    });
   }
 
   loadCurrentEmployeeSchedule() {
@@ -85,6 +96,32 @@ export class ScheduleOptimizerComponent {
           },
           error: (err) => {
             console.error('Failed to load employee schedule', err);
+          }
+        });
+      }
+    });
+  }
+
+  loadSchedule(startDate?: string, endDate?: string) {
+    const start = startDate || this.currentWeekStart;
+    const end = endDate || this.currentWeekEnd;
+
+    this.authService.currentUser.subscribe(user => {
+      if (user && user.companyId) {
+        const startDateTime = new Date(start);
+        startDateTime.setHours(0, 0, 0, 0);
+        const endDateTime = new Date(end);
+        endDateTime.setHours(23, 59, 59, 999);
+
+        this.scheduleService.getOptimizedSchedule(user.companyId, startDateTime.toISOString(), endDateTime.toISOString()).subscribe({
+          next: (response) => {
+            this.optimizedShifts = response.shifts;
+            this.optimizationScore = response.score;
+            this.cdr.markForCheck();
+            this.updateTimelineData();
+          },
+          error: (err) => {
+            console.error('Failed to load schedule', err);
           }
         });
       }
@@ -134,86 +171,9 @@ export class ScheduleOptimizerComponent {
     const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
 
     const start = new Date(now.setDate(diff));
-    const end = new Date(now.setDate(start.getDate() + 6));
-
+    const end = new Date(now.setDate(start.getDate() + 7));
     this.currentWeekStart = start.toISOString().split('T')[0];
     this.currentWeekEnd = end.toISOString().split('T')[0];
-  }
-
-  loadSchedule(startStr?: string, endStr?: string) {
-    this.authService.currentUser.subscribe(user => {
-      if (user && user.companyId) {
-
-        const startDateTime = new Date(startStr || this.currentWeekStart);
-        startDateTime.setHours(0, 0, 0, 0);
-
-        const endDateTime = new Date(endStr || this.currentWeekEnd);
-        endDateTime.setHours(23, 59, 59, 999);
-
-        this.scheduleService.getOptimizedSchedule(user.companyId, startDateTime.toISOString(), endDateTime.toISOString())
-          .subscribe({
-            next: (response) => {
-              // console.log('Loaded schedule:', response);
-              this.optimizedShifts = response.shifts;
-              this.optimizationScore = response.score;
-              this.cdr.markForCheck();
-
-              this.updateTimelineData();
-            },
-            error: (err) => {
-              console.error('Failed to load schedule', err);
-            }
-          });
-      }
-    });
-  }
-
-  setActiveTab(tab: 'employee' | 'location') {
-    this.activeTab = tab;
-    setTimeout(() => {
-      if (this.employeeTimeline) this.employeeTimeline.redraw();
-      if (this.locationTimeline) this.locationTimeline.redraw();
-    }, 0);
-  }
-
-  initTimelines() {
-    if (typeof vis === 'undefined') {
-      console.error('Vis.js not loaded');
-      return;
-    }
-
-    this.groupsEmployee = new vis.DataSet();
-    this.itemsEmployee = new vis.DataSet();
-    this.groupsLocation = new vis.DataSet();
-    this.itemsLocation = new vis.DataSet();
-
-    const options = {
-      stack: false,
-      start: this.currentWeekStart,
-      end: this.currentWeekEnd,
-      editable: false,
-      margin: {
-        item: 10,
-        axis: 5
-      },
-      orientation: 'top'
-    };
-
-    if (this.employeeTimelineContainer) {
-      this.employeeTimeline = new vis.Timeline(this.employeeTimelineContainer.nativeElement, this.itemsEmployee, this.groupsEmployee, options);
-
-      this.employeeTimeline.on('rangechanged', (properties: any) => {
-        this.onRangeChanged(properties);
-      });
-    }
-
-    if (this.locationTimelineContainer) {
-      this.locationTimeline = new vis.Timeline(this.locationTimelineContainer.nativeElement, this.itemsLocation, this.groupsLocation, options);
-
-      this.locationTimeline.on('rangechanged', (properties: any) => {
-        this.onRangeChanged(properties);
-      });
-    }
   }
 
   onRangeChanged(properties: any) {
@@ -291,6 +251,45 @@ export class ScheduleOptimizerComponent {
     }
   }
 
+  initTimelines() {
+    this.groupsEmployee = new DataSet();
+    this.itemsEmployee = new DataSet();
+    this.groupsLocation = new DataSet();
+    this.itemsLocation = new DataSet();
+
+    const options = {
+      stack: false,
+      start: this.currentWeekStart,
+      end: this.currentWeekEnd,
+      editable: false,
+      zoomable: true,
+      moveable: true,
+      selectable: true,
+      margin: {
+        item: 10,
+        axis: 5
+      },
+      orientation: 'top',
+      minHeight: '200px',
+    };
+
+    if (this.employeeTimelineContainer) {
+      this.employeeTimeline = new Timeline(this.employeeTimelineContainer.nativeElement, this.itemsEmployee, this.groupsEmployee, options);
+
+      this.employeeTimeline.on('rangechanged', (properties: any) => {
+        this.onRangeChanged(properties);
+      });
+    }
+
+    if (this.locationTimelineContainer) {
+      this.locationTimeline = new Timeline(this.locationTimelineContainer.nativeElement, this.itemsLocation, this.groupsLocation, options);
+
+      this.locationTimeline.on('rangechanged', (properties: any) => {
+        this.onRangeChanged(properties);
+      });
+    }
+  }
+
   getShiftsByDay(): Map<string, OptimizedShift[]> {
     const grouped = new Map<string, OptimizedShift[]>();
 
@@ -315,5 +314,18 @@ export class ScheduleOptimizerComponent {
 
   hasResults(): boolean {
     return this.optimizedShifts.length > 0;
+  }
+
+  onTabChange(index: number) {
+    this.selectedTabIndex = index;
+    this.activeTab = index === 0 ? 'employee' : 'location';
+    setTimeout(() => {
+      if (this.employeeTimeline) {
+        this.employeeTimeline.redraw();
+      }
+      if (this.locationTimeline) {  
+        this.locationTimeline.redraw();
+      }
+    }, 100);
   }
 }

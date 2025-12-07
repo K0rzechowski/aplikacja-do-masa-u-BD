@@ -2,6 +2,7 @@ package emino.backend.models;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -24,10 +25,10 @@ import lombok.Setter;
 @Entity
 @Builder
 public class Company {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; 
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -43,15 +44,19 @@ public class Company {
     @JsonManagedReference
     private Set<Admin> admins;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "company")
     private Set<MassageForCompany> massages;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "company")
     private Set<Shift> shifts;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "company")
     private Set<Room> rooms;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "company")
     private CompanyOpenTime companyOpenTime;
 }

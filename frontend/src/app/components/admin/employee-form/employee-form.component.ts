@@ -147,7 +147,6 @@ export class EmployeeFormComponent {
   }
 
   create(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate) {
-    console.log(this.employee);
     const newEmployee = {
       name,
       surname,
@@ -172,7 +171,6 @@ export class EmployeeFormComponent {
   }
 
   submitForm(): void {
-    // console.log("Submitting...", this.employee, this.formModel.valid)
     if (this.employee && this.formModel.valid) {
       this.edit(
         this.formModel.value.name,

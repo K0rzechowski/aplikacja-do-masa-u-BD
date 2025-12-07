@@ -1,0 +1,27 @@
+<div class="p-5">
+    <div class="flex justify-between items-center mb-2">
+        @if (currentNote) {
+            <h2 mat-dialog-title>Edytuj notatkę</h2>
+        } @else {
+            <h2 mat-dialog-title>Dodaj notatkę</h2>
+        }
+        <button mat-dialog-close class="p-1 btn">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <p class="text-lg color-slate-800 mb-2"><span class="font-medium">Dzień:</span> {{ reservation.shift.startTime | date:"dd/MM/yyyy"}}</p>
+        <p class="text-lg color-slate-800 mb-2"><span class="font-medium">Godziny:</span> {{ formatTime(reservation.shift.startTime) }} - {{ formatTime(reservation.shift.endTime) }}</p>
+        <p class="text-lg color-slate-800 mb-2"><span class="font-medium">Klient:</span> {{ reservation.customer.name }} {{ reservation.customer.surname }}</p>
+        <p class="text-lg color-slate-800 mb-2"><span class="font-medium">Masaż:</span> {{ reservationJSON.massageForCompany.massage.name }}</p>
+        <form [formGroup]="formModel">
+            <div class="mb-2">
+                <textarea matInput rows="4" formControlName="content" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700" placeholder="Treść uwag..."></textarea>
+                @if(formModel.controls['content'].invalid && formModel.controls['content'].touched ) {
+                    Treść jest wymagana
+                }
+            </div>
+            <input type="submit" class="btn btn-sky w-full" [disabled]="formModel.invalid" (click)="submitForm()" [value]="'Zapisz'"/>
+        </form>
+    </mat-dialog-content>
+</div>

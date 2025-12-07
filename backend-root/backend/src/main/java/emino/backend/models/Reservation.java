@@ -24,10 +24,10 @@ import lombok.Setter;
 @Entity
 @Builder
 public class Reservation {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; 
+    private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
@@ -40,7 +40,11 @@ public class Reservation {
     @OneToOne(mappedBy = "reservation")
     private NoteFromVisit note;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "shift_id")
     private Shift shift;
+
+    @ManyToOne()
+    @JoinColumn(name = "massage_id")
+    private MassageForCompany massage;
 }

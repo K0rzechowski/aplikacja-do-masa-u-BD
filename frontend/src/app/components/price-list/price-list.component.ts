@@ -31,7 +31,6 @@ export class PriceListComponent {
           this.massageService.getMassagesByCompany(this.company.id).subscribe((data: Massage[]) =>
             this.massages = data
         )}
-        console.log(this.massages)
       });
     }) 
   }

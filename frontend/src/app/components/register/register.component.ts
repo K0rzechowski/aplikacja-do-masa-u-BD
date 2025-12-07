@@ -69,7 +69,6 @@ export class RegisterComponent {
     const credentials: RegisterRequest = {name, surname, dateOfBirth: dateOfBirth.toISOString().split('T')[0], email, password} as RegisterRequest;
     this.authService.register(credentials).subscribe({
       next: (response) => {
-        console.log("Succesfully registered");
         this.router.navigate(['/']);
         this.alertService.success("Rejestracja nastąpiła poprawnie");
       },

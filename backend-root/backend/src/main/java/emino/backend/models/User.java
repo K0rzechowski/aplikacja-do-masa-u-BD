@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -37,8 +38,8 @@ import lombok.Setter;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Builder
 @Table(name = "users")
-public class User implements UserDetails{
-    
+public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -55,7 +56,7 @@ public class User implements UserDetails{
 
     @Column(nullable = false, length = 50)
     private String surname;
-    
+
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private LocalDate dateOfBirth;
@@ -64,6 +65,7 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private UserRole role;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "customer")
     private List<Reservation> customerReservations;
 

@@ -10,69 +10,49 @@
         </div>
     </div>
     } @else if (isEmployee) {
-        <div class="mb-6">
-            <div class="md:grid grid-cols-4">
-                <div class="md:col-span-3">
-                    <p class="text-4xl mb-2">Twój grafik</p>
-                    <p class="text-lg mb-2">Przeglądaj swoje przypisane zmiany</p>
-                </div>
+    <div class="mb-6">
+        <div class="md:grid grid-cols-4">
+            <div class="md:col-span-3">
+                <p class="text-4xl mb-2">Twój grafik</p>
+                <p class="text-lg mb-2">Przeglądaj swoje przypisane zmiany</p>
             </div>
+        </div>
 
-            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                @if (currentEmployeeShifts.length === 0) {
-                    <p class="text-center p-8 text-slate-600">Brak przypisanych zmian w tym tygodniu</p>
-                } @else {
-                    <div class="space-y-4">
-                        @for (day of getSortedEmployeeDays(); track day) {
-                            <div class="p-2">
-                                <p class="font-semibold mb-2">{{ getDayName(day) }}, {{ formatDate(day) }}</p>
-                                <div class="flex flex-wrap gap-2">
-                                    @for (shift of getEmployeeShiftsByDay().get(day); track shift.id) {
-                                        <div class="inline-block px-3 py-2 ">
-                                            <span class="flex items-center text-sm">
-                                                {{ formatTime(shift.startTime) }} - {{ formatTime(shift.endTime) }}
-                                                <mat-icon class="mx-1">meeting_room</mat-icon> {{ shift.location }}
-                                            </span>
-                                        </div>
-                                    }
-                                </div>
-
-                            </div>
+        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+            @if (currentEmployeeShifts.length === 0) {
+            <p class="text-center p-8 text-slate-600">Brak przypisanych zmian w tym tygodniu</p>
+            } @else {
+            <div class="space-y-4">
+                @for (day of getSortedEmployeeDays(); track day) {
+                <div class="p-2">
+                    <p class="font-semibold mb-2">{{ getDayName(day) }}, {{ formatDate(day) }}</p>
+                    <div class="flex flex-wrap gap-2">
+                        @for (shift of getEmployeeShiftsByDay().get(day); track shift.id) {
+                        <div class="inline-block px-3 py-2 ">
+                            <span class="flex items-center text-sm">
+                                {{ formatTime(shift.startTime) }} - {{ formatTime(shift.endTime) }}
+                                <mat-icon class="mx-1">meeting_room</mat-icon> {{ shift.location }}
+                            </span>
+                        </div>
                         }
                     </div>
-                }
 
+                </div>
+                }
             </div>
+            }
+
         </div>
+    </div>
     }
 
-    <div class="mb-4 border-b border-slate-200">
-        <ul class="flex flex-wrap mb-px text-base font-medium text-center" role="tablist">
-            <li class="mr-2" role="presentation">
-                <button class="inline-block p-4 border-b-2 rounded-t-lg"
-                    [ngClass]="{'border-slate-600 text-slate-600': activeTab === 'employee', 'border-transparent hover:text-slate-600 hover:border-slate-300': activeTab !== 'employee'}"
-                    (click)="setActiveTab('employee')" type="button" role="tab">
-                    Według pracownika
-                </button>
-            </li>
-            <li class="mr-2" role="presentation">
-                <button class="inline-block p-4 border-b-2 rounded-t-lg"
-                    [ngClass]="{'border-slate-600 text-slate-600': activeTab === 'location', 'border-transparent hover:text-slate-600 hover:border-slate-300': activeTab !== 'location'}"
-                    (click)="setActiveTab('location')" type="button" role="tab">
-                    Według sali
-                </button>
-            </li>
-        </ul>
-    </div>
-
-    <div id="myTabContent">
-        <div [class.hidden]="activeTab !== 'employee'" class="p-2 rounded-lg bg-slate-50"
-            role="tabpanel">
-            <div #employeeTimelineContainer></div>
-        </div>
-        <div [class.hidden]="activeTab !== 'location'" class="p-2 rounded-lg bg-slate-50"
-            role="tabpanel">
-            <div #locationTimelineContainer></div>
-        </div>
-    </div>
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
+        <mat-tab label="Według pracownika">
+            <div #employeeTimelineContainer id="employeeTimelineContainer" class="mt-4"></div>
+        </mat-tab>
+        <mat-tab label="Według sali">
+            <div #locationTimelineContainer id="locationTimelineContainer" class="mt-4 p-2 rounded-lg bg-slate-50">
+            </div>
+        </mat-tab>
+    </mat-tab-group>
 </div>

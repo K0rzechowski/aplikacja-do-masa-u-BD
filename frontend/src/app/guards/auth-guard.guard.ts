@@ -21,7 +21,10 @@ export const authGuard: CanActivateFn = async (
 
   const authenticated = await firstValueFrom(authService.isAuthenticated);
 
-  return protectedRoutes.includes(state.url) && !authenticated
-    ? router.navigate(['/login'])
-    : true;
+  if (protectedRoutes.includes(state.url) && !authenticated) {
+    router.navigate(['/login'])
+    return false;
+  }
+
+  return true;
 };
