@@ -37,14 +37,12 @@ export class ManageEmployeesComponent {
     );
 
     this.isAdmin$.subscribe(isAdmin => {
-      // console.log('Is Admin:', isAdmin);
       if (isAdmin) {
         this.loadEmployeesInMyCompany();
       }});    
   }
 
   loadEmployeesInMyCompany() {
-    // console.log('Loading employees...');
     this.emplService.getEmployeesByAdminsCompany().subscribe({
       next: (data: Employee[]) => {
         this.emplsInMyCompany = [...data];
@@ -52,8 +50,6 @@ export class ManageEmployeesComponent {
       },
       error: (error) => {
         console.error('Error loading employees:', error);
-        // console.error('Error status:', error.status);
-        // console.error('Error message:', error.error);
       }
     });
   }

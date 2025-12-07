@@ -62,8 +62,6 @@ export class DialogDeleteComponent {
   }
 
   checkType(): String {
-    console.log(this.data)
-    console.log(this.data.type)
     switch(this.data.type){
       case 'employee':
         const employee = this.data.item as Employee;
@@ -86,7 +84,6 @@ export class DialogDeleteComponent {
   }
 
   delete(): void {
-    console.log(this.data)
     if (this.idToDelete) {
       if(this.data.type === 'employee') { 
           this.emplService.deleteEmployee(this.idToDelete).subscribe({

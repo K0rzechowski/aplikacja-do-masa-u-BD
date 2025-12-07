@@ -162,7 +162,6 @@ export class CompanyFormsComponent {
 
   createOpenTime(openTime: string, closeTime: string) {
     if (this.company?.id) {
-      console.log(this.company.id)
       const newTime: CompanyOpenTime = {
         companyId: this.company.id,
         openTime,

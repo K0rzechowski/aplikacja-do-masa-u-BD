@@ -21,7 +21,7 @@ import { EmployeesComponent } from './components/employees/employees.component';
 import { ReserveFormComponent } from './components/reserve-form/reserve-form.component';
 import { ReservationHistoryComponent } from './components/reservation-history/reservation-history.component';
 import { ManageReservationsComponent } from './components/employee/manage-reservations/manage-reservations.component';
-import { StatisticsComponent } from './components/statistics/statistics.component';
+import { StatisticsComponent } from './components/admin/statistics/statistics.component';
 
 export const routes: Routes = [
   { path: '', component: MainPageComponent },

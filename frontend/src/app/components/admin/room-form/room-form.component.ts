@@ -75,7 +75,6 @@ export class RoomFormComponent {
   }
 
   submitForm(form: NgForm) {
-    console.log(form)
     if (this.room && form.valid) {
       this.edit(form.value.number);
     } else if (!this.room && form.valid) {

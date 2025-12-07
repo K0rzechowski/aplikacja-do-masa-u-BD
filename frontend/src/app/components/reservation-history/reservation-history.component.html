@@ -2,16 +2,16 @@
 <mat-tab-group>
     <mat-tab label="Nadchodzące wizyty">
         @for (res of upcomingReservations; track res) {
-            <app-reservation-card [reservation]="res" (reservationCancelled)="onReservationCancelled($event)" (reservationCancelled)="onReservationCompleted($event)"></app-reservation-card>
+            <app-reservation-card [reservation]="res" (reservationCancelled)="onReservationCancelled($event)" (reservationCompleted)="onReservationCompleted($event)"></app-reservation-card>
         } @empty {
             <p class="text-center text-slate-600 col-span-4 p-2">Brak nadchodzących wizyt.</p>
         }
     </mat-tab>
-    <mat-tab label="Przeszłe wizyty">
+    <mat-tab label="Wykonane wizyty">
         @for (res of pastReservations; track res) {
-            <app-reservation-card [reservation]="res" (reservationCancelled)="onReservationCancelled($event)"></app-reservation-card>
+            <app-reservation-card [reservation]="res" (reservationCancelled)="onReservationCancelled($event)" (reservationCompleted)="onReservationCompleted($event)"></app-reservation-card>
         } @empty {
-            <p class="text-center text-slate-600 col-span-4 p-2">Brak przeszłych wizyt.</p>
+            <p class="text-center text-slate-600 col-span-4 p-2">Brak wykonanych wizyt.</p>
         }
     </mat-tab>
     <mat-tab label="Anulowane wizyty">

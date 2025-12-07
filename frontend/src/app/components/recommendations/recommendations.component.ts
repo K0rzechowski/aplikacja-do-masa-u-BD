@@ -47,7 +47,6 @@ export class RecommendationsComponent {
   }
   
   getSelectedSymptoms(selected: Symptom[]) {
-    console.log(selected)
     this.selectedSymptoms = selected;
   }
 

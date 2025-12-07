@@ -35,13 +35,6 @@ export class ReservationHistoryComponent {
     private alertService: AlertService,
     private authService: AuthenticationService
   ) {
-  }
-
-  ngOnInit() {
-    this.loadReservations();
-  }
-
-  ngOnChanges() {
     this.loadReservations();
   }
 
@@ -57,7 +50,7 @@ export class ReservationHistoryComponent {
     const currentDate = new Date();
     allReservations.forEach(reservation => {
       const reservationDate = new Date(reservation.shift.startTime);
-      if (reservationDate < currentDate && reservation.status !== 'CANCELLED') {
+      if ((reservationDate < currentDate || reservation.status !== 'COMPLETED') && reservation.status !== 'CANCELLED') {
         this.pastReservations.push(reservation);
       }
     });
@@ -67,7 +60,7 @@ export class ReservationHistoryComponent {
     const currentDate = new Date();
     allReservations.forEach(reservation => {
       const reservationDate = new Date(reservation.shift.startTime);
-      if (reservationDate >= currentDate && reservation.status !== 'CANCELLED') {
+      if (reservationDate >= currentDate && reservation.status === 'RESERVED') {
         this.upcomingReservations.push(reservation);
       }
     });
@@ -81,7 +74,6 @@ export class ReservationHistoryComponent {
         this.loadUpcomingReservations(data);
       })
     }
-
   }
 
   onReservationCancelled(reservationId: string) {
@@ -100,9 +92,9 @@ export class ReservationHistoryComponent {
   }
 
   onReservationCompleted(reservationId: string) {
-    const upcomingIndex = this.pastReservations.findIndex(r => r.id === reservationId);
+    const upcomingIndex = this.upcomingReservations.findIndex(r => r.id === reservationId);
     if (upcomingIndex !== -1) {
-      const completedReservation = this.pastReservations.splice(upcomingIndex, 1)[0];
+      const completedReservation = this.upcomingReservations.splice(upcomingIndex, 1)[0];
       this.pastReservations.push(completedReservation);
       return;
     }

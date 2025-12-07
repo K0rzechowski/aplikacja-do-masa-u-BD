@@ -1,0 +1,17 @@
+<div class="flex justify-center items-center py-2">
+    <div class="flex-1"></div>
+    <p class="text-medium font-semibold text-center flex-1">Przychody w ciągu roku</p>
+    <div class="flex items-center gap-4 flex-1 justify-end">
+        <mat-icon (click)="prevYear()" class="px-2 cursor-pointer" [ngStyle]="{'color':'#008081'}">arrow_back_ios</mat-icon>
+        <span class="text-center">{{ formatYear(current) }}</span>
+        <mat-icon (click)="nextYear()" class="cursor-pointer" [ngStyle]="{'color':'#008081'}">arrow_forward_ios</mat-icon>
+    </div>
+</div>
+<div class="bg-slate-100 rounded mt-2 p-2 2xl:flex 2xl:justify-between">
+    <canvas
+        baseChart
+        [data]="lineChartData"
+        [options]="lineChartOptions"
+        [type]="lineChartType"
+    ></canvas>
+</div>

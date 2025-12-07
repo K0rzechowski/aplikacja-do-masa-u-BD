@@ -22,7 +22,7 @@ export class ReservationCardComponent {
 
   readonly dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
-  
+
   @Input() reservation: Reservation | undefined;
   @Output() reservationCancelled = new EventEmitter<string>();
   @Output() reservationCompleted = new EventEmitter<string>();
@@ -81,6 +81,7 @@ export class ReservationCardComponent {
           this.alertService.success("Poprawnie zmieniono status rezerwacji");
           reservation.status = ReservationStatus.COMPLETED;
           this.reservationCompleted.emit(reservation.id);
+          this.cdr.markForCheck();
         },
         error: (error: Error) => {
           this.alertService.error("Błąd podczas zmiany statusu: " + error.message);
