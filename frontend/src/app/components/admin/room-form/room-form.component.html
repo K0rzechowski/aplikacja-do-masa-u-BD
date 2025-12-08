@@ -9,7 +9,7 @@
             </div>
             
         }
-        <form #roomForm="ngForm" (ngSubmit)="submitForm(roomForm)">
+        <form #roomForm="ngForm">
             <div class="mb-4 md:mb-0">
                 <label for="number">Numer sali</label>
                 <input type="text" name="number" placeholder="{{room?.roomNumber || 'Numer sali'}}" 

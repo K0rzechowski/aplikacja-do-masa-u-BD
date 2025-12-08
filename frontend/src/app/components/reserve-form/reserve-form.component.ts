@@ -67,6 +67,16 @@ export class ReserveFormComponent {
     return currentUser;
   }
 
+  // get currentCompany$(): Observable<Company | null> {
+  //   return this.companyService.currentCompany;
+  // }
+
+  // get currentCompanyValue(): Company | null {
+  //   let currentCompany: Company | null = null;
+  //   this.currentCompany$.subscribe(company => currentCompany = company);
+  //   return currentCompany;
+  // }
+
   constructor(
     private reservationService: ReservationService,
     private alertService: AlertService,

@@ -10,10 +10,11 @@ import { A11yModule } from "@angular/cdk/a11y";
 import { MatSelectModule } from '@angular/material/select';
 import { AlertService } from '../../../services/alert.service';
 import { AvailabilityTypeLabels } from '../../../models/availability';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-availability-form',
-  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogModule, MatDialogClose, ReactiveFormsModule,  MatFormFieldModule, MatOptionModule, A11yModule, MatSelectModule],
+  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogModule, MatDialogClose, ReactiveFormsModule,  MatFormFieldModule, MatOptionModule, A11yModule, MatSelectModule, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './availability-form.component.html',
   styleUrl: './availability-form.component.css'

@@ -11,7 +11,7 @@
             </button>
         </div>
         <mat-dialog-content >
-            <p class="text-lg color-slate-800 mb-2">Dzień {{data.day.toISOString().split("T")[0]}}</p>
+            <p class="text-lg color-slate-800 mb-2">Dzień {{ data.day | date:'dd-MM-yyyy' }}</p>
             <form [formGroup]="formModel" (ngSubmit)="submitForm()">
                 <div class="mb-2">
                     <mat-form-field  class="w-full">
