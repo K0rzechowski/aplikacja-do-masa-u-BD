@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, LOCALE_ID } from '@angular/core';
+import { Component, ChangeDetectionStrategy, LOCALE_ID, ChangeDetectorRef, inject } from '@angular/core';
 import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatHint, MatInputModule, MatLabel} from '@angular/material/input';
@@ -19,6 +19,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { MatIconModule } from "@angular/material/icon";
 import { ShowPasswordDirective } from '../../directives/show-password.directive';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogDeleteComponent } from '../dialog-delete/dialog-delete.component';
+import { DialogData } from '../../models/dialog-data';
 
 registerLocaleData(localePl);
 
@@ -46,6 +49,9 @@ registerLocaleData(localePl);
 })
 export class ProfileComponent {
 
+  readonly dialog = inject(MatDialog);
+  private cdr = inject(ChangeDetectorRef);
+  
   user: User | null | undefined;
 
   formModel: FormGroup;
@@ -69,7 +75,8 @@ export class ProfileComponent {
 
     this.passwordForm = this.formBuilder.group({
       currentPassword: ['', Validators.required],
-      newPassword: ['', Validators.required]
+      password: ['', Validators.required],
+      confirmPassword: ['', [Validators.required, PasswordValidator.matchPassword]],
     })
   }
 
@@ -108,10 +115,21 @@ export class ProfileComponent {
     if (this.passwordForm.valid) {
       const passwordRequest = {
         currentPassword: this.passwordForm.get('currentPassword')?.value,
-        newPassword: this.passwordForm.get('newPassword')?.value
+        newPassword: this.passwordForm.get('password')?.value
       }
 
       this.updateProfile(passwordRequest);
+    }
+  }
+
+  openDeleteDialog(enterAnimationDuration: string, exitAnimationDuration: string, toDelete: DialogData): void {
+    if (this.dialog) {
+      const dialogRef = this.dialog.open(DialogDeleteComponent, {
+        width: '250px',
+        enterAnimationDuration,
+        exitAnimationDuration,
+        data: toDelete
+      });
     }
   }
 

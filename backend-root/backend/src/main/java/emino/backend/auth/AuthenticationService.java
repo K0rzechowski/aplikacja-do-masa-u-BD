@@ -128,4 +128,11 @@ public class AuthenticationService {
 
         return userResponse;
     }
+
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new IllegalArgumentException("Nie znaleziono danego użytkownika");
+        }
+        userRepository.deleteById(id);
+    }
 }

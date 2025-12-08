@@ -182,4 +182,8 @@ export class AuthenticationService {
       })
     );
   }
+
+  deleteUser(userId: string): Observable<any> {
+    return this.httpClient.delete(`${this.baseUrl}/delete/${userId}`);
+  }
 }
