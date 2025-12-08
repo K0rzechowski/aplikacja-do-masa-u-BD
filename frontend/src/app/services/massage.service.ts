@@ -15,40 +15,42 @@ export class MassageService {
 
   constructor(private httpClient: HttpClient) { }
 
-  private prepareFormData(request: Partial<Massage>, file: File): FormData {
+  private prepareFormData(request: Partial<Massage>, file: File | null): FormData {
     const formData: FormData = new FormData();
 
     formData.append('name', request.name || '');
     formData.append('price', request.price?.toString() || '0');
-    
+
     if (request.symptomIds && request.symptomIds.length > 0) {
       request.symptomIds.forEach(id => formData.append('symptomIds', id));
     }
-    
-    formData.append('file', file);
+
+    if (file) {
+      formData.append('file', file);
+    }
 
     return formData;
   }
 
   createMassage(request: Partial<Massage>, file: File): Observable<Massage> {
     const formData = this.prepareFormData(request, file);
-    
+
     return this.httpClient.post<Massage>(`${this.baseUrl}/create`, formData).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMessage = 'Błąd podczas tworzenia masażu';
-        
+
         if (error.error && error.error.message) {
           errorMessage = error.error.message;
-        } else if (error.status === 409 ) {
-          // errorMessage = 'Firma o danej nazwie i danym mieście już istnieje';
+        } else if (error.status === 409) {
+          errorMessage = 'Masaż o danej nazwie już istnieje';
         }
-        
+
         return throwError(() => new Error(errorMessage));
       })
     );
   }
 
-  editMassage(request: Massage, file: File): Observable<Massage> {
+  editMassage(request: Massage, file: File | null): Observable<Massage> {
     const formData = this.prepareFormData(request, file);
     return this.httpClient.put<Massage>(`${this.baseUrl}/edit/${request.id}`, formData);
   }
@@ -70,7 +72,7 @@ export class MassageService {
     if (city) {
       params = { city: city }
     }
-    return this.httpClient.get<MassageSymptom[]>(`${this.baseUrl}/symptom/${symptomId}`,{params});
+    return this.httpClient.get<MassageSymptom[]>(`${this.baseUrl}/symptom/${symptomId}`, {params});
   }
 
   getMassagesByCity(city: string): Observable<Massage[]> {

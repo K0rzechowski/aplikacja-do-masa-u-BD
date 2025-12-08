@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class MassageController {
-    
+
     private final SecurityService securityService;
     private final MassageService massageService;
 
@@ -53,11 +53,11 @@ public class MassageController {
         List<MassageForCompany> msgs = massageService.getMassagesByCompany(companyId);
 
         List<MassageDto> massagesAlphabetically = msgs.stream()
-            .sorted((e1, e2) -> {
-                return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
-            })
-            .map(massageService::getMassageResponse)
-            .toList();
+                .sorted((e1, e2) -> {
+                    return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
+                })
+                .map(massageService::getMassageResponse)
+                .toList();
 
         return ResponseEntity.ok(massagesAlphabetically);
     }
@@ -66,11 +66,11 @@ public class MassageController {
     public ResponseEntity<List<MassageDto>> getMassagesByCompany(@PathVariable Long id) {
         List<MassageForCompany> msgs = massageService.getMassagesByCompany(id);
         List<MassageDto> massagesAlphabetically = msgs.stream()
-            .sorted((e1, e2) -> {
-                return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
-            })
-            .map(massageService::getMassageResponse)
-            .toList();
+                .sorted((e1, e2) -> {
+                    return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
+                })
+                .map(massageService::getMassageResponse)
+                .toList();
         return ResponseEntity.ok(massagesAlphabetically);
     }
 
@@ -78,20 +78,20 @@ public class MassageController {
     public ResponseEntity<List<MassageDto>> getMassagesByEmployee(@PathVariable Long id) {
         List<MassageForCompany> msgs = massageService.getMassagesByEmployee(id);
         List<MassageDto> massagesAlphabetically = msgs.stream()
-        .sorted((e1, e2) -> {
-            return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
-        })
-        .map(massageService::getMassageResponse)
-        .toList();
-    return ResponseEntity.ok(massagesAlphabetically);
+                .sorted((e1, e2) -> {
+                    return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
+                })
+                .map(massageService::getMassageResponse)
+                .toList();
+        return ResponseEntity.ok(massagesAlphabetically);
     }
 
     @GetMapping("/symptom/{symptomId}")
     public ResponseEntity<List<MassageSymptomDto>> getMassagesBySymptom(@PathVariable Long symptomId, @RequestParam(required = false) String city) {
         List<MassageSymptomDto> msgs = massageService.getMassageSymptomAssociations(symptomId, city);
         List<MassageSymptomDto> massagesInOrder = msgs.stream()
-            .sorted((m1, m2) -> Double.compare(m2.getEffectivenessScore(), m1.getEffectivenessScore()))
-            .toList();
+                .sorted((m1, m2) -> Double.compare(m2.getEffectivenessScore(), m1.getEffectivenessScore()))
+                .toList();
 
         return ResponseEntity.ok(massagesInOrder);
     }
@@ -100,11 +100,11 @@ public class MassageController {
     public ResponseEntity<List<MassageDto>> getMassagesByCity(@PathVariable String city) {
         List<MassageForCompany> msgs = massageService.getMassagesByCity(city);
         List<MassageDto> massagesAlphabetically = msgs.stream()
-            .sorted((e1, e2) -> {
-                return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
-            })
-            .map(massageService::getMassageResponse)
-            .toList();
+                .sorted((e1, e2) -> {
+                    return e1.getMassage().getName().compareToIgnoreCase(e2.getMassage().getName());
+                })
+                .map(massageService::getMassageResponse)
+                .toList();
         return ResponseEntity.ok(massagesAlphabetically);
     }
 
@@ -112,7 +112,7 @@ public class MassageController {
     public ResponseEntity<MassageDto> editMassage(
             @PathVariable Long id,
             @ModelAttribute MassageCreateDto request,
-            @RequestPart("file") MultipartFile file) throws IOException {
+            @RequestPart(value="file", required = false) MultipartFile file) throws IOException {
         Admin admin = securityService.getCurrentAdmin();
         MassageForCompany updatedMassage = massageService.editMassage(id, request, file, admin);
         MassageDto msgDto = massageService.getMassageResponse(updatedMassage);
