@@ -21,6 +21,8 @@ import { Room } from '../../models/room';
 import { CompanyService } from '../../services/company.service';
 import { Company } from '../../models/company';
 import { Observable } from 'rxjs';
+import { User } from '../../models/auth/user';
+import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
   selector: 'app-dialog',
@@ -50,7 +52,8 @@ export class DialogDeleteComponent {
     private emplService: EmployeeService,
     private msgService: MassageService,
     private alertService: AlertService,
-    private companyService: CompanyService
+    private companyService: CompanyService,
+    private authService: AuthenticationService
   ) {
     this.checkType();
 
@@ -77,6 +80,11 @@ export class DialogDeleteComponent {
         const room = this.data.item as Room;
         this.idToDelete = room.id ?? '';
         this.thingToDelete = `${room.roomNumber}`;
+        return this.data.type;
+      case 'user':
+        const user = this.data.item as User;
+        this.idToDelete = user.id ?? '';
+        this.thingToDelete = `${user.name} ${user.surname}`;
         return this.data.type;
       default:
         return "";
@@ -114,6 +122,15 @@ export class DialogDeleteComponent {
             }
           });  
         }
+      } else if(this.data.type === 'user') { 
+        this.authService.deleteUser(this.idToDelete).subscribe({
+          next: () => {
+            this.alertService.success(`Poprawnie usunięto użytkownika ${this.idToDelete}`);
+          },
+          error: (error) => {
+            this.alertService.error(`Nieudana operacja usunięcia użytkownika ${this.idToDelete}`);
+          }
+        });  
       } 
     } 
     this.dialogRef.close(true);

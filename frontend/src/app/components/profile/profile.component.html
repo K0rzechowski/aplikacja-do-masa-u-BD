@@ -1,109 +1,135 @@
-<div>
-    <h2 class="text-4xl mb-4">Edytuj dane</h2>
-    <h3 class="text-lg mb-2">Zaktualizuj swoje podstawowe informacje</h3>
-    <form [formGroup]="formModel" (ngSubmit)="submitEditForm()">
-        <div class="md:flex justify-between space-x-2">
-            <div>
-                <label for="name">Imię</label>
-                <input type="text" id="name" placeholder="Imię" formControlName="name" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
-                <p class="warning">
-                    @if (formModel.controls['name'].invalid && formModel.controls['name'].touched ) {
-                        Imię jest wymagane
-                    }
-                </p>
-            </div>
-            <div class="mb-4">
-                <label for="surname">Nazwisko</label>
-                <input type="text" id="surname" placeholder="Nazwisko" formControlName="surname" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
-                <p class="warning">
-                    @if (formModel.controls['surname'].invalid && formModel.controls['surname'].touched ) {
-                        Nazwisko jest wymagane
-                    }
-                </p>
-            </div>
+<div class="md:grid grid-cols-3">
+    <div class="md:col-span-2">
+        <h2 class="text-4xl mb-2">Edytuj dane</h2>
+        <h3 class="text-lg mb-2">Zaktualizuj swoje podstawowe informacje</h3>
+    </div>
+    @if (user?.role === "USER") {
+        <div class="md:col-span-1 flex justify-end items-start">
+            <button class="btn btn-sky" (click)="openDeleteDialog('0ms', '0ms', { item: user, type: 'user' })">Usuń konto</button>
+        </div>
+    }
+</div>
+<form [formGroup]="formModel" (ngSubmit)="submitEditForm()">
+    <div class="md:flex justify-between space-x-2">
+        <div>
+            <label for="name">Imię</label>
+            <input type="text" id="name" placeholder="Imię" formControlName="name"
+                class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700" />
+            <p class="warning">
+                @if (formModel.controls['name'].invalid && formModel.controls['name'].touched ) {
+                Imię jest wymagane
+                }
+            </p>
         </div>
         <div class="mb-4">
-            <div class="md:block flex" >
-                <label for="dateOfBirth">Data urodzenia</label>
-                <mat-datepicker-toggle matIconSuffix [for]="mobilePicker" class="md:hidden"></mat-datepicker-toggle>
-            </div>
+            <label for="surname">Nazwisko</label>
+            <input type="text" id="surname" placeholder="Nazwisko" formControlName="surname"
+                class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700" />
+            <p class="warning">
+                @if (formModel.controls['surname'].invalid && formModel.controls['surname'].touched ) {
+                Nazwisko jest wymagane
+                }
+            </p>
+        </div>
+    </div>
+    <div class="mb-4">
+        <div class="md:block flex">
+            <label for="dateOfBirth">Data urodzenia</label>
+            <mat-datepicker-toggle matIconSuffix [for]="mobilePicker" class="md:hidden"></mat-datepicker-toggle>
+        </div>
 
-            <!-- Mobile: only icon -->
-            <div class="block md:hidden">
-                <mat-form-field appearance="outline" class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
-                    <input matInput [matDatepicker]="mobilePicker" formControlName="dateOfBirth" placeholder="DD/MM/YYYY">
-                </mat-form-field>
-                <mat-datepicker #mobilePicker touchUi></mat-datepicker>
-            </div>
+        <!-- Mobile: only icon -->
+        <div class="block md:hidden">
+            <mat-form-field appearance="outline"
+                class="w-full p-1 border border-gray-300 rounded bg-slate-300 text-slate-700">
+                <input matInput [matDatepicker]="mobilePicker" formControlName="dateOfBirth"
+                    placeholder="DD/MM/YYYY">
+            </mat-form-field>
+            <mat-datepicker #mobilePicker touchUi></mat-datepicker>
+        </div>
 
-            <!-- Desktop: full input -->
-            <div class="hidden md:block">
-                <mat-form-field appearance="outline" class="date-input w-full bg-slate-300 p-2 rounded">
-                    <mat-label>Data urodzenia</mat-label>
-                    <input matInput [matDatepicker]="desktopPicker" formControlName="dateOfBirth">
-                    <mat-hint>DD/MM/YYYY</mat-hint>
-                    <mat-datepicker-toggle matIconSuffix [for]="desktopPicker"></mat-datepicker-toggle>
-                </mat-form-field>
-                <mat-datepicker #desktopPicker></mat-datepicker>
+        <!-- Desktop: full input -->
+        <div class="hidden md:block">
+            <mat-form-field appearance="outline" class="date-input w-full bg-slate-300 p-2 rounded">
+                <mat-label>Data urodzenia</mat-label>
+                <input matInput [matDatepicker]="desktopPicker" formControlName="dateOfBirth">
+                <mat-hint>DD/MM/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="desktopPicker"></mat-datepicker-toggle>
+            </mat-form-field>
+            <mat-datepicker #desktopPicker></mat-datepicker>
+        </div>
+        <p class="warning">
+            @if(formModel.controls['dateOfBirth'].invalid && formModel.controls['dateOfBirth'].touched) {
+            Data urodzenia jest wymagana
+            }
+        </p>
+    </div>
+    <div>
+        <button class="btn-long btn-sky mb-4">Zatwierdź dane</button>
+    </div>
+</form>
+<div>
+    <h3 class="text-lg m-2">Zmień hasło</h3>
+    <form [formGroup]="passwordForm" (ngSubmit)="submitPasswordForm()" class="w-full lg:mx-auto max-w-1/2">
+        <div class="mb-4">
+            <label for="currentPassword">Aktualne hasło</label>
+            <div
+                class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700 flex justify-between relative">
+                <input type="password" id="currentPassword" formControlName="currentPassword"
+                    class="w-full outline-none" #passwordInput />
+                <mat-icon #passwordIcon class="cursor-pointer" appShowPassword [appShowPasswordIcon]="passwordIcon"
+                    [appShowPasswordInput]="passwordInput" [appShowPasswordTooltip]="tt"
+                    [matTooltipPosition]="'above'" matTooltip="Pokaż hasło" #tt="matTooltip">visibility</mat-icon>
             </div>
             <p class="warning">
-                @if(formModel.controls['dateOfBirth'].invalid && formModel.controls['dateOfBirth'].touched) {
-                    Data urodzenia jest wymagana
+                @if (passwordForm.controls['currentPassword'].invalid &&
+                passwordForm.controls['currentPassword'].touched ) {
+                Aktualne hasło jest wymagane
+                }
+            </p>
+        </div>
+        <div class="mb-4">
+            <label for="password">Nowe hasło</label>
+            <div
+                class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700 flex justify-between relative">
+                <input type="password" id="password" formControlName="password" class="w-full outline-none"
+                    #passwordSecondInput />
+                <mat-icon #passwordSecondIcon class="cursor-pointer" appShowPassword
+                    [appShowPasswordIcon]="passwordSecondIcon" [appShowPasswordInput]="passwordSecondInput"
+                    [appShowPasswordTooltip]="tt2" [matTooltipPosition]="'above'" matTooltip="Pokaż hasło"
+                    #tt2="matTooltip">visibility</mat-icon>
+            </div>
+            <p class="warning">
+                @if (passwordForm.controls['password'].invalid && passwordForm.controls['password'].touched ) {
+                Nowe hasło jest wymagane
+                }
+            </p>
+        </div>
+        <div class="mb-4">
+            <label for="confirmPassword">Powtórz nowe hasło</label>
+            <div
+                class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700 flex justify-between relative">
+                <input type="password" id="confirmPassword" formControlName="confirmPassword"
+                    class="w-full outline-none" #confirmPassword />
+                <mat-icon #confirmPasswordIcon class="cursor-pointer" appShowPassword
+                    [appShowPasswordIcon]="confirmPasswordIcon" [appShowPasswordInput]="confirmPassword"
+                    [appShowPasswordTooltip]="tt3" [matTooltipPosition]="'above'" matTooltip="Pokaż hasło"
+                    #tt3="matTooltip">visibility</mat-icon>
+            </div>
+            <p class="warning">
+                @if(passwordForm.controls['confirmPassword'].invalid &&
+                passwordForm.controls['confirmPassword'].touched ) {
+                @if (passwordForm.get('confirmPassword')?.errors?.['required']) {
+                Hasło jest wymagane
+                }
+                @if (passwordForm.get('confirmPassword')?.errors?.['mismatch']) {
+                Hasła różnią się
+                }
                 }
             </p>
         </div>
         <div>
-            <button class="btn-long btn-sky mb-4">Zatwierdź dane</button>
+            <button class="btn-long btn-sky mb-4">Zmień hasło</button>
         </div>
     </form>
-    <div>
-        <h3 class="text-lg m-2">Zmień hasło</h3>
-        <form [formGroup]="passwordForm" (ngSubmit)="submitPasswordForm()" class="w-full lg:mx-auto max-w-1/2">
-            <div class="mb-4">
-                <label for="currentPassword">Aktualne hasło</label>
-                <div class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700 flex justify-between relative">
-                    <input type="password" id="currentPassword" formControlName="currentPassword" class="w-full outline-none" #passwordInput/>
-                    <mat-icon
-                        #passwordIcon
-                        class="cursor-pointer"
-                        appShowPassword
-                        [appShowPasswordIcon]="passwordIcon"
-                        [appShowPasswordInput]="passwordInput"
-                        [appShowPasswordTooltip]="tt"
-                        [matTooltipPosition]="'above'"
-                        matTooltip="Pokaż hasło"
-                        #tt="matTooltip">visibility</mat-icon>
-                </div>
-                <p class="warning">
-                    @if (passwordForm.controls['currentPassword'].invalid && passwordForm.controls['currentPassword'].touched ) {
-                        Aktualne hasło jest wymagane
-                    }
-                </p>
-            </div>
-            <div class="mb-4">
-                <label for="newPassword">Nowe hasło</label>
-                <div class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700 flex justify-between relative">
-                    <input type="password" id="newPassword" formControlName="newPassword" class="w-full outline-none" #passwordSecondInput/>
-                    <mat-icon
-                        #passwordSecondIcon
-                        class="cursor-pointer"
-                        appShowPassword
-                        [appShowPasswordIcon]="passwordSecondIcon"
-                        [appShowPasswordInput]="passwordSecondInput"
-                        [appShowPasswordTooltip]="tt2"
-                        [matTooltipPosition]="'above'"
-                        matTooltip="Pokaż hasło"
-                        #tt2="matTooltip">visibility</mat-icon>
-                </div>
-                <p class="warning">
-                    @if (passwordForm.controls['newPassword'].invalid && passwordForm.controls['newPassword'].touched ) {
-                        Nowe hasło jest wymagane
-                    }
-                </p>
-            </div>
-            <div>
-                <button class="btn-long btn-sky mb-4">Zmień hasło</button>
-            </div>
-        </form>
-    </div>
 </div>

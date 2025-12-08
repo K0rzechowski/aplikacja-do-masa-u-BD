@@ -31,7 +31,7 @@ import { SearchComponent } from "../../search/search.component";
   styleUrl: './massage-form.component.css'
 })
 export class MassageFormComponent {
-  
+
   readonly dialogRef = inject(MatDialogRef, {optional: true});
   readonly dialogData = inject<{massage: Massage}>(MAT_DIALOG_DATA, {optional: true});
 
@@ -40,7 +40,7 @@ export class MassageFormComponent {
   existingSymptoms: Symptom[] = [];
   selectedSymptoms: Symptom[] = [];
   selectedFile: File | null = null;
-  
+
   @Input() massage?: Massage;
 
   constructor(
@@ -58,8 +58,9 @@ export class MassageFormComponent {
   ngOnInit() {
     if (this.massage) {
       this.massageBeforeUpdate = {...this.massage};
-      this.formModel.patchValue({ 
+      this.formModel.patchValue({
         name: this.massage.name,
+        file: this.massage.imageUrl,
         price: this.massage.price
       });
     }
@@ -86,14 +87,14 @@ export class MassageFormComponent {
     }
   }
 
-  edit(name: string, price: number, file: File) {
+  edit(name: string, price: number, file: File | null) {
     const updatedMassage: Massage = {
       id: this.massage?.id,
       name,
       price,
       company: this.massage?.company!,
       companyId: this.massage?.companyId!,
-      symptomIds: this.selectedSymptoms.map(s => s.id!),  
+      symptomIds: this.selectedSymptoms.map(s => s.id!),
     } as Massage;
     this.msgService.editMassage(updatedMassage, file).subscribe({
       next: (response) => {
@@ -102,7 +103,7 @@ export class MassageFormComponent {
       },
       error: (error: Error) => {
         this.alertService.error("Błąd podczas edycji: " + error.message);
-      } 
+      }
     });
   }
 
@@ -119,7 +120,7 @@ export class MassageFormComponent {
       },
       error: (error: Error) => {
         this.alertService.error("Błąd podczas dodawania masażu: " + error.message);
-      } 
+      }
     });
 
     if (this.dialogRef) {
@@ -128,7 +129,7 @@ export class MassageFormComponent {
   }
 
   submitForm(): void {
-    if (this.massage && this.formModel.valid && this.selectedFile) {
+    if (this.massage && this.formModel.valid) {
       this.edit(
         this.formModel.value.name,
         this.formModel.value.price,

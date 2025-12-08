@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -158,5 +159,16 @@ public class AuthenticationController {
                 "authenticated", false,
                 "message", "Not authenticated"
             ));
+    }
+
+    @DeleteMapping("/remove/{id}")
+    public ResponseEntity deleteUser(@PathVariable Long id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(403).build(); 
+        }
+
+        authService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 }

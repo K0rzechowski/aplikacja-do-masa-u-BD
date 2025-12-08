@@ -22,6 +22,8 @@ import { ReserveFormComponent } from './components/reserve-form/reserve-form.com
 import { ReservationHistoryComponent } from './components/reservation-history/reservation-history.component';
 import { ManageReservationsComponent } from './components/employee/manage-reservations/manage-reservations.component';
 import { StatisticsComponent } from './components/admin/statistics/statistics.component';
+import { RegulaminComponent } from './components/regulamin/regulamin.component';
+import { PolitykaPrywatnosciComponent } from './components/polityka-prywatnosci/polityka-prywatnosci.component';
 
 export const routes: Routes = [
   { path: '', component: MainPageComponent },
@@ -49,4 +51,6 @@ export const routes: Routes = [
   { path: ':city/:name/employees', component: EmployeesComponent },
   { path: ':city/:name/price', component: PriceListComponent },
   { path: 'reservation', component: ReserveFormComponent, canActivate: [authGuard] },
+  { path: 'regulamin', component: RegulaminComponent },
+  { path: 'politykaPrywatnosci', component: PolitykaPrywatnosciComponent },
 ];
