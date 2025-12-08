@@ -41,7 +41,7 @@ export const routes: Routes = [
       { path: 'employees', component: ManageEmployeesComponent, canActivate: [adminGuard] },
       { path: 'massages', component: ManageMassagesComponent, canActivate: [adminGuard] },
       { path: 'companySettings', component: CompanyFormsComponent, canActivate: [adminGuard] },
-      { path: 'statistics', component: StatisticsComponent, canActivate: [adminGuard] },
+      { path: 'statistics', component: StatisticsComponent, canActivate: [employeeOrAdminGuard] },
       { path: 'schedule', component: ScheduleOptimizerComponent, canActivate: [employeeOrAdminGuard] },
     ]
   },

@@ -50,6 +50,7 @@ export class SettingsComponent {
         this.settingsChoices.push({ label: 'Zarządzaj dostępnością na dzień', route: 'availabilities' });
         this.settingsChoices.push({ label: 'Grafiki', route: 'schedule' });
         this.settingsChoices.push({ label: 'Zarządzaj rezerwacjami klientów', route: 'manageReservations' });
+        this.settingsChoices.push({ label: 'Statystyki', route: 'statistics' });
       }
     });
   }
