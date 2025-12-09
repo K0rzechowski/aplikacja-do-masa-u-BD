@@ -42,7 +42,7 @@ export class FinanceChartComponent {
       this.reservationService.getReservationsByCompany(this.currentCompanyId).subscribe(reservations => {
         this.currentYearReservations = reservations.filter(reservation => {
           const reservationDate = new Date(reservation.shift.startTime);
-          return reservationDate.getFullYear() === this.current.getFullYear() && reservation.status !== "CANCELLED";
+          return reservationDate.getFullYear() === this.current.getFullYear() && reservation.status === "COMPLETED";
         });
 
         const monthlyRevenue = new Array(12).fill(0);

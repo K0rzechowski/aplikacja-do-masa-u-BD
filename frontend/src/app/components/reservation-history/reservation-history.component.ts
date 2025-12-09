@@ -50,7 +50,7 @@ export class ReservationHistoryComponent {
     const currentDate = new Date();
     allReservations.forEach(reservation => {
       const reservationDate = new Date(reservation.shift.startTime);
-      if ((reservationDate < currentDate || reservation.status !== 'COMPLETED') && reservation.status !== 'CANCELLED') {
+      if ((reservationDate < currentDate || reservation.status === 'COMPLETED') && reservation.status !== 'CANCELLED') {
         this.pastReservations.push(reservation);
       }
     });

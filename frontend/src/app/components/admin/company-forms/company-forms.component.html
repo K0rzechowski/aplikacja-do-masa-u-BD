@@ -1,10 +1,6 @@
 <div>
-    <div class="md:grid grid-cols-3">
-        <div class="md:col-span-2">
-            <h2 class="text-4xl mb-2">Zarządzaj firmą "{{ company?.name }}"</h2>
-            <h3 class="text-lg">Dodaj godziny otwarcia</h3>
-        </div>
-    </div>
+    <h2 class="text-4xl mb-2">Zarządzaj firmą "{{ company?.name }}"</h2>
+    <h3 class="text-lg">Dodaj godziny otwarcia</h3>
     <div class="my-5">
         <form [formGroup]="openForm" (ngSubmit)="submitOpenTime()">
             <div class="lg:flex justify-evenly space-x-4">
