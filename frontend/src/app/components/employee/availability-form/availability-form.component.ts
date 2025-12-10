@@ -10,11 +10,15 @@ import { A11yModule } from "@angular/cdk/a11y";
 import { MatSelectModule } from '@angular/material/select';
 import { AlertService } from '../../../services/alert.service';
 import { AvailabilityTypeLabels } from '../../../models/availability';
-import { DatePipe } from '@angular/common';
+import { ScheduleService } from '../../../services/schedule.service';
+import { employeeOrAdminGuard } from '../../../guards/employee-or-admin.guard';
+import { EmployeeService } from '../../../services/employee.service';
+import { Employee } from '../../../models/employee';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-availability-form',
-  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogModule, MatDialogClose, ReactiveFormsModule,  MatFormFieldModule, MatOptionModule, A11yModule, MatSelectModule, DatePipe],
+  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogModule, MatDialogClose, ReactiveFormsModule,  MatFormFieldModule, MatOptionModule, A11yModule, MatSelectModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './availability-form.component.html',
   styleUrl: './availability-form.component.css'
@@ -33,7 +37,9 @@ export class AvailabilityFormComponent {
   constructor (
     private availabilityService: AvailabilityService,
     private formBuilder: FormBuilder,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private scheduleService: ScheduleService,
+    private employeeService: EmployeeService
   ) {
     this.formModel = this.formBuilder.group({
       type: [null, Validators.required]
@@ -95,5 +101,10 @@ export class AvailabilityFormComponent {
     } else if (!this.currentDayAvailability && this.formModel.valid) {
       this.create(this.formModel.value.type);
     }
+  }
+
+  formatDate(date: Date): string {
+    date = new Date(date);
+    return date.toLocaleString('pl-PL', { weekday: 'long', day:'2-digit', month: 'long', year: 'numeric' });
   }
 }

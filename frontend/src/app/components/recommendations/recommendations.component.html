@@ -54,7 +54,7 @@
                                         }
                                     }
                                 </ul>
-                                }
+                            }
                         </p>
                     </div>
                     <div class="px-3 pb-3 pt-0 mt-2">
@@ -63,7 +63,8 @@
                         </button>
                     </div>
                 </div>  
-            } @empty {
+            }
+            @if(selectedSymptoms.length > 0 && recommendedMassages.length == 0) {
                 <p class="text-center text-slate-600 col-span-4">Brak rekomendacji dla danego symptomu.</p>
             }
             @if (randomMassage) {

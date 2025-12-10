@@ -54,6 +54,14 @@ public class EmployeeController {
         return ResponseEntity.ok(emplsAlphabetically);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable Long id) {
+        Employee empl = emplService.getEmployeeById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego pracownika"));
+        EmployeeDto emplDto = emplService.getEmployeeResponse(empl);
+        return ResponseEntity.ok(emplDto);
+    }
+
     @GetMapping("/company/{id}")
     public ResponseEntity<List<EmployeeDto>> getEmployeesByCompany(@PathVariable Long id) {
         List<Employee> empls = emplService.getEmployeesByCompany(id);

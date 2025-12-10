@@ -14,6 +14,7 @@ import { Company } from '../../../models/company';
 import { CompanyService } from '../../../services/company.service';
 import { OptimizedShift } from '../../../models/optaplanner/optimized-shifts';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { checkIfMonday } from '../../../validators/date.validator';
 
 @Component({
   selector: 'app-create-schedule',
@@ -57,7 +58,7 @@ export class CreateScheduleComponent {
     private formBuilder: FormBuilder
   ) {
     this.formModel = this.formBuilder.group({
-      startTime: [null, Validators.required]
+      startTime: [null, [Validators.required, checkIfMonday]]
     })
 
     this.currentCompany$.subscribe(c => {

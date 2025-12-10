@@ -17,10 +17,15 @@
                     <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
                 </mat-form-field>
                 <mat-datepicker #startPicker></mat-datepicker>      
+                
             </div>
-            
+            <p class="warning text-center mb-2">
+                @if(formModel.controls['startTime'].touched && formModel.get('startTime')?.errors?.['notMonday']) {
+                    Wybrany dzień musi być poniedziałkiem
+                }
+            </p>
             <button 
-                mat-button 
+                mat-button
                 class="btn-long btn-sky mb-4 cursor-pointer"
                 [class.cursor-progress]="isProcessing()"
                 [class.cursor-pointer]="!isProcessing()"

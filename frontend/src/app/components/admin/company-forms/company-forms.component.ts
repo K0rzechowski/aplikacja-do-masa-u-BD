@@ -21,6 +21,7 @@ import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { AlertService } from '../../../services/alert.service';
 import { Moment } from 'moment';
 import moment from 'moment';
+import OpenTimeValidator from '../../../validators/open-time.validator';
 
 registerLocaleData(localePl, 'pl');
 
@@ -70,8 +71,8 @@ export class CompanyFormsComponent {
     });
 
     this.openForm = this.formBuilder.group({
-      startTime: [this.companyOpenTime?.openTime, [Validators.required]],
-      closeTime: [this.companyOpenTime?.closeTime, [Validators.required]]
+      startTime: [this.companyOpenTime?.openTime, Validators.required],
+      closeTime: [this.companyOpenTime?.closeTime, [Validators.required, OpenTimeValidator.checkTime]]
     })
 
     this.loadRoomsInMyCompany();

@@ -1,4 +1,5 @@
 <mat-form-field class="w-full">
+    <mat-label>Wyszukaj, np. ból karku</mat-label>
     <mat-chip-grid #chipGrid aria-label="Wybrane">
         @for (data of selectedData(); track data.id) {
             <mat-chip-row (removed)="removeData(data)" [removable]="true">

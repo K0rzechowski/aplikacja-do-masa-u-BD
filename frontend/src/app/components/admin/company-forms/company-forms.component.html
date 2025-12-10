@@ -1,12 +1,12 @@
 <div>
     <h2 class="text-4xl mb-2">Zarządzaj firmą "{{ company?.name }}"</h2>
-    <h3 class="text-lg">Dodaj godziny otwarcia</h3>
     <div class="my-5">
         <form [formGroup]="openForm" (ngSubmit)="submitOpenTime()">
             <div class="lg:flex justify-evenly space-x-4">
                 @if (openTime && closeTime) {
                     <p class="text-lg font-semibold mb-2">Godziny otwarcia: {{openTime}} - {{closeTime}}</p>
                 } @else {
+                    <h3 class="text-lg">Dodaj godziny otwarcia</h3>
                     <div>
                         <mat-form-field>
                             <mat-label for="startTime">Godzina otwarcia</mat-label>
@@ -28,9 +28,12 @@
                             <mat-timepicker #closePicker/>
                         </mat-form-field>
                         <p class="warning">
-                            @if (openForm.controls['closeTime'].invalid && openForm.controls['closeTime'].touched ) {
+                            @if(openForm.controls['closeTime'].touched && openForm.get('closeTime')?.errors?.['closingEarlier']) {
+                                Godzina zamknięcia nie może być przed godziną otwarcia
+                            } @else if (openForm.controls['closeTime'].invalid && openForm.controls['closeTime'].touched ) {
                                 Godzina zamknięcia jest wymagana
-                            }
+                            } 
+
                         </p>
                     </div>
                     <input type="submit" class="btn btn-sky place-self-center" value="Zapisz godziny"/>
