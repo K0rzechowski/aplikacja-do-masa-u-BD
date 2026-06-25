@@ -18,7 +18,7 @@ export const appConfig: ApplicationConfig = {
       useClass: CredentialsInterceptor,
       multi: true
     },
-    provideCloudinaryLoader("https://res.cloudinary.com/dmx0gdmxh/"),
+    provideCloudinaryLoader(`https://res.cloudinary.com/${environment.cloudinaryCloudName}/`),
       {
         provide: RECAPTCHA_SETTINGS,
         useValue: {

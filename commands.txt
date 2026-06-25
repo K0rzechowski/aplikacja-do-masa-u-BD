@@ -1,5 +1,0 @@
-# to open postgres in terminal
-docker exec -it db psql -U $POSTGRES_USER -d $POSTGRES_DB
-
-# to create a new component
-docker exec -it frontend ng generate component component-name

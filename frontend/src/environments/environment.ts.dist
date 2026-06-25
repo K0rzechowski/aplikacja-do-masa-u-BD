@@ -1,10 +1,13 @@
 export const environment = {
-    production: true, //false
+    production: true,
     userAuthUrl: 'http://localhost:8080/api/auth',
     baseUrl: 'http://localhost:8080/api',
 
-    // key generated from https://www.google.com/u/3/recaptcha/admin/site/740113027/setup
+    // key generated from https://www.google.com/recaptcha/
     recaptcha: {
         siteKey: 'XXXX'
     },
+
+    // https://console.cloudinary.com -> Settings -> API Keys -> Cloud name
+    cloudinaryCloudName: 'XXXX',
 };
