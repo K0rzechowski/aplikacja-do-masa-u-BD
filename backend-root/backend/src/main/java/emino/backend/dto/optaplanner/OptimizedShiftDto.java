@@ -17,6 +17,5 @@ public class OptimizedShiftDto {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String location;
-    private String requiredSkill;
     private String employeeName;
 }

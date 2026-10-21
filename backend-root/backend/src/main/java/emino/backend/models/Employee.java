@@ -32,12 +32,12 @@ public class Employee extends User {
     @JsonBackReference
     private Company company;
 
+    @ManyToOne
+    @JoinColumn(name = "branch_office_id", nullable = false)
+    private BranchOffice branchOffice;
+
     @Column(nullable = false, length = 9)
     private String phoneNumber;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "employee")
-    private List<EmployeeAvailability> availabilities;
 
     @JsonIgnore
     @OneToMany(mappedBy = "assignedEmployee")
@@ -50,9 +50,10 @@ public class Employee extends User {
 
     @Builder(builderMethodName = "emplBuilder")
     public Employee(Long id, String password, String email, String name, String surname, LocalDate dateOfBirth,
-            UserRole role, Company company, String phoneNumber) {
+            UserRole role, Company company, BranchOffice branchOffice, String phoneNumber) {
         super(id, password, email, name, surname, dateOfBirth, role, null);
         this.phoneNumber = phoneNumber;
         this.company = company;
+        this.branchOffice = branchOffice;
     }
 }

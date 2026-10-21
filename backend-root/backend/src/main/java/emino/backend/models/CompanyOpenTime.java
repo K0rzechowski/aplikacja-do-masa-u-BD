@@ -2,6 +2,8 @@ package emino.backend.models;
 
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,8 +30,9 @@ public class CompanyOpenTime {
     private Long id; 
 
     @OneToOne
-    @JoinColumn(name="company_id")
-    private Company company;
+    @JoinColumn(name = "branch_office_id", nullable = false, unique = true)
+    @JsonIgnore
+    private BranchOffice branchOffice;
 
     @Column(nullable=false)
     private LocalTime openTime;

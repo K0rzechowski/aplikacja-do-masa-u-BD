@@ -4,13 +4,11 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,22 +19,24 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-public class EmployeeAvailability {
-    
+@Builder
+public class Review {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee;
+    @OneToOne
+    @JoinColumn(name = "reservation_id", referencedColumnName = "id", nullable = false, unique = true)
+    private Reservation reservation;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private Integer rating;
 
-    @Enumerated(EnumType.STRING)
+    @Column(length = 1000)
+    private String comment;
+
     @Column(nullable = false)
-    private AvailabilityType availabilityType;
+    private LocalDate dateOfCreation;
 }

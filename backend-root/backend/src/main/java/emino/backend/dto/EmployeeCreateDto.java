@@ -18,6 +18,7 @@ public class EmployeeCreateDto {
     private LocalDate dateOfBirth;
     private String email;
     private String phoneNumber;
+    private Long branchOfficeId;
     private List<Long> massageIds;
     private UserRole role;
 }

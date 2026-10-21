@@ -15,9 +15,11 @@ import emino.backend.exception.AccessDeniedException;
 import emino.backend.mail.EmailService;
 import emino.backend.mail.GenerateCustomPassword;
 import emino.backend.models.Admin;
+import emino.backend.models.BranchOffice;
 import emino.backend.models.Employee;
 import emino.backend.models.MassageForCompany;
 import emino.backend.models.UserRole;
+import emino.backend.repositories.BranchOfficeRepository;
 import emino.backend.repositories.CompanyRepository;
 import emino.backend.repositories.EmployeeRepository;
 import emino.backend.repositories.MassageForCompanyRepository;
@@ -30,6 +32,7 @@ public class EmployeeService {
     
     private final EmployeeRepository emplRepository;
     private final CompanyRepository companyRepository;
+    private final BranchOfficeRepository branchOfficeRepository;
     private final MassageForCompanyRepository massageRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
@@ -52,6 +55,7 @@ public class EmployeeService {
 
     public Employee createEmployee(EmployeeCreateDto request, Admin admin) throws MessagingException {
         var company = admin.getCompany();
+        BranchOffice branchOffice = getBranchOfficeOfCompany(request.getBranchOfficeId(), admin);
         String generatedPassword = passwordGenerator.generatePassayPassword();
 
         Employee employee = Employee.emplBuilder()
@@ -63,6 +67,7 @@ public class EmployeeService {
             .phoneNumber(request.getPhoneNumber())
             .role(UserRole.EMPLOYEE)
             .company(company)
+            .branchOffice(branchOffice)
             .build();
 
         if (!employee.getCompany().equals(admin.getCompany())) {
@@ -114,6 +119,9 @@ public class EmployeeService {
         if (request.getPhoneNumber() != null) {
             employee.setPhoneNumber(request.getPhoneNumber());
         }
+        if (request.getBranchOfficeId() != null) {
+            employee.setBranchOffice(getBranchOfficeOfCompany(request.getBranchOfficeId(), admin));
+        }
 
         if (!employee.getCompany().equals(admin.getCompany())) {
             throw new AccessDeniedException("Nie można edytować pracownika innej firmy");
@@ -142,6 +150,20 @@ public class EmployeeService {
         }
     }
 
+    private BranchOffice getBranchOfficeOfCompany(Long branchOfficeId, Admin admin) {
+        if (branchOfficeId == null) {
+            throw new IllegalArgumentException("Pracownik musi być przypisany do placówki");
+        }
+
+        BranchOffice branchOffice = branchOfficeRepository.findById(branchOfficeId)
+            .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej placówki"));
+
+        if (!branchOffice.getCompany().getId().equals(admin.getCompany().getId())) {
+            throw new AccessDeniedException("Nie można przypisać pracownika do placówki innej firmy");
+        }
+        return branchOffice;
+    }
+
     public List<Employee> getEmployeesByMassage(Long massageId) {
         MassageForCompany massage = massageRepository.findById(massageId)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danego masażu"));
@@ -159,6 +181,8 @@ public class EmployeeService {
         dto.setPhoneNumber(employee.getPhoneNumber());
         dto.setCompanyId(employee.getCompany().getId());
         dto.setCompanyName(employee.getCompany().getName());
+        dto.setBranchOfficeId(employee.getBranchOffice().getId());
+        dto.setBranchOfficeName(employee.getBranchOffice().getName());
         
         if (employee.getMassagesToHandle() != null) {
             List<MassageDto> massageDtos = employee.getMassagesToHandle().stream()

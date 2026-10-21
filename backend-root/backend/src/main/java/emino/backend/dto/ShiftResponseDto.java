@@ -13,10 +13,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ShiftResponseDto {
    
+    private Long id;
     private Long companyId;
+    private Long branchOfficeId;
+    private String branchOfficeName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String roomNumber;
-    private String massageName;
+    private Long assignedEmployeeId;
     private String assignedEmployeeName;
 }

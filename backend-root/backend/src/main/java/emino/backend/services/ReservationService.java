@@ -42,7 +42,7 @@ public class ReservationService {
     public List<Reservation> getReservationsByCompany(Long companyId) {
         var company = companyRepository.findById(companyId)
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono danej firmy"));
-        return reservationRepository.findByShiftCompanyId(companyId);
+        return reservationRepository.findByShiftBranchOfficeCompanyId(companyId);
     }
 
     public List<Reservation> getAllReservations() {
@@ -63,6 +63,15 @@ public class ReservationService {
         MassageForCompany massage = massageRepository.findById(request.getMassageForCompany().getId())
             .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono masażu"));
 
+        Employee employee = shift.getAssignedEmployee();
+        if (employee == null) {
+            throw new IllegalStateException("Na tę zmianę nie zapisał się jeszcze żaden pracownik");
+        }
+        if (employee.getMassagesToHandle() == null || employee.getMassagesToHandle().stream()
+                .noneMatch(handled -> handled.getId().equals(massage.getId()))) {
+            throw new IllegalStateException("Pracownik tej zmiany nie wykonuje wybranego masażu");
+        }
+
         Reservation reservation = Reservation.builder()
             .customer(customer)
             .shift(shift)
@@ -71,7 +80,7 @@ public class ReservationService {
             .build();
 
         Reservation savedReservation = reservationRepository.save(reservation);
-        emailService.sendReservationConfirmationEmail(customer, shift.getCompany(), massage.getMassage().getName(), shift);
+        emailService.sendReservationConfirmationEmail(customer, shift.getBranchOffice(), massage.getMassage().getName(), shift);
         return savedReservation;
     }
 
@@ -92,7 +101,7 @@ public class ReservationService {
 
         reservation.setStatus(Status.CANCELLED);
         reservationRepository.save(reservation);
-        emailService.sendCancelReservationEmail(customer, reservation.getShift().getCompany(), reservation.getMassage().getMassage().getName(), reservation.getShift());
+        emailService.sendCancelReservationEmail(customer, reservation.getShift().getBranchOffice(), reservation.getMassage().getMassage().getName(), reservation.getShift());
     }
 
     public void setReservationAsCompleted(Long reservationId, Long employeeId) {

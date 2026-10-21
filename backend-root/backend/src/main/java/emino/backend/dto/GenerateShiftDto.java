@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GenerateShiftDto {
     
-    private Long companyId;
+    private Long branchOfficeId;
     private LocalDate startDate;
 }

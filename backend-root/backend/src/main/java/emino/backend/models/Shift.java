@@ -38,12 +38,8 @@ public class Shift {
     private LocalDateTime endTime;
 
     @ManyToOne
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "room_id", nullable = false)
     private Room room;
-
-    @ManyToOne()
-    @JoinColumn(name = "massage_id")
-    private MassageForCompany massage;
 
     @ManyToOne()
     @JoinColumn(name = "assigned_employee_id")
@@ -54,6 +50,6 @@ public class Shift {
     private Set<Reservation> reservation;
 
     @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @JoinColumn(name = "branch_office_id", nullable = false)
+    private BranchOffice branchOffice;
 }

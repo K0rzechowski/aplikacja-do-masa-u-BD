@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class CompanyOpenTimeDto {
 
     private Long id; 
-    private Long companyId;
+    private Long branchOfficeId;
     private LocalTime openTime;
     private LocalTime closeTime;  
 }

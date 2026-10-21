@@ -20,8 +20,6 @@ public class OptaPlannerMapper {
                         .startTime(shift.getStartTime())
                         .endTime(shift.getEndTime())
                         .location(shift.getRoom().getRoomNumber())
-                        .requiredSkill(shift.getMassage() != null ? shift.getMassage().getMassage().getName()
-                                        : null)
                         .employeeName(employeeName)
                         .build();
         }

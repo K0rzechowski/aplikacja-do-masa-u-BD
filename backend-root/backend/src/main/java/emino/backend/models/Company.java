@@ -5,13 +5,13 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,14 +49,6 @@ public class Company {
     private Set<MassageForCompany> massages;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "company")
-    private Set<Shift> shifts;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "company")
-    private Set<Room> rooms;
-
-    @JsonIgnore
-    @OneToOne(mappedBy = "company")
-    private CompanyOpenTime companyOpenTime;
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BranchOffice> branchOffices;
 }

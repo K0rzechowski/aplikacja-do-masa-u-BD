@@ -28,7 +28,7 @@ services:
       - ../frontend:/app
 
   db:
-    image: postgres
+    image: postgres:17
     container_name: db
     env_file:
       - .env

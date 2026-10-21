@@ -1,5 +1,7 @@
 package emino.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,6 +41,10 @@ public class Reservation {
 
     @OneToOne(mappedBy = "reservation")
     private NoteFromVisit note;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "reservation")
+    private Review review;
 
     @ManyToOne
     @JoinColumn(name = "shift_id")

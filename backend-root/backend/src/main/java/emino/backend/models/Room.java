@@ -1,6 +1,6 @@
 package emino.backend.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,9 +28,9 @@ public class Room {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "company_id", nullable = false)
-    @JsonBackReference
-    private Company company;
+    @JoinColumn(name = "branch_office_id", nullable = false)
+    @JsonIgnore
+    private BranchOffice branchOffice;
 
     @Column(nullable = false)
     private String roomNumber;

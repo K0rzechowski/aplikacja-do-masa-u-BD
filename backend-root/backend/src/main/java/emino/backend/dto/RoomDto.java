@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class RoomDto {
    
     private Long id;
-    private Long companyId;
+    private Long branchOfficeId;
     private String roomNumber;
 }

@@ -9,7 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import emino.backend.models.Admin;
-import emino.backend.models.Company;
+import emino.backend.models.BranchOffice;
 import emino.backend.models.Employee;
 import emino.backend.models.Shift;
 import emino.backend.models.User;
@@ -85,7 +85,7 @@ public class EmailService {
         emailSender.send(message);
     }
 
-    public void sendReservationConfirmationEmail(User to, Company company, String massageName, Shift shift) throws MessagingException {
+    public void sendReservationConfirmationEmail(User to, BranchOffice branchOffice, String massageName, Shift shift) throws MessagingException {
         String htmlTemplate = readTemplate("templates/reservationTemplate.html");
 
         MimeMessage message = emailSender.createMimeMessage();
@@ -98,15 +98,15 @@ public class EmailService {
             .replace("${name}", to.getName())
             .replace("${massageName}", massageName)
             .replace("${time}", shift.getStartTime().toString())
-            .replace("${location}", company.getName())
-            .replace("${city}", company.getCity());
+            .replace("${location}", branchOffice.getCompany().getName() + " – " + branchOffice.getName())
+            .replace("${city}", branchOffice.getAddress() + ", " + branchOffice.getCity());
 
         message.setContent(htmlContent, "text/html; charset=utf-8");
 
         emailSender.send(message);
     }
 
-    public void sendCancelReservationEmail(User to, Company company, String massageName, Shift shift) throws MessagingException {
+    public void sendCancelReservationEmail(User to, BranchOffice branchOffice, String massageName, Shift shift) throws MessagingException {
         String htmlTemplate = readTemplate("templates/cancelReservationTemplate.html");
 
         MimeMessage message = emailSender.createMimeMessage();
@@ -119,8 +119,8 @@ public class EmailService {
             .replace("${name}", to.getName())
             .replace("${massageName}", massageName)
             .replace("${time}", shift.getStartTime().toString())
-            .replace("${location}", company.getName())
-            .replace("${city}", company.getCity());
+            .replace("${location}", branchOffice.getCompany().getName() + " – " + branchOffice.getName())
+            .replace("${city}", branchOffice.getAddress() + ", " + branchOffice.getCity());
 
         message.setContent(htmlContent, "text/html; charset=utf-8");
 

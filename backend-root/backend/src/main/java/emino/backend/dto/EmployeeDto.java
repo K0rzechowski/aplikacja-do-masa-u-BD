@@ -22,5 +22,7 @@ public class EmployeeDto {
     private String phoneNumber;
     private Long companyId;
     private String companyName;
+    private Long branchOfficeId;
+    private String branchOfficeName;
     private List<MassageDto> massages;
 }

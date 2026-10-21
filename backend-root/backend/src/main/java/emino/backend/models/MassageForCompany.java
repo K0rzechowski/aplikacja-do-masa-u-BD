@@ -49,10 +49,6 @@ public class MassageForCompany {
 
     @JsonIgnore
     @OneToMany(mappedBy = "massage")
-    private Set<Shift> shifts;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "massage")
     private Set<Reservation> reservations;
 
     @JsonIgnore
