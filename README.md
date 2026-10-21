@@ -4,7 +4,7 @@
 
 ### Opis projektu
 
-Repozytorium zawiera projekt pracy inżynierskiej: aplikację webową do zarządzania salonem masażu. System pozwala klientom wyszukiwać firmy i usługi, rejestrować się, rezerwować wizyty oraz otrzymywać rekomendacje masaży na podstawie objawów. Administratorzy firm i pracownicy mogą zarządzać masażami, pokojami, pracownikami, rezerwacjami, dostępnością, statystykami i zoptymalizowanym harmonogramem pracy.
+Repozytorium zawiera projekt pracy inżynierskiej: aplikację webową do zarządzania salonem masażu. System pozwala klientom wyszukiwać firmy i usługi, rejestrować się, rezerwować wizyty oraz otrzymywać rekomendacje masaży na podstawie objawów. Administratorzy firm i pracownicy mogą zarządzać masażami, pokojami, pracownikami, rezerwacjami, dostępnością, statystykami i harmonogramem pracy.
 
 ### Struktura projektu i technologie
 
@@ -21,7 +21,7 @@ Repozytorium zawiera projekt pracy inżynierskiej: aplikację webową do zarząd
 - `frontend` - aplikacja Angular 19 uruchamiana na porcie `4200`.
 - `backend-root/backend` - główne API Spring Boot 3 uruchamiane na porcie `8080`.
 - `backend-root/recommendations` - moduł Spring Boot dla logiki rekomendacji masaży.
-- `docker` - konfiguracja Docker Compose dla frontendu, backendu, bazy PostgreSQL i usługi OptaPlanner.
+- `docker` - konfiguracja Docker Compose dla frontendu, backendu i bazy PostgreSQL.
 
 ### Główne funkcje
 
@@ -32,7 +32,6 @@ Repozytorium zawiera projekt pracy inżynierskiej: aplikację webową do zarząd
 - Rekomendacje masaży na podstawie wybranych objawów.
 - Obsługa przesyłania zdjęć przez Cloudinary.
 - Obsługa Google reCAPTCHA.
-- Optymalizacja harmonogramu przez zewnętrzną usługę OptaPlanner.
 
 ### Wymagania
 
@@ -61,14 +60,6 @@ POSTGRES_DB=twoja_nazwa_bazy
 SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
 SPRING_DATASOURCE_USERNAME=twój_użytkownik_bazy
 SPRING_DATASOURCE_PASSWORD=twoje_hasło_bazy
-```
-
-Docker Compose przekazuje też dane datasource do usługi OptaPlanner/Quarkus. Dodaj do `docker/.env` również:
-
-```dotenv
-QUARKUS_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
-QUARKUS_DATASOURCE_USERNAME=twój_użytkownik_bazy
-QUARKUS_DATASOURCE_PASSWORD=twoje_hasło_bazy
 ```
 
 #### Środowisko backendu
@@ -136,34 +127,10 @@ cd backend-root/backend
 ./mvnw clean package -DskipTests
 ```
 
-4. Przygotuj zewnętrzną usługę OptaPlanner employee scheduling.
-
-   Usługa pochodzi z repozytorium [emilia-nodz/optaplanner-quickstarts](https://github.com/emilia-nodz/optaplanner-quickstarts/tree/myProject) na branchu `myProject`.
-
-   Sklonuj repozytorium jako folder sąsiedni do `praca-inzynierska` (Docker Compose używa ścieżki `../../optaplanner-quickstarts/use-cases/employee-scheduling` jako build context z poziomu folderu `docker`):
+4. Uruchom aplikację:
 
 ```bash
-cd ../../..
-git clone -b myProject https://github.com/emilia-nodz/optaplanner-quickstarts.git
-cd optaplanner-quickstarts/use-cases/employee-scheduling
-mvn clean package -Dnet.bytebuddy.experimental=true -DskipTests
-```
-
-Oczekiwana struktura katalogów po klonowaniu:
-
-```
-katalog_nadrzędny/
-├── praca-inzynierska/
-│   └── docker/
-└── optaplanner-quickstarts/
-    └── use-cases/
-        └── employee-scheduling/
-```
-
-5. Uruchom aplikację:
-
-```bash
-cd ../../praca-inzynierska/docker
+cd ../../docker
 docker-compose up --build
 ```
 
@@ -174,10 +141,6 @@ Zatrzymanie kontenerów:
 ```bash
 docker-compose stop
 ```
-
-### Uwagi
-
-- Backend wywołuje serwis OptaPlanner wewnętrznie pod adresem `http://optaplanner:8081` — nie zmieniaj tej wartości w konfiguracji.
 
 ### Licencja
 
@@ -192,14 +155,9 @@ Ten projekt korzysta z następującego oprogramowania zewnętrznego:
   Użyte w module `backend-root/recommendations` do algorytmu rekomendacji masaży.
   Źródło: [github.com/haifengl/smile](https://github.com/haifengl/smile)
 
-- **Apache OptaPlanner Quickstarts** (`incubator-kie-optaplanner-quickstarts`)
-  Copyright © The Apache Software Foundation. Licencja: Apache License 2.0.
-  Użyte jako baza dla zewnętrznej usługi optymalizacji harmonogramu (`optaplanner-quickstarts`, branch `myProject`).
-  Źródło: [github.com/apache/incubator-kie-optaplanner-quickstarts](https://github.com/apache/incubator-kie-optaplanner-quickstarts)
-
 ## Web application with schedule optimizer for use in massage salon
 
-This repository contains an engineering thesis project: a web application for massage salon management. The system lets customers find companies and services, register and book visits, and receive massage recommendations based on symptoms. Company admins and employees can manage massages, rooms, employees, reservations, availability, statistics, and optimized work schedules.
+This repository contains an engineering thesis project: a web application for massage salon management. The system lets customers find companies and services, register and book visits, and receive massage recommendations based on symptoms. Company admins and employees can manage massages, rooms, employees, reservations, availability, statistics, and work schedules.
 
 ### Project Structure and tech stack
 
@@ -216,7 +174,7 @@ This repository contains an engineering thesis project: a web application for ma
 - `frontend` - Angular 19 application served on port `4200`.
 - `backend-root/backend` - Spring Boot 3 backend API served on port `8080`.
 - `backend-root/recommendations` - Spring Boot module for massage recommendation logic.
-- `docker` - Docker Compose configuration for the frontend, backend, PostgreSQL database, and OptaPlanner employee scheduling service.
+- `docker` - Docker Compose configuration for the frontend, backend, and PostgreSQL database.
 
 ### Main Features
 
@@ -227,7 +185,6 @@ This repository contains an engineering thesis project: a web application for ma
 - Massage recommendations based on selected symptoms.
 - Image upload support through Cloudinary.
 - Google reCAPTCHA support for protected forms.
-- Schedule optimization through an external OptaPlanner employee scheduling service.
 
 ### Requirements
 
@@ -256,14 +213,6 @@ POSTGRES_DB=your_database_name
 SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
 SPRING_DATASOURCE_USERNAME=your_database_user
 SPRING_DATASOURCE_PASSWORD=your_database_password
-```
-
-The Docker Compose file also passes datasource values to the OptaPlanner/Quarkus service. Add these to `docker/.env` as well:
-
-```dotenv
-QUARKUS_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
-QUARKUS_DATASOURCE_USERNAME=your_database_user
-QUARKUS_DATASOURCE_PASSWORD=your_database_password
 ```
 
 #### Backend Environment
@@ -331,34 +280,10 @@ cd backend-root/backend
 ./mvnw clean package -DskipTests
 ```
 
-4. Prepare the external OptaPlanner employee scheduling service.
-
-   The service comes from the [emilia-nodz/optaplanner-quickstarts](https://github.com/emilia-nodz/optaplanner-quickstarts/tree/myProject) repository, branch `myProject`.
-
-   Clone it as a sibling folder next to `praca-inzynierska` (Docker Compose uses `../../optaplanner-quickstarts/use-cases/employee-scheduling` as the build context from inside the `docker` directory):
+4. Start the application:
 
 ```bash
-cd ../../..
-git clone -b myProject https://github.com/emilia-nodz/optaplanner-quickstarts.git
-cd optaplanner-quickstarts/use-cases/employee-scheduling
-mvn clean package -Dnet.bytebuddy.experimental=true -DskipTests
-```
-
-Expected directory structure after cloning:
-
-```
-parent_directory/
-├── praca-inzynierska/
-│   └── docker/
-└── optaplanner-quickstarts/
-    └── use-cases/
-        └── employee-scheduling/
-```
-
-5. Start the application:
-
-```bash
-cd ../../praca-inzynierska/docker
+cd ../../docker
 docker-compose up --build
 ```
 
@@ -369,10 +294,6 @@ Stop the containers with:
 ```bash
 docker-compose stop
 ```
-
-### Notes
-
-- The backend calls the OptaPlanner service internally at `http://optaplanner:8081` — do not change this value in configuration.
 
 ### License
 
@@ -386,8 +307,3 @@ This project uses the following third-party software:
   Copyright © 2010–2026 Haifeng Li. License: GNU GPL v3.
   Used in `backend-root/recommendations` for the massage recommendation algorithm.
   Source: [github.com/haifengl/smile](https://github.com/haifengl/smile)
-
-- **Apache OptaPlanner Quickstarts** (`incubator-kie-optaplanner-quickstarts`)
-  Copyright © The Apache Software Foundation. License: Apache License 2.0.
-  Used as the base for the external employee scheduling service (`optaplanner-quickstarts`, branch `myProject`).
-  Source: [github.com/apache/incubator-kie-optaplanner-quickstarts](https://github.com/apache/incubator-kie-optaplanner-quickstarts)

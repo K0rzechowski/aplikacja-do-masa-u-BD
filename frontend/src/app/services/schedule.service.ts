@@ -25,14 +25,6 @@ export class ScheduleService {
     return this.httpClient.post<GenerateShiftResponse>(`${this.shiftUrl}/generate`, body);
   }
 
-  optimizeSchedule(companyId: string, startTime: string, endTime: string): Observable<OptimizedScheduleResponse> {
-    const params = new HttpParams()
-      .set('startTime', startTime)
-      .set('endTime', endTime);
-
-    return this.httpClient.post<OptimizedScheduleResponse>(`${this.baseUrl}/optimize/${companyId}`, null, { params: params });
-  }
-
   getOptimizedSchedule(companyId: string, startTime: string, endTime: string): Observable<OptimizedScheduleResponse> {
     const params = new HttpParams()
       .set('startTime', startTime)

@@ -9,10 +9,9 @@ import { MatIcon } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Company } from '../../../models/company';
 import { CompanyService } from '../../../services/company.service';
-import { OptimizedShift } from '../../../models/optaplanner/optimized-shifts';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { checkIfMonday } from '../../../validators/date.validator';
 
@@ -44,8 +43,6 @@ export class CreateScheduleComponent {
   formModel: FormGroup;
   currentCompany: Company | undefined;
   isGenerating = false;
-  isOptimizing = false;
-  currentStep: "idle" | "generating" | "optimizing" | "completed" = "idle";
 
   get currentCompany$(): Observable<Company | null> {
     return this.companyService.currentCompany;
@@ -79,48 +76,20 @@ export class CreateScheduleComponent {
     return `${year}-${month}-${day}`;
   }
 
-  private formatToISOStartDateTime(date: Date): string {
-    return `${this.formatDate(date)}T00:00:00`;
-  }
-
-  private formatToISOEndDateTime(date: Date): string {
-    return `${this.formatDate(date)}T23:59:59`;
-  }
-
   createSchedule() {
     if (this.currentCompany != null && this.currentCompany?.id && this.formModel.valid) {
       this.isGenerating = true;
-      const startDate = this.formModel.value.startTime;
-      const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + 6);
+      const startDateStr = this.formatDate(this.formModel.value.startTime);
 
-      const startDateStr = this.formatDate(startDate);
-
-      const startDateTime = this.formatToISOStartDateTime(startDate);
-      const endDateTime = this.formatToISOEndDateTime(endDate);
-
-      this.scheduleService.generateShifts(this.currentCompany.id, startDateStr).pipe(
-        switchMap(response => {
+      this.scheduleService.generateShifts(this.currentCompany.id, startDateStr).subscribe({
+        next: (response) => {
           this.isGenerating = false;
+
           this.alertService.success(response.message);
-
-          this.isOptimizing = true;
-          if (this.currentCompany?.id) {
-            return this.scheduleService.optimizeSchedule(this.currentCompany.id, startDateTime, endDateTime);
-          }
-          return of();
-        })
-      )
-      .subscribe({
-        next: (optimizeResponse) => {
-          this.isOptimizing = false;
-
-          this.alertService.success(`${optimizeResponse.message}`);
           this.dialogRef.close();
         },
         error: (error) => {
           this.isGenerating = false;
-          this.isOptimizing = false;
 
           console.error("Error", error);
 
@@ -132,15 +101,12 @@ export class CreateScheduleComponent {
   }
 
   isProcessing(): boolean {
-    return this.isGenerating || this.isOptimizing;
+    return this.isGenerating;
   }
 
   getStatusMessage(): string {
     if (this.isGenerating) {
       return "Generowanie zmian...";
-    }
-    if (this.isOptimizing) {
-      return "Optymalizacja w toku...";
     }
     return "Stwórz grafik";
   }
