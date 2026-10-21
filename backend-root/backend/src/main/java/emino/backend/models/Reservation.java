@@ -47,8 +47,8 @@ public class Reservation {
     private Review review;
 
     @ManyToOne
-    @JoinColumn(name = "shift_id")
-    private Shift shift;
+    @JoinColumn(name = "time_slot_id", nullable = false)
+    private TimeSlot timeSlot;
 
     @ManyToOne()
     @JoinColumn(name = "massage_id")

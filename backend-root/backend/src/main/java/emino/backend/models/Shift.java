@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,12 +43,12 @@ public class Shift {
     private Room room;
 
     @ManyToOne()
-    @JoinColumn(name = "assigned_employee_id")
+    @JoinColumn(name = "assigned_employee_id", nullable = false)
     private Employee assignedEmployee;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "shift")
-    private Set<Reservation> reservation;
+    @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TimeSlot> timeSlots;
 
     @ManyToOne
     @JoinColumn(name = "branch_office_id", nullable = false)
