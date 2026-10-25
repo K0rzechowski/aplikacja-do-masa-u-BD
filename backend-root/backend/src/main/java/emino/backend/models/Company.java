@@ -33,13 +33,6 @@ public class Company {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String city;
-
-    @OneToMany(mappedBy = "company")
-    @JsonManagedReference
-    private Set<Employee> employees;
-
     @OneToMany(mappedBy = "company")
     @JsonManagedReference
     private Set<Admin> admins;

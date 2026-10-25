@@ -2,6 +2,8 @@ package emino.backend.models;
 
 import java.time.LocalDate;
 
+import org.hibernate.annotations.Check;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +23,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Builder
+@Check(constraints = "rating BETWEEN 1 AND 5")
 public class Review {
 
     @Id

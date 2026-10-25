@@ -3,8 +3,11 @@ package emino.backend.models;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import org.hibernate.annotations.Check;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,6 +28,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Builder
+@Check(constraints = "start_time < end_time")
 public class Shift {
 
     @Id
@@ -42,14 +46,10 @@ public class Shift {
     private Room room;
 
     @ManyToOne()
-    @JoinColumn(name = "assigned_employee_id")
+    @JoinColumn(name = "assigned_employee_id", nullable = false)
     private Employee assignedEmployee;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "shift")
-    private Set<Reservation> reservation;
-
-    @ManyToOne
-    @JoinColumn(name = "branch_office_id", nullable = false)
-    private BranchOffice branchOffice;
+    @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TimeSlot> timeSlots;
 }

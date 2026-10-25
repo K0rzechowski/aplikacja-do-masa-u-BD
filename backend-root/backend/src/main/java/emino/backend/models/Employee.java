@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -28,11 +27,6 @@ import lombok.Setter;
 public class Employee extends User {
 
     @ManyToOne
-    @JoinColumn(name = "company_id", nullable = false)
-    @JsonBackReference
-    private Company company;
-
-    @ManyToOne
     @JoinColumn(name = "branch_office_id", nullable = false)
     private BranchOffice branchOffice;
 
@@ -50,10 +44,9 @@ public class Employee extends User {
 
     @Builder(builderMethodName = "emplBuilder")
     public Employee(Long id, String password, String email, String name, String surname, LocalDate dateOfBirth,
-            UserRole role, Company company, BranchOffice branchOffice, String phoneNumber) {
+            UserRole role, BranchOffice branchOffice, String phoneNumber) {
         super(id, password, email, name, surname, dateOfBirth, role, null);
         this.phoneNumber = phoneNumber;
-        this.company = company;
         this.branchOffice = branchOffice;
     }
 }

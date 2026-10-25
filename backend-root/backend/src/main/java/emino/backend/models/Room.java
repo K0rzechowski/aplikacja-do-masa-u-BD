@@ -1,5 +1,7 @@
 package emino.backend.models;
 
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -9,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,4 +37,8 @@ public class Room {
 
     @Column(nullable = false)
     private String roomNumber;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "room")
+    private Set<Shift> shifts;
 }

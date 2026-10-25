@@ -1,5 +1,7 @@
 package emino.backend.models;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -32,7 +34,7 @@ public class Reservation {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_id", referencedColumnName = "id")
+    @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
     private User customer;
 
     @Enumerated(EnumType.STRING)
@@ -47,10 +49,13 @@ public class Reservation {
     private Review review;
 
     @ManyToOne
-    @JoinColumn(name = "shift_id")
-    private Shift shift;
+    @JoinColumn(name = "time_slot_id", nullable = false)
+    private TimeSlot timeSlot;
 
     @ManyToOne()
-    @JoinColumn(name = "massage_id")
+    @JoinColumn(name = "massage_id", nullable = false)
     private MassageForCompany massage;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 }

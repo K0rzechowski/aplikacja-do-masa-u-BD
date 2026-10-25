@@ -14,7 +14,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,14 +51,10 @@ public class BranchOffice {
     private Set<Room> rooms;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "branchOffice", cascade = CascadeType.ALL, orphanRemoval = true)
-    private CompanyOpenTime openTime;
+    @OneToMany(mappedBy = "branchOffice", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OpeningHours> openingHours;
 
     @JsonIgnore
     @OneToMany(mappedBy = "branchOffice")
     private Set<Employee> employees;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "branchOffice")
-    private Set<Shift> shifts;
 }
