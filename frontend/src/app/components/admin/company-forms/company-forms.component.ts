@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, LOCALE_ID, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, LOCALE_ID } from '@angular/core';
 import { CompanyService } from '../../../services/company.service';
 import { Company, CompanyOpenTime } from '../../../models/company';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,7 +14,6 @@ import { DialogData } from '../../../models/dialog-data';
 import { Room } from '../../../models/room';
 import { RoomFormComponent } from "../room-form/room-form.component";
 import { MAT_DATE_LOCALE } from '@angular/material/core';
-import { MAT_NATIVE_DATE_FORMATS } from '@angular/material/core';
 import { registerLocaleData } from '@angular/common';
 import localePl from '@angular/common/locales/pl';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
@@ -22,6 +21,9 @@ import { AlertService } from '../../../services/alert.service';
 import { Moment } from 'moment';
 import moment from 'moment';
 import OpenTimeValidator from '../../../validators/open-time.validator';
+import { BranchOffice } from '../../../models/branch-office';
+import { BranchOfficeService } from '../../../services/branch-office.service';
+import { BranchFormComponent } from '../branch-form/branch-form.component';
 
 registerLocaleData(localePl, 'pl');
 
@@ -31,7 +33,7 @@ registerLocaleData(localePl, 'pl');
     { provide: LOCALE_ID, useValue: 'pl-PL'},
     { provide: MAT_DATE_LOCALE, useValue: 'pl-PL' }
   ],
-  imports: [ReactiveFormsModule, CommonModule, MatFormField, MatFormFieldModule, MatTimepickerModule, MatInputModule, RoomFormComponent],
+  imports: [ReactiveFormsModule, CommonModule, MatFormField, MatFormFieldModule, MatTimepickerModule, MatInputModule, RoomFormComponent, BranchFormComponent],
   templateUrl: './company-forms.component.html',
   styleUrl: './company-forms.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,48 +46,94 @@ export class CompanyFormsComponent {
   get currentCompany$(): Observable<Company | null> {
     return this.companyService.currentCompany;
   }
-  
-  @Output() emitter: EventEmitter<Room> = new EventEmitter();
-  
-  isAdmin$: Observable<boolean> | undefined;
+
   company: Company | undefined;
   openForm: FormGroup;
-  companyOpenTime: CompanyOpenTime | undefined;
+
+  branchOffices: BranchOffice[] = [];
+  selectedBranch: BranchOffice | undefined;
+  branchToEdit: BranchOffice | undefined;
+
+  branchOpenTime: CompanyOpenTime | undefined;
   openTime: string | undefined;
   closeTime: string | undefined;
-  roomsInMyCompany: Room[] = [];
+  showOpenTimeForm: boolean = false;
+
+  roomsInBranch: Room[] = [];
   showRoomDetails: boolean = false;
   roomToEdit: Room | undefined;
-  
+
   constructor (
     private companyService: CompanyService,
+    private branchOfficeService: BranchOfficeService,
     private alertService: AlertService,
     private formBuilder: FormBuilder,
   ) {
+    this.openForm = this.formBuilder.group({
+      startTime: [null, Validators.required],
+      closeTime: [null, [Validators.required, OpenTimeValidator.checkTime]]
+    });
+
     this.currentCompany$.subscribe(c => {
       if (c !== null) {
         this.company = c;
-
-        this.loadOpenTime();        
+        this.loadBranchOffices();
       }
     });
-
-    this.openForm = this.formBuilder.group({
-      startTime: [this.companyOpenTime?.openTime, Validators.required],
-      closeTime: [this.companyOpenTime?.closeTime, [Validators.required, OpenTimeValidator.checkTime]]
-    })
-
-    this.loadRoomsInMyCompany();
   }
 
+  loadBranchOffices() {
+    if (this.company?.id) {
+      this.branchOfficeService.getBranchOfficesByCompany(this.company.id).subscribe({
+        next: (data: BranchOffice[]) => {
+          this.branchOffices = data;
+
+          const stillExists = data.find(b => b.id === this.selectedBranch?.id);
+          if (stillExists) {
+            this.selectedBranch = stillExists;
+          } else if (data.length > 0) {
+            this.selectBranch(data[0]);
+          } else {
+            this.selectedBranch = undefined;
+          }
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          console.error('Error loading branch offices:', error);
+        }
+      });
+    }
+  }
+
+  selectBranch(branch: BranchOffice) {
+    this.selectedBranch = branch;
+    this.branchToEdit = undefined;
+    this.showRoomDetails = false;
+    this.roomToEdit = undefined;
+    this.showOpenTimeForm = false;
+    this.openForm.reset();
+    this.loadOpenTime();
+    this.loadRoomsInBranch();
+  }
 
   loadOpenTime() {
-    if (this.company?.id) {
-      this.companyService.getCompanyOpenTime(this.company?.id).subscribe(data => {
-        this.companyOpenTime = data;
-        this.openTime = this.formatTimeForView(data.openTime);
-        this.closeTime = this.formatTimeForView(data.closeTime);
-      })
+    this.branchOpenTime = undefined;
+    this.openTime = undefined;
+    this.closeTime = undefined;
+
+    if (this.selectedBranch?.id) {
+      this.branchOfficeService.getOpenTime(this.selectedBranch.id).subscribe({
+        next: (data) => {
+          this.branchOpenTime = data;
+          this.openTime = this.formatTimeForView(data.openTime);
+          this.closeTime = this.formatTimeForView(data.closeTime);
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          // brak ustalonych godzin otwarcia
+          this.cdr.markForCheck();
+        }
+      });
     }
   }
 
@@ -97,17 +145,19 @@ export class CompanyFormsComponent {
     return time.substring(0, 5);
   }
 
-  loadRoomsInMyCompany() {
-    if (this.company?.id) {
-      this.companyService.getCompanyRooms(this.company?.id).subscribe({
+  loadRoomsInBranch() {
+    if (this.selectedBranch?.id) {
+      this.branchOfficeService.getRooms(this.selectedBranch.id).subscribe({
         next: (data: Room[]) => {
-          this.roomsInMyCompany = [...data];
+          this.roomsInBranch = [...data];
           this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error loading rooms:', error);
         }
       });
+    } else {
+      this.roomsInBranch = [];
     }
   }
 
@@ -121,61 +171,99 @@ export class CompanyFormsComponent {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        if (result) { 
+        if (result) {
           setTimeout(() => {
-            this.loadRoomsInMyCompany();
+            if (toDelete.type === 'branch') {
+              this.loadBranchOffices();
+            } else {
+              this.loadRoomsInBranch();
+            }
           }, 300);
-          this.loadRoomsInMyCompany();
         }
       });
     }
   }
 
-  openCreateDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
-    if (this.dialog) {
+  openCreateRoomDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
+    if (this.dialog && this.selectedBranch?.id) {
       const dialogRef = this.dialog.open(RoomFormComponent, {
+        width: '500px',
+        enterAnimationDuration,
+        exitAnimationDuration,
+        data: { branchOfficeId: this.selectedBranch.id }
+      });
+
+      dialogRef.afterClosed().subscribe((created: boolean | undefined) => {
+        if (created) {
+          setTimeout(() => {
+            this.loadRoomsInBranch();
+          }, 300);
+        }
+      });
+    }
+  }
+
+  openCreateBranchDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
+    if (this.dialog) {
+      const dialogRef = this.dialog.open(BranchFormComponent, {
         width: '500px',
         enterAnimationDuration,
         exitAnimationDuration
       });
 
-      dialogRef.afterClosed().subscribe((newRoom: Room | undefined) => {
-        if (newRoom) { 
+      dialogRef.afterClosed().subscribe((created: boolean | undefined) => {
+        if (created) {
           setTimeout(() => {
-            this.loadRoomsInMyCompany();
+            this.loadBranchOffices();
           }, 300);
         }
       });
     }
   }
 
+  editBranch(branch: BranchOffice): void {
+    this.branchToEdit = { ...branch };
+  }
+
+  closeBranchEdit(): void {
+    this.branchToEdit = undefined;
+    this.loadBranchOffices();
+  }
+
   edit(room: Room): void {
     this.showRoomDetails = true;
-    this.roomToEdit = { ...room }; 
-    this.emitter.emit(this.roomToEdit);
+    this.roomToEdit = { ...room };
   }
 
   closeEdit(): void {
     this.showRoomDetails = false;
-    this.roomToEdit = undefined; 
-    this.loadRoomsInMyCompany();
+    this.roomToEdit = undefined;
+    this.loadRoomsInBranch();
   }
 
-  createOpenTime(openTime: string, closeTime: string) {
-    if (this.company?.id) {
+  saveOpenTime(openTime: string, closeTime: string) {
+    if (this.selectedBranch?.id) {
       const newTime: CompanyOpenTime = {
-        companyId: this.company.id,
+        id: this.branchOpenTime?.id,
+        branchOfficeId: this.selectedBranch.id,
         openTime,
         closeTime
       };
-      this.companyService.createCompanyOpenTime(newTime).subscribe({
-        next: (response) => {
-          this.alertService.success("Operacja dodania godzin otwarcia powiodła się");
+      const request = this.branchOpenTime
+        ? this.branchOfficeService.editOpenTime(newTime)
+        : this.branchOfficeService.setOpenTime(newTime);
+
+      request.subscribe({
+        next: () => {
+          this.alertService.success("Zapisano godziny otwarcia placówki");
+          this.showOpenTimeForm = false;
+          this.openForm.reset();
+          this.loadOpenTime();
         },
         error: (error: Error) => {
-          this.alertService.error("Błąd podczas dodawania godzin otwarcia: " + error.message);
-        } 
-      })
+          this.alertService.error("Błąd podczas zapisywania godzin otwarcia: " + error.message);
+        }
+      });
     }
   }
 
@@ -196,7 +284,7 @@ export class CompanyFormsComponent {
     if (this.openForm.valid) {
       const startTime = this.momentToTimeString(this.openForm.value.startTime);
       const closeTime = this.momentToTimeString(this.openForm.value.closeTime);
-      this.createOpenTime(startTime, closeTime);
+      this.saveOpenTime(startTime, closeTime);
     }
   }
 }

@@ -3,6 +3,5 @@ export interface OptimizedShift {
     startTime: string,
     endTime: string,
     location: string,
-    requiredSkill: string,
     employeeName: string | null
 }

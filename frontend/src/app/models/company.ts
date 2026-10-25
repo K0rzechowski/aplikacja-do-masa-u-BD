@@ -6,7 +6,7 @@ export interface Company {
 
 export interface CompanyOpenTime {
     id?: string,
-    companyId: string,
+    branchOfficeId: string,
     openTime: string,
     closeTime: string
 }

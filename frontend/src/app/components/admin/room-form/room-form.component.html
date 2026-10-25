@@ -24,9 +24,9 @@
                 
             <div class="grid-cols-2">
                 @if (room) {
-                    <button class="btn-long btn-sky cursor-pointer mb-4"> Zapisz</button>
+                    <button type="button" class="btn-long btn-sky cursor-pointer mb-4" (click)="submitForm(roomForm)"> Zapisz</button>
                 } @else {
-                    <button mat-button mat-dialog-close class="btn-long btn-sky mb-4 cursor-pointer" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="submitForm(roomForm)">Stwórz</button>
+                    <button type="button" mat-button class="btn-long btn-sky mb-4 cursor-pointer" style="color: black; border-radius: 5px; background-color: #73D4FF;" (click)="submitForm(roomForm)">Stwórz</button>
                 }
             </div>
         </form>

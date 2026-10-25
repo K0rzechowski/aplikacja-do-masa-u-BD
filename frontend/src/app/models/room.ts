@@ -1,5 +1,5 @@
 export interface Room{
     id?: string,
-    companyId: string,
+    branchOfficeId: string,
     roomNumber: string
 }

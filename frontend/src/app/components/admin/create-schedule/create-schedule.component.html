@@ -8,6 +8,24 @@
     </div>
     <mat-dialog-content>
         <form [formGroup]="formModel">
+            <label for="branchOfficeId" class="flex justify-center items-center">Wybierz placówkę</label>
+            <div class="flex justify-center items-center mb-4">
+                <mat-form-field>
+                    <mat-label>Placówka</mat-label>
+                    <mat-select id="branchOfficeId" formControlName="branchOfficeId">
+                        @for (branch of branchOffices; track branch.id) {
+                            <mat-option [value]="branch.id">{{ branch.name }} ({{ branch.city }})</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <p class="warning text-center mb-2">
+                @if (branchOffices.length === 0) {
+                    Najpierw dodaj placówkę w ustawieniach firmy
+                } @else if (formModel.controls['branchOfficeId'].touched && formModel.controls['branchOfficeId'].invalid) {
+                    Placówka jest wymagana
+                }
+            </p>
             <label for="startTime" class="flex justify-center items-center">Wybierz datę rozpoczęcia tygodnia</label>
             <div class="flex justify-center items-center mb-4">
                 <mat-form-field>

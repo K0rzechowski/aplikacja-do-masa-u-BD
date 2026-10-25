@@ -1,12 +1,76 @@
 <div>
     <h2 class="text-4xl mb-2">Zarządzaj firmą "{{ company?.name }}"</h2>
+    <p class="text-lg mb-2">Dodawaj placówki, ustalaj ich godziny otwarcia i sale</p>
+</div>
+
+<div class="my-5">
+    <div class="flex justify-between">
+        <h3 class="text-lg place-self-center">Placówki</h3>
+        <div class="md:col-span-1 flex justify-end items-start">
+            <button class="btn btn-sky" (click)="openCreateBranchDialog('0ms', '0ms')">+ Dodaj placówkę</button>
+        </div>
+    </div>
+    <div class="overflow-auto max-h-145 rounded-md border border-gray-300 shadow-sm mt-5">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="px-4 py-2">Nazwa</th>
+                    <th class="px-4 py-2">Miasto</th>
+                    <th class="px-4 py-2">Adres</th>
+                    <th class="px-4 py-2 text-right">Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (branch of branchOffices; track branch.id) {
+                    <tr class="cursor-pointer" [class.bg-sky-100]="selectedBranch?.id === branch.id" (click)="selectBranch(branch)">
+                        <td class="px-4 py-2 border-t border-gray-200">{{ branch.name }}</td>
+                        <td class="px-4 py-2 border-t border-gray-200">{{ branch.city }}</td>
+                        <td class="px-4 py-2 border-t border-gray-200">{{ branch.address }}</td>
+                        <td class="px-4 py-2 border-t border-gray-200 text-right">
+                            <div class="inline-flex justify-end gap-2">
+                                <img src="icons/edit.png" alt="Edytuj placówkę" title="Edytuj placówkę" class="cursor-pointer" (click)="$event.stopPropagation(); editBranch(branch)">
+                                <img src="icons/delete.png" alt="Usuń placówkę" title="Usuń placówkę" class="cursor-pointer" (click)="$event.stopPropagation(); openDeleteDialog('0ms', '0ms', { item: branch, type: 'branch' })" />
+                            </div>
+                        </td>
+                    </tr>
+                    @if (branchToEdit && branchToEdit.id === branch.id) {
+                        <tr>
+                            <td colspan="4" class="w-full bg-gray-50 border-t border-gray-200 px-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <p class="font-semibold">Edycja</p>
+                                    <button (click)="closeBranchEdit()" class="p-1 btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                                    </button>
+                                </div>
+                                <app-branch-form [branchOffice]="branchToEdit"></app-branch-form>
+                            </td>
+                        </tr>
+                    }
+                } @empty {
+                    <tr>
+                        <td colspan="4" class="px-4 py-4 text-center text-slate-600">Firma nie ma jeszcze żadnych placówek. Dodaj pierwszą placówkę.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (selectedBranch) {
+    <hr class="h-px my-6 bg-slate-300 border-0">
+    <h3 class="text-2xl mb-2">Placówka "{{ selectedBranch.name }}"</h3>
+    <p class="text-slate-600 mb-4">{{ selectedBranch.city }}, {{ selectedBranch.address }}</p>
+
     <div class="my-5">
-        <form [formGroup]="openForm" (ngSubmit)="submitOpenTime()">
-            <div class="lg:flex justify-evenly space-x-4">
-                @if (openTime && closeTime) {
-                    <p class="text-lg font-semibold mb-2">Godziny otwarcia: {{openTime}} - {{closeTime}}</p>
-                } @else {
-                    <h3 class="text-lg">Dodaj godziny otwarcia</h3>
+        @if (openTime && closeTime && !showOpenTimeForm) {
+            <div class="flex justify-between items-center">
+                <p class="text-lg font-semibold">Godziny otwarcia: {{openTime}} - {{closeTime}}</p>
+                <button class="btn btn-sky" (click)="showOpenTimeForm = true">Zmień godziny</button>
+            </div>
+        } @else {
+            <form [formGroup]="openForm" (ngSubmit)="submitOpenTime()">
+                <h3 class="text-lg mb-2">{{ openTime ? 'Zmień godziny otwarcia' : 'Dodaj godziny otwarcia' }}</h3>
+                <div class="lg:flex justify-evenly space-x-4">
                     <div>
                         <mat-form-field>
                             <mat-label for="startTime">Godzina otwarcia</mat-label>
@@ -32,57 +96,66 @@
                                 Godzina zamknięcia nie może być przed godziną otwarcia
                             } @else if (openForm.controls['closeTime'].invalid && openForm.controls['closeTime'].touched ) {
                                 Godzina zamknięcia jest wymagana
-                            } 
-
+                            }
                         </p>
                     </div>
-                    <input type="submit" class="btn btn-sky place-self-center" value="Zapisz godziny"/>
-                }
+                    <div class="flex gap-2 place-self-center">
+                        <input type="submit" class="btn btn-sky" value="Zapisz godziny"/>
+                        @if (openTime) {
+                            <button type="button" class="btn btn-long-gray bg-[#D0D2DC]" (click)="showOpenTimeForm = false">Anuluj</button>
+                        }
+                    </div>
+                </div>
+            </form>
+        }
+    </div>
+
+    <div>
+        <div class="flex justify-between">
+            <h3 class="text-lg place-self-center">Dodaj lub edytuj sale</h3>
+            <div class="md:col-span-1 flex justify-end items-start">
+                <button class="btn btn-sky" (click)="openCreateRoomDialog('0ms', '0ms')">+ Dodaj salę</button>
             </div>
-        </form>
-    </div>
-</div>
-<div>
-    <div class="flex justify-between">
-        <h3 class="text-lg place-self-center">Dodaj lub edytuj sale</h3>
-        <div class="md:col-span-1 flex justify-end items-start">
-            <button class="btn btn-sky" (click)="openCreateDialog('0ms', '0ms')">+ Dodaj salę</button>
         </div>
-    </div>
-    <div class="overflow-auto max-h-145 rounded-md border border-gray-300 shadow-sm mt-5">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-gray-100">
-                <th class="px-4 py-2">Numer sali</th>
-                <th class="px-4 py-2 text-right">Akcje</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (room of roomsInMyCompany; track $index) {
-                    <tr>
-                        <td class="px-4 py-2 border-t border-gray-200">{{ room.roomNumber }} </td>
-                        <td class="px-4 py-2 border-t border-gray-200 text-right">
-                        <div class="inline-flex justify-end gap-2">
-                            <img src="icons/edit.png" alt="Edytuj pracownika" title="Edytuj pracownika" class="cursor-pointer" (click)="edit(room)">
-                            <img src="icons/delete.png" alt="Usuń pracownika" title="Usuń pracownika" class="cursor-pointer" (click)="openDeleteDialog('0ms', '0ms', { item: room, type: 'room' })" />
-                        </div>
-                        </td>
-                    </tr>     
-                    @if (showRoomDetails && roomToEdit && roomToEdit.id === room.id) {
+        <div class="overflow-auto max-h-145 rounded-md border border-gray-300 shadow-sm mt-5">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-100">
+                    <th class="px-4 py-2">Numer sali</th>
+                    <th class="px-4 py-2 text-right">Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (room of roomsInBranch; track room.id) {
                         <tr>
-                        <td colspan="4" class="w-full bg-gray-50 border-t border-gray-200 px-4">
-                            <div class="flex justify-between items-center mb-2">
-                            <p class="font-semibold">Edycja</p>
-                            <button (click)="closeEdit()" class="p-1 btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
-                            </button>
+                            <td class="px-4 py-2 border-t border-gray-200">{{ room.roomNumber }} </td>
+                            <td class="px-4 py-2 border-t border-gray-200 text-right">
+                            <div class="inline-flex justify-end gap-2">
+                                <img src="icons/edit.png" alt="Edytuj salę" title="Edytuj salę" class="cursor-pointer" (click)="edit(room)">
+                                <img src="icons/delete.png" alt="Usuń salę" title="Usuń salę" class="cursor-pointer" (click)="openDeleteDialog('0ms', '0ms', { item: room, type: 'room' })" />
                             </div>
-                            <app-room-form [room]="roomToEdit"></app-room-form>
-                        </td>
+                            </td>
+                        </tr>
+                        @if (showRoomDetails && roomToEdit && roomToEdit.id === room.id) {
+                            <tr>
+                            <td colspan="4" class="w-full bg-gray-50 border-t border-gray-200 px-4">
+                                <div class="flex justify-between items-center mb-2">
+                                <p class="font-semibold">Edycja</p>
+                                <button (click)="closeEdit()" class="p-1 btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                                </button>
+                                </div>
+                                <app-room-form [room]="roomToEdit"></app-room-form>
+                            </td>
+                            </tr>
+                        }
+                    } @empty {
+                        <tr>
+                            <td colspan="2" class="px-4 py-4 text-center text-slate-600">Placówka nie ma jeszcze żadnych sal.</td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+}

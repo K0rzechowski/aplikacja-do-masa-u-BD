@@ -1,0 +1,48 @@
+<div>
+    <div class="d-flex justify-content-between p-5">
+        @if(!branchOffice) {
+            <div class="flex justify-between items-center mb-2">
+                <h2 mat-dialog-title>Dodaj placówkę</h2>
+                <button class="p-1 btn" type="button" (click)="dialogRef?.close()">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#008081"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                </button>
+            </div>
+        }
+        <form [formGroup]="formModel" (ngSubmit)="submitForm()">
+            <div class="mb-4">
+                <label for="name">Nazwa placówki</label>
+                <input type="text" id="name" placeholder="Nazwa placówki" formControlName="name" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                <p class="warning">
+                    @if(formModel.controls['name'].invalid && formModel.controls['name'].touched) {
+                        Nazwa placówki jest wymagana
+                    }
+                </p>
+            </div>
+            <div class="md:flex md:justify-between md:space-x-2">
+                <div class="mb-4 md:flex-1">
+                    <label for="city">Miasto</label>
+                    <input type="text" id="city" placeholder="Miasto" formControlName="city" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                    <p class="warning">
+                        @if(formModel.controls['city'].invalid && formModel.controls['city'].touched) {
+                            Miasto jest wymagane
+                        }
+                    </p>
+                </div>
+                <div class="mb-4 md:flex-1">
+                    <label for="address">Adres</label>
+                    <input type="text" id="address" placeholder="Ulica i numer" formControlName="address" class="w-full p-2 border border-gray-300 rounded bg-slate-300 text-slate-700"/>
+                    <p class="warning">
+                        @if(formModel.controls['address'].invalid && formModel.controls['address'].touched) {
+                            Adres jest wymagany
+                        }
+                    </p>
+                </div>
+            </div>
+            <div class="grid-cols-2">
+                <button type="submit" class="btn-long btn-sky cursor-pointer mb-4" style="color: black; border-radius: 5px; background-color: #73D4FF;">
+                    {{ branchOffice ? 'Zapisz' : 'Stwórz' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

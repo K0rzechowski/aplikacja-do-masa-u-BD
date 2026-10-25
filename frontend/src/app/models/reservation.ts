@@ -1,12 +1,23 @@
 import { User } from "./auth/user";
+import { BranchOffice } from "./branch-office";
+import { Employee } from "./employee";
 import { Massage } from "./massage";
-import { OptimizedShift } from "./optaplanner/optimized-shifts";
+import { Room } from "./room";
+
+export interface ReservationShift {
+    id: string,
+    startTime: string,
+    endTime: string,
+    room?: Room,
+    branchOffice?: BranchOffice,
+    assignedEmployee?: Employee | null
+}
 
 export interface Reservation {
     id: string,
     customer: User,
     status: ReservationStatus,
-    shift: OptimizedShift,
+    shift: ReservationShift,
     massageForCompany: Massage
 }
 

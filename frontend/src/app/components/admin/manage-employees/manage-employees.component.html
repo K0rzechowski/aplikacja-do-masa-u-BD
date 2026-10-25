@@ -14,6 +14,7 @@
         <th class="px-4 py-2">Imię i nazwisko</th>
         <th class="px-4 py-2">Email</th>
         <th class="px-4 py-2">Numer telefonu</th>
+        <th class="px-4 py-2">Placówka</th>
         <th class="px-4 py-2 text-right">Akcje</th>
       </tr>
     </thead>
@@ -23,6 +24,7 @@
           <td class="px-4 py-2 border-t border-gray-200">{{ empl.name }} {{ empl.surname }}</td>
           <td class="px-4 py-2 border-t border-gray-200">{{ empl.email }}</td>
           <td class="px-4 py-2 border-t border-gray-200">+48{{ empl.phoneNumber }}</td>
+          <td class="px-4 py-2 border-t border-gray-200">{{ empl.branchOfficeName }}</td>
           <td class="px-4 py-2 border-t border-gray-200 text-right">
             <div class="inline-flex justify-end gap-2">
               <img src="icons/edit.png" alt="Edytuj pracownika" title="Edytuj pracownika" class="cursor-pointer" (click)="edit(empl)">
@@ -32,7 +34,7 @@
         </tr>     
         @if (showEmployeeDetails && emplToEdit && emplToEdit.id === empl.id) {
           <tr>
-            <td colspan="4" class="w-full bg-gray-50 border-t border-gray-200 px-4">
+            <td colspan="5" class="w-full bg-gray-50 border-t border-gray-200 px-4">
               <div class="flex justify-between items-center mb-2">
                 <p class="font-semibold">Edycja</p>
                 <button (click)="closeEdit()" class="p-1 btn">

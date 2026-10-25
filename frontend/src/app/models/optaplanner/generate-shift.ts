@@ -1,5 +1,5 @@
 export interface GenerateShiftRequest {
-    companyId: string,
+    branchOfficeId: string,
     startDate: string
 }
 

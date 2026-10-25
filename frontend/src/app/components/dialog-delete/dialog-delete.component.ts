@@ -18,9 +18,8 @@ import { MatSingleDateSelectionModel } from '@angular/material/datepicker';
 import { MassageService } from '../../services/massage.service';
 import { Massage } from '../../models/massage';
 import { Room } from '../../models/room';
-import { CompanyService } from '../../services/company.service';
-import { Company } from '../../models/company';
-import { Observable } from 'rxjs';
+import { BranchOffice } from '../../models/branch-office';
+import { BranchOfficeService } from '../../services/branch-office.service';
 import { User } from '../../models/auth/user';
 import { AuthenticationService } from '../../services/authentication.service';
 
@@ -42,26 +41,15 @@ export class DialogDeleteComponent {
 
   idToDelete: string | undefined = '';
   thingToDelete: String | undefined = '';
-  company: Company | undefined;
-
-  get currentCompany$(): Observable<Company | null> {
-    return this.companyService.currentCompany;
-  }
 
   constructor (
     private emplService: EmployeeService,
     private msgService: MassageService,
     private alertService: AlertService,
-    private companyService: CompanyService,
+    private branchOfficeService: BranchOfficeService,
     private authService: AuthenticationService
   ) {
     this.checkType();
-
-    this.currentCompany$.subscribe(c => {
-      if (c !== null) {
-        this.company = c;
-      }
-    });
   }
 
   checkType(): String {
@@ -80,6 +68,11 @@ export class DialogDeleteComponent {
         const room = this.data.item as Room;
         this.idToDelete = room.id ?? '';
         this.thingToDelete = `${room.roomNumber}`;
+        return this.data.type;
+      case 'branch':
+        const branch = this.data.item as BranchOffice;
+        this.idToDelete = branch.id ?? '';
+        this.thingToDelete = `placówkę ${branch.name}`;
         return this.data.type;
       case 'user':
         const user = this.data.item as User;
@@ -112,16 +105,24 @@ export class DialogDeleteComponent {
           }
         });
       } else if(this.data.type === 'room') { 
-        if (this.company?.id) {
-          this.companyService.deleteRoom(this.company?.id, this.idToDelete).subscribe({
-            next: () => {
-              this.alertService.success(`Poprawnie usunięto salę o ID ${this.idToDelete}`);
-            },
-            error: (error) => {
-              this.alertService.error(`Nieudana operacja usunięcia sali o ID ${this.idToDelete}`);
-            }
-          });  
-        }
+        const room = this.data.item as Room;
+        this.branchOfficeService.deleteRoom(room.branchOfficeId, this.idToDelete).subscribe({
+          next: () => {
+            this.alertService.success(`Poprawnie usunięto salę o ID ${this.idToDelete}`);
+          },
+          error: (error: Error) => {
+            this.alertService.error(`Nieudana operacja usunięcia sali: ${error.message}`);
+          }
+        });
+      } else if(this.data.type === 'branch') { 
+        this.branchOfficeService.deleteBranchOffice(this.idToDelete).subscribe({
+          next: () => {
+            this.alertService.success(`Poprawnie usunięto placówkę o ID ${this.idToDelete}`);
+          },
+          error: (error: Error) => {
+            this.alertService.error(`Nieudana operacja usunięcia placówki: ${error.message}`);
+          }
+        });
       } else if(this.data.type === 'user') { 
         this.authService.deleteUser(this.idToDelete).subscribe({
           next: () => {

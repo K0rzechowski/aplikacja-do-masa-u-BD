@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ScheduleService } from '../../../services/schedule.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { DialogData } from '../../../models/dialog-data';
@@ -14,10 +14,13 @@ import { Company } from '../../../models/company';
 import { CompanyService } from '../../../services/company.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { checkIfMonday } from '../../../validators/date.validator';
+import { MatSelectModule } from '@angular/material/select';
+import { BranchOffice } from '../../../models/branch-office';
+import { BranchOfficeService } from '../../../services/branch-office.service';
 
 @Component({
   selector: 'app-create-schedule',
-  imports: [MatDialogModule, MatFormField, ReactiveFormsModule, MatLabel, MatInputModule, MatHint, MatDatepickerModule, MatProgressSpinnerModule],
+  imports: [MatDialogModule, MatFormField, ReactiveFormsModule, MatLabel, MatInputModule, MatHint, MatDatepickerModule, MatProgressSpinnerModule, MatSelectModule],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'pl' },
     provideMomentDateAdapter({
@@ -39,9 +42,11 @@ import { checkIfMonday } from '../../../validators/date.validator';
 export class CreateScheduleComponent {
 
   readonly dialogRef = inject(MatDialogRef<CreateScheduleComponent>);
+  private cdr = inject(ChangeDetectorRef);
 
   formModel: FormGroup;
   currentCompany: Company | undefined;
+  branchOffices: BranchOffice[] = [];
   isGenerating = false;
 
   get currentCompany$(): Observable<Company | null> {
@@ -52,15 +57,26 @@ export class CreateScheduleComponent {
     private scheduleService: ScheduleService,
     private alertService: AlertService,
     private companyService: CompanyService,
+    private branchOfficeService: BranchOfficeService,
     private formBuilder: FormBuilder
   ) {
     this.formModel = this.formBuilder.group({
+      branchOfficeId: [null, Validators.required],
       startTime: [null, [Validators.required, checkIfMonday]]
     })
 
     this.currentCompany$.subscribe(c => {
       if (c !== null) {
         this.currentCompany = c;
+        if (c.id) {
+          this.branchOfficeService.getBranchOfficesByCompany(c.id).subscribe(data => {
+            this.branchOffices = data;
+            if (data.length === 1) {
+              this.formModel.patchValue({ branchOfficeId: data[0].id });
+            }
+            this.cdr.markForCheck();
+          });
+        }
       }
     });
   }
@@ -77,23 +93,29 @@ export class CreateScheduleComponent {
   }
 
   createSchedule() {
-    if (this.currentCompany != null && this.currentCompany?.id && this.formModel.valid) {
+    if (this.formModel.invalid) {
+      this.formModel.markAllAsTouched();
+      return;
+    }
+    if (!this.isGenerating) {
       this.isGenerating = true;
       const startDateStr = this.formatDate(this.formModel.value.startTime);
 
-      this.scheduleService.generateShifts(this.currentCompany.id, startDateStr).subscribe({
+      this.scheduleService.generateShifts(this.formModel.value.branchOfficeId, startDateStr).subscribe({
         next: (response) => {
           this.isGenerating = false;
+          this.cdr.markForCheck();
 
           this.alertService.success(response.message);
           this.dialogRef.close();
         },
         error: (error) => {
           this.isGenerating = false;
+          this.cdr.markForCheck();
 
           console.error("Error", error);
 
-          const errorMessage = error.error?.message || error.message || "Wystąpił błąd";
+          const errorMessage = error.error?.message || error.error?.detail || error.message || "Wystąpił błąd";
           this.alertService.error(errorMessage);
         }
       })

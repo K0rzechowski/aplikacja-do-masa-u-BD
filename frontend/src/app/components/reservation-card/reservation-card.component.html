@@ -18,12 +18,24 @@
                         @if(isEmployee) {
                             {{ reservation.customer.name }} {{ reservation.customer.surname }}
                         } @else {
-                            {{ reservationData.shift.assignedEmployee.name }} {{ reservationData.shift.assignedEmployee.surname }}
+                            {{ reservationData.shift.assignedEmployee?.name }} {{ reservationData.shift.assignedEmployee?.surname }}
                         }
                     </p>
-                    <p class="mt-2 font-light">{{ reservationData.shift.company.city }}, "{{
-                        reservationData.shift.company.name }}"</p>
-                    <p class="mt-2 font-light">{{ reservationData.shift.room.roomNumber }}</p>
+                    @if (reservationData.shift.branchOffice) {
+                        <p class="mt-2 font-light">{{ reservationData.shift.branchOffice.name }}, {{
+                            reservationData.shift.branchOffice.city }}, {{ reservationData.shift.branchOffice.address }}</p>
+                    }
+                    <p class="mt-2 font-light">{{ reservationData.shift.room?.roomNumber }}</p>
+                    @if (review) {
+                        <div class="mt-2 flex items-center text-amber-500" [attr.aria-label]="'Twoja ocena ' + review.rating + ' na 5'">
+                            @for (star of stars; track star) {
+                                <mat-icon>{{ star <= review.rating ? 'star' : 'star_border' }}</mat-icon>
+                            }
+                        </div>
+                        @if (review.comment) {
+                            <p class="mt-1 font-light italic">"{{ review.comment }}"</p>
+                        }
+                    }
                 </div>
             </div>
             <div class="lg:absolute lg:bottom-5 lg:right-5">
@@ -34,8 +46,11 @@
                         }
                         <button class="btn btn-long-gray bg-[#D0D2DC]" (click)="showNote()">Notatka</button>
                     } @else {
-                        @if (reservation.status !== "CANCELLED") {
+                        @if (reservation.status === "RESERVED") {
                             <button class="btn btn-long-gray bg-[#D0D2DC]" (click)="cancelReservation()">Anuluj rezerwację</button>
+                        }
+                        @if (reservation.status === "COMPLETED" && !review) {
+                            <button class="btn btn-sky" (click)="openReviewDialog()">Oceń wizytę</button>
                         }
                     }
                 </div>

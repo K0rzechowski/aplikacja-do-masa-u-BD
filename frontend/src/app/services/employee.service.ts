@@ -44,6 +44,7 @@ export class EmployeeService {
       dateOfBirth: employee.dateOfBirth,
       email: employee.email,
       password: employee.password,
+      branchOfficeId: employee.branchOfficeId,
       massageIds: employee.massageIds || []
     };
         

@@ -84,6 +84,25 @@
                 </p>
             </div>
 
+            <div class="mb-4">
+                <label for="branchOfficeId">Placówka</label>
+                <div>
+                    <mat-form-field class="w-full">
+                        <mat-select id="branchOfficeId" formControlName="branchOfficeId" placeholder="Wybierz placówkę">
+                            @for (branch of branchOffices; track branch.id) {
+                                <mat-option [value]="branch.id">{{ branch.name }} ({{ branch.city }}, {{ branch.address }})</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <p class="warning">
+                    @if (branchOffices.length === 0) {
+                        Najpierw dodaj placówkę w ustawieniach firmy
+                    } @else if (formModel.controls['branchOfficeId'].invalid && formModel.controls['branchOfficeId'].touched) {
+                        Placówka jest wymagana
+                    }
+                </p>
+            </div>
             @if (employee) {
                 <div class="mb-2">
                     <label for="role">Rola</label>

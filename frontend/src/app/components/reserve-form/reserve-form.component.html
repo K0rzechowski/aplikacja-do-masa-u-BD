@@ -8,12 +8,13 @@
                         <mat-expansion-panel-header>
                             <mat-panel-title> Placówka </mat-panel-title>
                             <mat-panel-description>
-                                Wybierz placówkę
+                                Wybierz firmę i placówkę
                                 <mat-icon [ngStyle]="{'color':'#008081'}">location_city</mat-icon>
                             </mat-panel-description>
                         </mat-expansion-panel-header>
 
                         <mat-form-field class="w-full">
+                            <mat-label>Firma</mat-label>
                             <mat-select formControlName="company">
                                 @for (company of allCompanies; track company ) {
                                 <mat-option [value]="company"><span class="font-medium">{{ company.city }}</span> "{{
@@ -21,6 +22,20 @@
                                 }
                             </mat-select>
                         </mat-form-field>
+
+                        @if (formModel.get('company')?.value) {
+                            <mat-form-field class="w-full">
+                                <mat-label>Placówka</mat-label>
+                                <mat-select formControlName="branchOffice">
+                                    @for (branch of allBranchOffices; track branch.id) {
+                                    <mat-option [value]="branch"><span class="font-medium">{{ branch.name }}</span> – {{ branch.city }}, {{ branch.address }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                            @if (allBranchOffices.length === 0) {
+                                <p class="text-sm text-slate-600">Ta firma nie ma jeszcze żadnych placówek</p>
+                            }
+                        }
 
                         <mat-action-row>
                             <button mat-button (click)="nextStep()">Przejdź dalej</button>
@@ -66,6 +81,9 @@
                                 }
                             </mat-select>
                         </mat-form-field>
+                        @if (formModel.get('branchOffice')?.value && formModel.get('massage')?.value && allEmployees.length === 0) {
+                            <p class="text-sm text-slate-600">Brak masażystów wykonujących ten masaż w wybranej placówce</p>
+                        }
                         <mat-action-row>
                             <button mat-button (click)="prevStep()">Cofnij</button>
                             <button mat-button (click)="nextStep()">Przejdź dalej</button>
@@ -123,6 +141,9 @@
                             <p class="text-lg font-medium">Placówka:</p>
                             @if (formModel.get('company')?.value) {
                                 <p class="text-base ml-2">{{ formModel.get('company')?.value?.city }} "{{ formModel.get('company')?.value?.name }}"</p>
+                                @if (formModel.get('branchOffice')?.value; as branch) {
+                                    <p class="text-base ml-2">{{ branch.name }}, {{ branch.city }}, {{ branch.address }}</p>
+                                }
                             } @else {
                                 <p class="text-base text-slate-600 ml-2">Nie wybrano</p>
                             }

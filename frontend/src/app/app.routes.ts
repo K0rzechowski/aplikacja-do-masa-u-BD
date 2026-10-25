@@ -15,7 +15,8 @@ import { employeeGuard } from './guards/employee.guard';
 import { employeeOrAdminGuard } from './guards/employee-or-admin.guard';
 import { PriceListComponent } from './components/price-list/price-list.component';
 import { CompanyFormsComponent } from './components/admin/company-forms/company-forms.component';
-import { AvailabilityCalendarComponent } from './components/employee/availability-calendar/availability-calendar.component';
+import { ShiftSignupComponent } from './components/employee/shift-signup/shift-signup.component';
+import { ReviewsComponent } from './components/reviews/reviews.component';
 import { ScheduleOptimizerComponent } from './components/schedule-optimizer/schedule-optimizer.component';
 import { EmployeesComponent } from './components/employees/employees.component';
 import { ReserveFormComponent } from './components/reserve-form/reserve-form.component';
@@ -37,7 +38,7 @@ export const routes: Routes = [
       { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
       { path: 'reservations', component: ReservationHistoryComponent, canActivate: [authGuard] },
       { path: 'manageReservations', component: ManageReservationsComponent, canActivate: [employeeGuard] },
-      { path: 'availabilities', component: AvailabilityCalendarComponent, canActivate: [employeeGuard] },
+      { path: 'shifts', component: ShiftSignupComponent, canActivate: [employeeGuard] },
       { path: 'employees', component: ManageEmployeesComponent, canActivate: [adminGuard] },
       { path: 'massages', component: ManageMassagesComponent, canActivate: [adminGuard] },
       { path: 'companySettings', component: CompanyFormsComponent, canActivate: [adminGuard] },
@@ -50,6 +51,7 @@ export const routes: Routes = [
   { path: ':city/:name/massages', component: MassagesComponent },
   { path: ':city/:name/employees', component: EmployeesComponent },
   { path: ':city/:name/price', component: PriceListComponent },
+  { path: ':city/:name/reviews', component: ReviewsComponent },
   { path: 'reservation', component: ReserveFormComponent, canActivate: [authGuard] },
   { path: 'regulamin', component: RegulaminComponent },
   { path: 'politykaPrywatnosci', component: PolitykaPrywatnosciComponent },

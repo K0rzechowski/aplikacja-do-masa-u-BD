@@ -1,0 +1,68 @@
+<div class="md:grid grid-cols-4 mb-6">
+    <div class="md:col-span-3">
+        <p class="text-4xl mb-2">Zapisy na zmiany</p>
+        <p class="text-lg mb-2">
+            Zapisz się na wolne zmiany w placówce
+            @if (branchOfficeName) {
+                <span class="font-medium">"{{ branchOfficeName }}"</span>
+            }
+        </p>
+    </div>
+</div>
+
+<div class="flex items-center justify-between mb-4">
+    <button class="btn btn-long-gray bg-[#D0D2DC] flex items-center" (click)="previousWeek()">
+        <mat-icon>chevron_left</mat-icon> Poprzedni
+    </button>
+    <div class="text-center">
+        <p class="font-semibold">{{ weekStart | date:'dd.MM.yyyy' }} – {{ weekEnd | date:'dd.MM.yyyy' }}</p>
+        <p class="text-sm text-slate-600">Twoje zmiany w tym tygodniu: {{ myShiftsCount() }}</p>
+    </div>
+    <button class="btn btn-long-gray bg-[#D0D2DC] flex items-center" (click)="nextWeek()">
+        Następny <mat-icon>chevron_right</mat-icon>
+    </button>
+</div>
+
+<div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+    @if (isLoading) {
+        <p class="text-center p-8 text-slate-600">Ładowanie zmian...</p>
+    } @else {
+        @for (group of shiftsByDay; track group.day.getTime()) {
+            <div class="p-2 mb-2">
+                <p class="font-semibold mb-2 capitalize">{{ group.day | date:'EEEE, dd.MM.yyyy':'':'pl-PL' }}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                    @for (shift of group.shifts; track shift.id) {
+                        <div class="p-3 rounded-lg border text-sm"
+                            [class.bg-sky-100]="isMine(shift)"
+                            [class.border-sky-300]="isMine(shift)"
+                            [class.bg-white]="!isMine(shift)"
+                            [class.opacity-60]="isPast(shift)">
+                            <p class="flex items-center font-medium">
+                                {{ shift.startTime | date:'HH:mm' }} - {{ shift.endTime | date:'HH:mm' }}
+                                <mat-icon class="mx-1">meeting_room</mat-icon> {{ shift.roomNumber }}
+                            </p>
+                            <p class="text-slate-600 mb-2">
+                                @if (isMine(shift)) {
+                                    Twoja zmiana
+                                } @else if (shift.assignedEmployeeName) {
+                                    {{ shift.assignedEmployeeName }}
+                                } @else {
+                                    Wolna
+                                }
+                            </p>
+                            @if (!isPast(shift)) {
+                                @if (isMine(shift)) {
+                                    <button class="btn btn-long-gray bg-[#D0D2DC] w-full" [disabled]="pendingShiftId === shift.id" (click)="signOff(shift)">Wypisz się</button>
+                                } @else if (!shift.assignedEmployeeId) {
+                                    <button class="btn btn-sky w-full" [disabled]="pendingShiftId === shift.id" (click)="signUp(shift)">Zapisz się</button>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        } @empty {
+            <p class="text-center p-8 text-slate-600">Brak zmian w tym tygodniu. Poproś administratora o utworzenie grafiku.</p>
+        }
+    }
+</div>

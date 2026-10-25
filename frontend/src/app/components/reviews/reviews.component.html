@@ -1,0 +1,45 @@
+<div class="md:flex md:justify-between md:items-center mt-6">
+    <div>
+        <p class="text-4xl mb-2">Opinie klientów</p>
+        @if (reviews.length > 0) {
+            <p class="text-lg flex items-center">
+                Średnia ocena: <span class="font-semibold mx-1">{{ averageRating.toFixed(1) }}</span> / 5
+                <span class="text-slate-600 ml-2">({{ reviews.length }} {{ reviews.length === 1 ? 'opinia' : 'opinii' }})</span>
+            </p>
+        }
+    </div>
+    <mat-form-field class="mt-4 md:mt-0">
+        <mat-label>Wybierz placówkę</mat-label>
+        <mat-select [value]="selectedBranchId" (selectionChange)="onBranchChange($event.value)">
+            @for (branch of branchOffices; track branch.id) {
+                <mat-option [value]="branch.id">{{ branch.name }} ({{ branch.city }}, {{ branch.address }})</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+    @for (review of reviews; track review.id) {
+        <div class="bg-white shadow-sm border border-slate-200 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-2">
+                <div class="flex text-amber-500" [attr.aria-label]="'Ocena ' + review.rating + ' na 5'">
+                    @for (star of stars; track star) {
+                        <mat-icon>{{ star <= review.rating ? 'star' : 'star_border' }}</mat-icon>
+                    }
+                </div>
+                <p class="text-sm text-slate-600">{{ review.dateOfCreation | date:'dd.MM.yyyy' }}</p>
+            </div>
+            @if (review.comment) {
+                <p class="text-slate-700">{{ review.comment }}</p>
+            }
+        </div>
+    } @empty {
+        <p class="text-center text-slate-600 col-span-2 p-4">
+            @if (branchOffices.length === 0) {
+                Ta firma nie ma jeszcze placówek.
+            } @else {
+                Ta placówka nie ma jeszcze opinii.
+            }
+        </p>
+    }
+</div>

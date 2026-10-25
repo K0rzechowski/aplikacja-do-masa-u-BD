@@ -1,7 +1,7 @@
 import { ReservationService } from '../../services/reservation.service';
 import { AlertService } from '../../services/alert.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -23,8 +23,9 @@ import { EmployeeService } from '../../services/employee.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { Observable } from 'rxjs';
 import { User } from '../../models/auth/user';
-import { OptimizedScheduleResponse } from '../../models/optaplanner/optimized-schedule-response';
-import { OptimizedShift } from '../../models/optaplanner/optimized-shifts';
+import { Shift } from '../../models/shift';
+import { BranchOffice } from '../../models/branch-office';
+import { BranchOfficeService } from '../../services/branch-office.service';
 import { ScheduleService } from '../../services/schedule.service';
 import { Reservation, ReservationStatus } from '../../models/reservation';
 
@@ -38,9 +39,12 @@ import { Reservation, ReservationStatus } from '../../models/reservation';
 })
 export class ReserveFormComponent {
 
+  private cdr = inject(ChangeDetectorRef);
+
   formModel: FormGroup;
   step = signal(0);
   allCompanies: Company[] = [];
+  allBranchOffices: BranchOffice[] = [];
   allMassages: Massage[] = [];
   allEmployees: Employee[] = [];
   shiftTimes: string[] = [];
@@ -50,12 +54,12 @@ export class ReserveFormComponent {
   totalShifts: number = 0;
   paginatedShiftTimes: string[] = [];
 
-  currentWeekShifts: OptimizedShift[] = [];
-  nextWeekShifts: OptimizedShift[] = [];
+  currentWeekShifts: Shift[] = [];
+  nextWeekShifts: Shift[] = [];
   showNextWeek: boolean = false;
-  allShifts: OptimizedShift[] = [];
+  allShifts: Shift[] = [];
 
-  shiftMap: Map<string, OptimizedShift> = new Map();
+  shiftMap: Map<string, Shift> = new Map();
 
   get currentUser$(): Observable<User | null> {
     return this.authService.currentUser;
@@ -85,10 +89,12 @@ export class ReserveFormComponent {
     private massageService: MassageService,
     private employeeService: EmployeeService,
     private authService: AuthenticationService,
-    private scheduleService: ScheduleService
+    private scheduleService: ScheduleService,
+    private branchOfficeService: BranchOfficeService
   ) {
     this.formModel = this.formBuilder.group({
       company: [null, Validators.required],
+      branchOffice: [null, Validators.required],
       massage: [null, Validators.required],
       employee: [null, Validators.required],
       date: [null, Validators.required]
@@ -99,71 +105,97 @@ export class ReserveFormComponent {
     );
 
     this.getCompanyChange();
+    this.getBranchOfficeChange();
     this.getMassageChange();
     this.getEmployeeChange();
   }
 
   getCompanyChange() {
     this.formModel.get('company')?.valueChanges.subscribe(company => {
+      this.formModel.patchValue({
+        branchOffice: null,
+        massage: null,
+        employee: null
+      }, { emitEvent: false });
+      this.allBranchOffices = [];
+      this.allMassages = [];
+      this.allEmployees = [];
+      this.clearShifts();
+
       if (company && company.id) {
-        this.formModel.patchValue({
-          massage: null,
-          employee: null
+        this.branchOfficeService.getBranchOfficesByCompany(company.id).subscribe(data => {
+          this.allBranchOffices = data;
+          if (data.length === 1) {
+            this.formModel.patchValue({ branchOffice: data[0] });
+          }
+          this.cdr.markForCheck();
         });
-        this.allMassages = [];
-        this.allEmployees = [];
 
         this.massageService.getMassagesByCompany(company.id).subscribe(data => {
           this.allMassages = data;
+          this.cdr.markForCheck();
         });
-      } else {
-        this.allMassages = [];
-        this.allEmployees = [];
       }
     });
   }
 
+  getBranchOfficeChange() {
+    this.formModel.get('branchOffice')?.valueChanges.subscribe(() => {
+      this.formModel.patchValue({ employee: null }, { emitEvent: false });
+      this.clearShifts();
+      this.loadEmployees();
+    });
+  }
+
+  loadEmployees() {
+    const selectedCompany = this.formModel.get('company')?.value;
+    const selectedBranch = this.formModel.get('branchOffice')?.value;
+    const massage = this.formModel.get('massage')?.value;
+
+    if (massage?.id && selectedCompany?.id && selectedBranch?.id) {
+      this.employeeService.getEmployeesByCompany(selectedCompany.id).subscribe(employees => {
+        this.allEmployees = employees.filter(employee =>
+          String(employee.branchOfficeId) === String(selectedBranch.id) &&
+          employee.massages?.some(m => m.id === massage.id)
+        );
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.allEmployees = [];
+    }
+  }
+
   getMassageChange() {
-    this.formModel.get('massage')?.valueChanges.subscribe(massage => {
-      const selectedCompany = this.formModel.get('company')?.value;
-
-      if (massage && massage.id && selectedCompany && selectedCompany.id) {
-        this.formModel.patchValue({
-          employee: null
-        });
-
-        this.employeeService.getEmployeesByCompany(selectedCompany.id).subscribe(employees => {
-          this.allEmployees = employees.filter(employee =>
-            employee.massages?.some(m => m.id === massage.id)
-          );
-        });
-      } else {
-        this.allEmployees = [];
-      }
+    this.formModel.get('massage')?.valueChanges.subscribe(() => {
+      this.formModel.patchValue({ employee: null }, { emitEvent: false });
+      this.clearShifts();
+      this.loadEmployees();
     });
   }
 
   getEmployeeChange() {
     this.formModel.get('employee')?.valueChanges.subscribe(employee => {
       const selectedCompany = this.formModel.get('company')?.value;
+      const selectedBranch = this.formModel.get('branchOffice')?.value;
       const selectedMassage = this.formModel.get('massage')?.value;
 
-      if (employee && employee.id && selectedCompany && selectedCompany.id && selectedMassage && selectedMassage.id) {
-        this.scheduleService.getWeeklyShifts(selectedCompany.id).subscribe(result => {
-          const employeeName = `${employee.name} ${employee.surname}`;
+      this.clearShifts();
+
+      if (employee?.id && selectedCompany?.id && selectedBranch?.id && selectedMassage?.id) {
+        this.scheduleService.getWeeklyShifts(selectedBranch.id, selectedCompany.id).subscribe(result => {
+          const isEmployeeShift = (shift: Shift) => String(shift.assignedEmployeeId) === String(employee.id);
 
           this.currentWeekShifts = result.currentWeekShifts.filter(shift => {
             const currentTime = new Date(Date.now()).getTime();
-            return new Date(shift.startTime).getTime() > currentTime && shift.employeeName === employeeName;
+            return new Date(shift.startTime).getTime() > currentTime && isEmployeeShift(shift);
           });
 
-          this.nextWeekShifts = result.nextWeekShifts.filter(shift => {
-            return shift.employeeName === employeeName;
-          });
+          this.nextWeekShifts = result.nextWeekShifts.filter(isEmployeeShift);
 
           this.showNextWeek = this.nextWeekShifts.length > 0;
 
-          this.allShifts = [...this.currentWeekShifts, ...this.nextWeekShifts];
+          this.allShifts = [...this.currentWeekShifts, ...this.nextWeekShifts]
+            .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
           this.totalShifts = this.allShifts.length;
 
           this.shiftMap.clear();
@@ -174,19 +206,23 @@ export class ReserveFormComponent {
           });
 
           this.updatePaginatedShifts();
+          this.cdr.markForCheck();
         });
-      } else {
-        this.shiftTimes = [];
-        this.paginatedShiftTimes = [];
-        this.currentWeekShifts = [];
-        this.nextWeekShifts = [];
-        this.showNextWeek = false;
-        this.allShifts = [];
-        this.totalShifts = 0;
-        this.pageIndex = 0;
-        this.shiftMap.clear();
       }
     });
+  }
+
+  clearShifts() {
+    this.formModel.patchValue({ date: null }, { emitEvent: false });
+    this.shiftTimes = [];
+    this.paginatedShiftTimes = [];
+    this.currentWeekShifts = [];
+    this.nextWeekShifts = [];
+    this.showNextWeek = false;
+    this.allShifts = [];
+    this.totalShifts = 0;
+    this.pageIndex = 0;
+    this.shiftMap.clear();
   }
 
   setStep(index: number) {
@@ -213,7 +249,7 @@ export class ReserveFormComponent {
     this.paginatedShiftTimes = this.shiftTimes.slice(startIndex, endIndex);
   }
 
-  formatDateTime(shift: OptimizedShift): string {
+  formatDateTime(shift: Shift): string {
     const startTime = new Date(shift.startTime);
     const endTime = new Date(shift.endTime);
     
@@ -227,7 +263,7 @@ export class ReserveFormComponent {
     this.formModel.patchValue({ date: time });
   }
 
-  getSelectedShift(): OptimizedShift | undefined {
+  getSelectedShift(): Shift | undefined {
     const selectedTimeString = this.formModel.get('date')?.value;
     return selectedTimeString ? this.shiftMap.get(selectedTimeString) : undefined;
   }
@@ -240,7 +276,7 @@ export class ReserveFormComponent {
       const reservation: Partial<Reservation> = {
         customer: this.currentUserValue!,
         status: ReservationStatus.RESERVED,
-        shift: selectedShift,
+        shift: { id: selectedShift.id, startTime: selectedShift.startTime, endTime: selectedShift.endTime },
         massageForCompany: selectedMassage
       };
       
@@ -248,6 +284,8 @@ export class ReserveFormComponent {
         next: (response) => {
           this.alertService.success('Rezerwacja utworzona pomyślnie');
           this.formModel.reset();
+          this.setStep(0);
+          this.cdr.markForCheck();
         },
         error: (error: Error) => {
           this.alertService.error(error.message);

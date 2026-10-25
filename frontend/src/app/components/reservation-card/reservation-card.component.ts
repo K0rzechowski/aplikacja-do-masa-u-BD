@@ -8,12 +8,16 @@ import { AlertService } from '../../services/alert.service';
 import { ReservationService } from '../../services/reservation.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NoteFormDialogComponent } from '../note-form-dialog/note-form-dialog.component';
+import { MatIconModule } from '@angular/material/icon';
+import { Review } from '../../models/review';
+import { ReviewService } from '../../services/review.service';
+import { ReviewFormDialogComponent } from '../review-form-dialog/review-form-dialog.component';
 
 registerLocaleData(localePl, 'pl-PL');
 
 @Component({
   selector: 'app-reservation-card',
-  imports: [DatePipe, StatusColorDirective, MatDialogModule],
+  imports: [DatePipe, StatusColorDirective, MatDialogModule, MatIconModule],
   templateUrl: './reservation-card.component.html',
   styleUrl: './reservation-card.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,17 +32,52 @@ export class ReservationCardComponent {
   @Output() reservationCompleted = new EventEmitter<string>();
   @Input() isEmployee: boolean = false;
   reservationData: any;
+  review: Review | undefined;
+  stars = [1, 2, 3, 4, 5];
 
   status = Object.values(ReservationStatus);
   ReservationStatusLabels = ReservationStatusLabels;
 
   constructor(
     private alertService: AlertService,
-    private reservationService: ReservationService
+    private reservationService: ReservationService,
+    private reviewService: ReviewService
   ) { }
 
   ngOnInit() {
     this.reservationData = JSON.parse(JSON.stringify(this.reservation));
+    this.loadReview();
+  }
+
+  loadReview() {
+    if (this.reservation && this.reservation.status === ReservationStatus.COMPLETED) {
+      this.reviewService.getReviewByReservation(this.reservation.id).subscribe({
+        next: (review) => {
+          this.review = review;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          // wizyta nie została jeszcze oceniona
+          this.review = undefined;
+        }
+      });
+    }
+  }
+
+  openReviewDialog() {
+    if (this.dialog && this.reservation && !this.isEmployee) {
+      const dialogRef = this.dialog.open(ReviewFormDialogComponent, {
+        width: '400px',
+        data: { reservation: this.reservation }
+      });
+
+      dialogRef.afterClosed().subscribe((created: Review | undefined) => {
+        if (created) {
+          this.review = created;
+          this.cdr.markForCheck();
+        }
+      });
+    }
   }
 
   formatDate(dateString: string): string {

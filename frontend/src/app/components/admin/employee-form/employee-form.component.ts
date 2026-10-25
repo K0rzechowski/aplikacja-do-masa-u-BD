@@ -35,6 +35,8 @@ import { SearchComponent } from "../../search/search.component";
 import { Observable } from 'rxjs';
 import { User, UserRole } from '../../../models/auth/user';
 import { AuthenticationService } from '../../../services/authentication.service';
+import { BranchOffice } from '../../../models/branch-office';
+import { BranchOfficeService } from '../../../services/branch-office.service';
 
 @Component({
   selector: 'app-employee-form',
@@ -67,6 +69,7 @@ export class EmployeeFormComponent {
   selectedMassages: Massage[] = [];
   existingMassages: Massage[] = [];
   companyId: string = '';
+  branchOffices: BranchOffice[] = [];
   
   @Input() employee?: Employee;
 
@@ -77,6 +80,7 @@ export class EmployeeFormComponent {
     private massageService: MassageService,
     private cdr: ChangeDetectorRef,
     private authService: AuthenticationService,
+    private branchOfficeService: BranchOfficeService,
   ) {
     this.formModel = this.formBuilder.group({
       name:[this.employee?.name, Validators.required],
@@ -84,6 +88,7 @@ export class EmployeeFormComponent {
       dateOfBirth: [this.employee?.dateOfBirth, Validators.required],
       email: [this.employee?.email, [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       phoneNumber: [this.employee?.phoneNumber, [Validators.required, PhoneNumberValidator.checkPhoneNumberCharacters, PhoneNumberValidator.checkPhoneNumberLength]],
+      branchOfficeId: [this.employee?.branchOfficeId, Validators.required],
       role: [this.employee?.role]
     })
   }
@@ -95,6 +100,15 @@ export class EmployeeFormComponent {
   ngOnInit() {
     this.currentUser$.subscribe(user => {
       this.companyId = user?.companyId || '';
+      if (this.companyId) {
+        this.branchOfficeService.getBranchOfficesByCompany(this.companyId).subscribe(data => {
+          this.branchOffices = data;
+          if (!this.employee && data.length === 1) {
+            this.formModel.patchValue({ branchOfficeId: data[0].id });
+          }
+          this.cdr.markForCheck();
+        });
+      }
     });
     if (this.employee) {
       this.employeeBeforeUpdate = {...this.employee};
@@ -104,6 +118,7 @@ export class EmployeeFormComponent {
         email: this.employee.email,
         phoneNumber: this.employee.phoneNumber,
         dateOfBirth: this.employee.dateOfBirth,
+        branchOfficeId: this.employee.branchOfficeId,
         role: "EMPLOYEE"})
     }
     this.loadAlreadySelectedMassages();
@@ -122,7 +137,7 @@ export class EmployeeFormComponent {
     }
   }
 
-  edit(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate, role: UserRole) {
+  edit(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate, role: UserRole, branchOfficeId: string) {
     const updatedEmployee: Employee = {
       id: this.employee?.id,
       name,
@@ -132,6 +147,7 @@ export class EmployeeFormComponent {
       email,
       role: role,
       company: this.employee?.company!,
+      branchOfficeId,
       massageIds: this.selectedMassages.map(m => m.id!),  
     } as Employee;
     this.emplService.editEmployee(updatedEmployee).subscribe({
@@ -146,8 +162,9 @@ export class EmployeeFormComponent {
     });
   }
 
-  create(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate) {
+  create(name: string, surname:string, email:string, phoneNumber: string, dateOfBirth: LocalDate, branchOfficeId: string) {
     const newEmployee = {
+      branchOfficeId,
       name,
       surname,
       phoneNumber,
@@ -178,7 +195,8 @@ export class EmployeeFormComponent {
         this.formModel.value.email,
         this.formModel.value.phoneNumber,
         this.formModel.value.dateOfBirth,
-        this.formModel.value.role
+        this.formModel.value.role,
+        this.formModel.value.branchOfficeId
       );
     } else if (!this.employee && this.formModel.valid) {
       this.create(
@@ -187,6 +205,7 @@ export class EmployeeFormComponent {
         this.formModel.value.email,
         this.formModel.value.phoneNumber,
         this.formModel.value.dateOfBirth,
+        this.formModel.value.branchOfficeId
       );
     }
   }
